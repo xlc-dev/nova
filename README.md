@@ -34,8 +34,9 @@ go build # Or run `make` if you enabled the Makefile
 - 🔌 Easy-to-use CLI interface
 - 🛠️ Modern REST API development
 - 🗃 Database management
-- 💻 Modern CLI tooling included
+- 💻 CLI tooling included
 - 📝 Automatic data validation
+- 🚧 OpenAPI support
 
 ## Docs
 

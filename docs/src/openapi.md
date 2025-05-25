@@ -1,4 +1,4 @@
-# OpenAPI Spec
+# OpenAPI
 
 Nova's OpenAPI support automatically generates and serves an OpenAPI 3.0 specification for your routes, plus an embedded Swagger UI. It provides:
 

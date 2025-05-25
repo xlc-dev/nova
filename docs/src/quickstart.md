@@ -28,10 +28,9 @@ That's it! Now you got a Nova project up and running.
 
 Here are some links to help you get started with Nova:
 
-- 🏗️ [Scaffolding](./scaffolding.md) - Generate new projects fast from pre-built templates
 - 🛠️ [CLI](./cli.md) - Learn about Nova's powerful CLI tooling
+- 🏗️ [Scaffolding](./scaffolding.md) - Generate new projects fast from pre-built templates
 - 🔀 [Router](./router.md) - Use Nova's simple and powerful router to handle HTTP requests based on [net/http](https://pkg.go.dev/net/http)
 - 🗃️ [Database Migrations](./database_migrations.md) - Manage your database migrations
-- 🚧 [Validation](./validation.md) - Add validation to your Nova models
 - 🔐 [OpenAPI](./openapi.md) - Generate an OpenAPI specification for your API
 - 🗳️ [Middleware](./middleware.md) - Use middleware to add functionality to your Nova API
