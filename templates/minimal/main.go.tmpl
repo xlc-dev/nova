@@ -1,0 +1,110 @@
+package main
+
+import (
+    {{if .DBAdapter}}"database/sql"{{end}}
+    "fmt"
+    "log"
+    "net/http"
+    "os"
+
+    {{if .DBAdapter}}_ "{{.DBAdapter}}"{{end}}
+
+    "github.com/xlc-dev/nova/nova"
+)
+
+func main() {
+	{{if .DBAdapter}}// Load .env file
+	if err := nova.LoadDotenv(); err != nil {
+		log.Fatal(err)
+	}{{end}}
+
+	cli, err := nova.NewCLI(&nova.CLI{
+		Name: "Nova",
+		Version: "0.0.1",
+		Description: "{{.Name}} API",
+		GlobalFlags: []nova.Flag{
+			&nova.BoolFlag{
+				Name:        "verbose",
+				Aliases:     []string{"V"},
+				Usage:       "Enable verbose output",
+			},
+		},
+		Commands: []*nova.Command{
+			{
+				Name:  "api",
+				Usage: "Starts a Hello World API",
+				Flags: []nova.Flag{
+					&nova.IntFlag{
+						Name:        "port",
+						Aliases:     []string{"p"},
+						Usage:       "Port for the server to listen on",
+						Default:     8080,
+					},
+					&nova.StringFlag{
+						Name:        "host",
+						Aliases:     []string{"H"},
+						Usage:       "Hostname or IP address to bind the server",
+						Default:     "127.0.0.1",
+					},
+					&nova.BoolFlag{
+						Name:        "watch",
+						Aliases:     []string{"w"},
+						Usage:       "Enable recompiling on changes",
+					},
+					&nova.StringFlag{
+						Name:        "extensions",
+						Aliases:     []string{"e"},
+						Usage:       "Comma-separated list of file extensions to watch for changes",
+						Default: 	 ".go",
+					},
+					&nova.StringFlag{
+						Name:        "log_format",
+						Aliases:     []string{"lf"},
+						Usage:       "Log format: json or text",
+						Default:     "text",
+					},
+					&nova.StringFlag{
+						Name:        "log_level",
+						Aliases:     []string{"ll"},
+						Usage:       "Log level: debug, info, warn, error",
+						Default:     "info",
+					},
+				},
+				Action: func(ctx *nova.Context) error {
+					{{if .DBAdapter}}db, err := sql.Open("{{.DBImport}}", os.Getenv("DATABASE_URL"))
+					if err != nil {
+						log.Fatal(err)
+					}
+					defer db.Close()
+
+					if err := db.Ping(); err != nil {
+						log.Fatal(err)
+					}{{end}}
+
+					// Create a new router.
+					router := nova.NewRouter()
+
+					// Register Hello route.
+					router.Get("/hello/{name}", func(w http.ResponseWriter, r *http.Request) {
+						w.Write([]byte("Hello, {{.Name}}!"))
+					})
+
+					// Start the Nova server.
+					if err := nova.Serve(ctx, router); err != nil {
+						return fmt.Errorf("failed to start server: %s", err)
+					}
+
+					return nil
+				},
+			},
+		},
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := cli.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
