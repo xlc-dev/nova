@@ -1,0 +1,15 @@
+.DS_Store
+Thumbs.db
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+.idea/
+.vscode/
+*~
+*.swp
+*.venv
+*.db
+rnova
+mdbook-mermaid
