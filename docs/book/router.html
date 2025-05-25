@@ -1,0 +1,593 @@
+<!DOCTYPE HTML>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+
+<head>
+    <!-- Book generated using mdBook -->
+    <meta charset="UTF-8">
+    <title>Router - nova</title>
+
+
+    <!-- Custom HTML head -->
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/chrome.css">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+    <link rel="stylesheet" href="fonts/fonts.css">
+
+    <!-- Highlight.js Stylesheets -->
+    <link rel="stylesheet" href="highlight.css">
+    <link rel="stylesheet" href="tomorrow-night.css">
+    <link rel="stylesheet" href="ayu-highlight.css">
+
+    <!-- Custom theme stylesheets -->
+
+    <!-- MathJax -->
+    <script async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <!-- Provide site root to javascript -->
+    <script>
+        var path_to_root = "";
+        var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+    </script>
+    <!-- Start loading toc.js asap -->
+    <script src="toc.js"></script>
+</head>
+
+<body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch (e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch (e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor"
+                            title="Toggle Table of Contents" aria-label="Toggle Table of Contents"
+                            aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)"
+                            aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S"
+                            aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">nova</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..."
+                            aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function (link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="router"><a class="header" href="#router">Router</a></h1>
+<p>Nova includes a minimal, zero-dependency HTTP router built upon Go’s standard <code>net/http</code> package. It simplifies routing by providing:</p>
+<ul>
+<li><strong>Dynamic Route Parameters:</strong> Define routes with named parameters (e.g., <code>/users/{id}</code>).</li>
+<li><strong>Regex:</strong> Optionally constrain parameters using regular expressions (e.g., <code>/users/{id:[0-9]+}</code>).</li>
+<li><strong>Composable Middleware:</strong> Apply middleware globally, to groups of routes, or individually.</li>
+<li><strong>Route Grouping:</strong> Organize related routes under a common path prefix and shared middleware.</li>
+<li><strong>Subrouters:</strong> Mount independent router instances under specific path prefixes for modular applications.</li>
+<li><strong>Standard <code>http.Handler</code> Compatibility:</strong> Integrates seamlessly with standard Go HTTP handlers and middleware.</li>
+<li><strong>Customizable 404/405 Handlers:</strong> Provide your own handlers for “Not Found” and “Method Not Allowed” responses.</li>
+<li><strong>Context-Based Parameter Access:</strong> Retrieve URL parameters easily within your handlers via the request context.</li>
+<li><strong>Enhanced Handler Signature:</strong> Use <code>HandlerFunc</code> with a <code>ResponseContext</code> for cleaner error handling, response helpers, and automatic data binding/validation.</li>
+<li><strong>Validation &amp; Localization:</strong> Built-in struct validation with multi-language error messages for form and JSON input.</li>
+</ul>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#core-concepts">Core Concepts</a>
+<ul>
+<li><a href="#the-router-struct">The <code>Router</code> Struct</a></li>
+<li><a href="#the-group-struct">The <code>Group</code> Struct</a></li>
+<li><a href="#route-matching">Route Matching</a></li>
+</ul>
+</li>
+<li><a href="#defining-routes">Defining Routes</a>
+<ul>
+<li><a href="#standard-handlers">Standard Handlers</a></li>
+<li><a href="#enhanced-handlers-handlerfunc">Enhanced Handlers (<code>HandlerFunc</code>)</a></li>
+</ul>
+</li>
+<li><a href="#route-parameters">Route Parameters</a>
+<ul>
+<li><a href="#basic-parameters">Basic Parameters</a></li>
+<li><a href="#regex-constrained-parameters">Regex Constrained Parameters</a></li>
+<li><a href="#accessing-parameters-urlparam">Accessing Parameters (<code>URLParam</code>)</a></li>
+</ul>
+</li>
+<li><a href="#middleware">Middleware</a>
+<ul>
+<li><a href="#global-middleware-routeruse">Global Middleware (<code>router.Use</code>)</a></li>
+<li><a href="#group-middleware-groupuse">Group Middleware (<code>group.Use</code>)</a></li>
+<li><a href="#execution-order">Execution Order</a></li>
+</ul>
+</li>
+<li><a href="#route-groups">Route Groups</a></li>
+<li><a href="#subrouters">Subrouters</a></li>
+<li><a href="#custom-error-handlers">Custom Error Handlers</a>
+<ul>
+<li><a href="#not-found-404">Not Found (404)</a></li>
+<li><a href="#method-not-allowed-405">Method Not Allowed (405)</a></li>
+</ul>
+</li>
+<li><a href="#serving-static-files">Serving Static Files</a></li>
+<li><a href="#validation--localization">Validation &amp; Localization</a></li>
+<li><a href="#full-example">Full Example</a></li>
+</ol>
+<hr />
+<h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
+<p>Here’s a minimal example to create a router and start an HTTP server:</p>
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/xlc-dev/nova/nova"
+)
+
+func main() {
+	router := nova.NewRouter()
+
+	router.GetFunc("/", func(ctx *nova.ResponseContext) error {
+		return ctx.Text(http.StatusOK, "Hello, Nova router!")
+	})
+
+	cli, err := nova.NewCLI(&amp;nova.CLI{
+		Name:    "minimal",
+		Version: "0.0.1",
+		Action: func(ctx *nova.Context) error {
+			return nova.Serve(ctx, router)
+		},
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := cli.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre>
+<p>Build and run:</p>
+<pre><code class="language-bash">go build -o app # Or use make!
+./app
+</code></pre>
+<p>Test the routes:</p>
+<pre><code class="language-bash">curl http://localhost:8080/
+# Output: Hello, Nova router!
+</code></pre>
+<hr />
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<h3 id="the-router-struct"><a class="header" href="#the-router-struct">The <code>Router</code> Struct</a></h3>
+<p>The <code>nova.Router</code> is the main component. You create one using <code>nova.NewRouter()</code>. It implements the standard <code>http.Handler</code> interface, so it can be passed directly to <code>http.ListenAndServe</code>.</p>
+<p>Key responsibilities:</p>
+<ul>
+<li>Registering routes (<code>Get</code>, <code>Post</code>, <code>Handle</code>, etc.).</li>
+<li>Registering enhanced handler routes (<code>GetFunc</code>, <code>PostFunc</code>, etc.) with <code>ResponseContext</code>.</li>
+<li>Applying global middleware (<code>Use</code>).</li>
+<li>Managing route groups (<code>Group</code>) and subrouters (<code>Subrouter</code>).</li>
+<li>Matching incoming requests to registered routes.</li>
+<li>Extracting URL parameters.</li>
+<li>Dispatching requests to the appropriate handler, wrapped in middleware.</li>
+<li>Handling 404 (Not Found) and 405 (Method Not Allowed) errors.</li>
+</ul>
+<h3 id="the-group-struct"><a class="header" href="#the-group-struct">The <code>Group</code> Struct</a></h3>
+<p>A <code>nova.Group</code> allows you to define a set of routes that share a common URL prefix and/or middleware stack. It’s a lightweight helper created via <code>router.Group("/prefix", optionalMiddleware...)</code>. Routes added to the group (<code>group.Get</code>, <code>group.Post</code>, etc.) automatically inherit the prefix and middleware.</p>
+<h3 id="route-matching"><a class="header" href="#route-matching">Route Matching</a></h3>
+<p>Nova matches routes based on the request path segments:</p>
+<ol>
+<li>The incoming request path is split by <code>/</code>.</li>
+<li>The router iterates through its registered routes.</li>
+<li>For each route, it compares the request path segments with the route’s pre-compiled segments.</li>
+<li>Literal segments must match exactly.</li>
+<li>Parameter segments (<code>{name}</code>) match any value in that position and capture it.</li>
+<li>Regex-constrained parameter segments (<code>{name:regex}</code>) must match the provided regular expression.</li>
+<li>If a route pattern matches the path:
+<ul>
+<li>If the HTTP method also matches, the handler (with middleware) is executed. URL parameters are added to the request context.</li>
+<li>If the HTTP method <em>doesn’t</em> match, a 405 Method Not Allowed response is sent (using the custom handler if set).</li>
+</ul>
+</li>
+<li>If no route pattern matches the path, a 404 Not Found response is sent (using the custom handler if set).</li>
+<li>Subrouters are checked first based on their prefix before checking the parent router’s direct routes.</li>
+</ol>
+<hr />
+<h2 id="defining-routes"><a class="header" href="#defining-routes">Defining Routes</a></h2>
+<p>Nova supports two handler signatures:</p>
+<h3 id="standard-handlers"><a class="header" href="#standard-handlers">Standard Handlers</a></h3>
+<p>Use the HTTP method helper functions on a <code>Router</code> or <code>Group</code> instance.</p>
+<pre><code class="language-go">router.Get("/posts", listPostsHandler)
+router.Post("/posts", createPostHandler)
+router.Put("/posts/{id:[0-9]+}", updatePostHandler)
+router.Delete("/posts/{id:[0-9]+}", deletePostHandler)
+</code></pre>
+<h3 id="enhanced-handlers-handlerfunc"><a class="header" href="#enhanced-handlers-handlerfunc">Enhanced Handlers (<code>HandlerFunc</code>)</a></h3>
+<p>For cleaner error handling, response helpers, and automatic data binding/validation, use the enhanced handler signature:</p>
+<pre><code class="language-go">router.GetFunc("/hello/{name}", func(ctx *nova.ResponseContext) error {
+	name := ctx.URLParam("name")
+	return ctx.Text(http.StatusOK, "Hello, "+name+"!")
+})
+</code></pre>
+<p>You can use <code>.GetFunc</code>, <code>.PostFunc</code>, <code>.PutFunc</code>, <code>.PatchFunc</code>, <code>.DeleteFunc</code> on both <code>Router</code> and <code>Group</code>.</p>
+<hr />
+<h2 id="route-parameters"><a class="header" href="#route-parameters">Route Parameters</a></h2>
+<p>Parameters allow parts of the URL path to be dynamic and captured for use in your handlers.</p>
+<h3 id="basic-parameters"><a class="header" href="#basic-parameters">Basic Parameters</a></h3>
+<p>Define parameters using curly braces: <code>{name}</code>.</p>
+<pre><code class="language-go">router.GetFunc("/products/{category}", func(ctx *nova.ResponseContext) error {
+	category := ctx.URLParam("category")
+	return ctx.Text(http.StatusOK, "Fetching products in category: "+category)
+})
+</code></pre>
+<h3 id="regex-constrained-parameters"><a class="header" href="#regex-constrained-parameters">Regex Constrained Parameters</a></h3>
+<p>Add validation by appending a colon and a Go regular expression within the curly braces: <code>{name:regex}</code>.</p>
+<pre><code class="language-go">router.GetFunc("/articles/{id:[0-9]+}", func(ctx *nova.ResponseContext) error {
+	id := ctx.URLParam("id")
+	return ctx.Text(http.StatusOK, "Fetching article with ID: "+id)
+})
+</code></pre>
+<h3 id="accessing-parameters-urlparam"><a class="header" href="#accessing-parameters-urlparam">Accessing Parameters (<code>URLParam</code>)</a></h3>
+<p>Inside your handler, use <code>ctx.URLParam("key")</code> to retrieve the value of a captured parameter.</p>
+<hr />
+<h2 id="middleware"><a class="header" href="#middleware">Middleware</a></h2>
+<p>Middleware provides a way to add cross-cutting concerns (like logging, authentication, compression, CORS) to your request handling pipeline.</p>
+<ul>
+<li><strong>Type:</strong> <code>type Middleware func(http.Handler) http.Handler</code></li>
+<li><strong>Functionality:</strong> A middleware function takes an <code>http.Handler</code> (the “next” handler in the chain) and returns a new <code>http.Handler</code>.</li>
+</ul>
+<h3 id="global-middleware-routeruse"><a class="header" href="#global-middleware-routeruse">Global Middleware (<code>router.Use</code>)</a></h3>
+<p>Middleware added via <code>router.Use(mws...)</code> applies to <em>all</em> routes handled by that router instance <em>and</em> any subrouters or groups created from it <em>after</em> the <code>Use</code> call.</p>
+<h3 id="group-middleware-groupuse"><a class="header" href="#group-middleware-groupuse">Group Middleware (<code>group.Use</code>)</a></h3>
+<p>Middleware added via <code>group.Use(mws...)</code> applies only to routes registered <em>through that specific group instance</em>. It runs <em>after</em> any global middleware defined on the parent router.</p>
+<p>You can also pass middleware directly when creating the group:</p>
+<pre><code class="language-go">adminGroup := router.Group("/admin", requireAdminMiddleware)
+adminGroup.GetFunc("/", adminDashboardHandler)
+</code></pre>
+<h3 id="execution-order"><a class="header" href="#execution-order">Execution Order</a></h3>
+<p>Middleware execution follows a standard “onion” model:</p>
+<ol>
+<li>Request comes in.</li>
+<li>Global middleware (added via <code>router.Use</code>) executes in the reverse order they were added (last added runs first).</li>
+<li>Group middleware (added via <code>group.Use</code> or <code>router.Group</code>) executes in the reverse order they were added to the group.</li>
+<li>The route’s specific handler executes.</li>
+<li>Response travels back out through the middleware in the forward order they were added.</li>
+</ol>
+<hr />
+<h2 id="route-groups"><a class="header" href="#route-groups">Route Groups</a></h2>
+<p>Groups simplify managing routes with common prefixes and middleware. Create a group using <code>router.Group(prefix, optionalMiddleware...)</code>.</p>
+<pre><code class="language-go">v1 := router.Group("/api/v1")
+v1.GetFunc("/users", listV1Users)
+</code></pre>
+<hr />
+<h2 id="subrouters"><a class="header" href="#subrouters">Subrouters</a></h2>
+<p>Subrouters allow mounting a completely separate <code>nova.Router</code> instance at a specific prefix.</p>
+<pre><code class="language-go">mainRouter := nova.NewRouter()
+adminRouter := mainRouter.Subrouter("/admin")
+adminRouter.GetFunc("/", adminDashboardHandler)
+</code></pre>
+<hr />
+<h2 id="custom-error-handlers"><a class="header" href="#custom-error-handlers">Custom Error Handlers</a></h2>
+<p>You can customize the responses for 404 and 405 errors.</p>
+<h3 id="not-found-404"><a class="header" href="#not-found-404">Not Found (404)</a></h3>
+<pre><code class="language-go">func customNotFound(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprintln(w, `{"error": "Resource not found", "path": "`+r.URL.Path+`"}`)
+}
+
+router := nova.NewRouter()
+router.SetNotFoundHandler(http.HandlerFunc(customNotFound))
+</code></pre>
+<h3 id="method-not-allowed-405"><a class="header" href="#method-not-allowed-405">Method Not Allowed (405)</a></h3>
+<pre><code class="language-go">func customMethodNotAllowed(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Allow", "GET, POST")
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	fmt.Fprintf(w, "Method %s not allowed for %s\n", r.Method, r.URL.Path)
+}
+
+router := nova.NewRouter()
+router.SetMethodNotAllowedHandler(http.HandlerFunc(customMethodNotAllowed))
+</code></pre>
+<hr />
+<h2 id="serving-static-files"><a class="header" href="#serving-static-files">Serving Static Files</a></h2>
+<p>Serve static files from an <code>fs.FS</code> under a URL prefix:</p>
+<pre><code class="language-go">import "embed"
+
+//go:embed static/*
+var staticFS embed.FS
+
+router.Static("/static", staticFS)
+</code></pre>
+<p>This will serve files at <code>/static/*</code>.</p>
+<hr />
+<h2 id="validation--localization"><a class="header" href="#validation--localization">Validation &amp; Localization</a></h2>
+<p>Nova provides built-in struct validation for both JSON and form data, with multi-language error messages.</p>
+<h3 id="binding-and-validating-input"><a class="header" href="#binding-and-validating-input">Binding and Validating Input</a></h3>
+<p>Use the enhanced handler signature and <code>ResponseContext</code> helpers:</p>
+<pre><code class="language-go">type UserInput struct {
+	Email    string `json:"email" minlength:"5" format:"email"`
+	Password string `json:"password" format:"password"`
+}
+
+router.PostFunc("/signup", func(ctx *nova.ResponseContext) error {
+	var input UserInput
+	if err := ctx.BindValidated(&amp;input); err != nil {
+		return ctx.JSONError(http.StatusBadRequest, err.Error())
+	}
+	// Use input.Email and input.Password
+	return ctx.JSON(http.StatusOK, map[string]string{"status": "ok"})
+})
+</code></pre>
+<ul>
+<li><code>ctx.Bind(&amp;input)</code> binds JSON or form data (no validation).</li>
+<li><code>ctx.BindValidated(&amp;input)</code> binds and validates, returning localized error messages based on the <code>Accept-Language</code> header.</li>
+</ul>
+<p>Supported validation tags include: <code>required</code>, <code>minlength</code>, <code>maxlength</code>, <code>pattern</code>, <code>enum</code>, <code>format</code> (email, url, uuid, date, time, date-time, password, phone, alphanumeric, alpha, numeric), <code>min</code>, <code>max</code>, <code>multipleOf</code>, <code>minItems</code>, <code>maxItems</code>, <code>uniqueItems</code>.</p>
+<hr />
+<h2 id="full-example"><a class="header" href="#full-example">Full Example</a></h2>
+<pre><code class="language-go">package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/xlc-dev/nova/nova"
+)
+
+func requestIDMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reqID := fmt.Sprintf("%d", time.Now().UnixNano())
+		ctx := context.WithValue(r.Context(), "requestID", reqID)
+		log.Printf("[%s] Incoming request: %s %s", reqID, r.Method, r.URL.Path)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("Authorization")
+		if token != "Bearer valid-token" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func handleHome(ctx *nova.ResponseContext) error {
+	return ctx.Text(http.StatusOK, "Welcome Home!")
+}
+
+func handleGetUser(ctx *nova.ResponseContext) error {
+	userID := ctx.URLParam("id")
+	return ctx.Text(http.StatusOK, fmt.Sprintf(
+		"Profile for user ID: %s (Request ID: %v)\n",
+		userID, ctx.Request().Context().Value("requestID"),
+	))
+}
+
+func handleGetArticles(ctx *nova.ResponseContext) error {
+	return ctx.Text(http.StatusOK, "List of articles")
+}
+
+func handleCreateArticle(ctx *nova.ResponseContext) error {
+	ctx.Writer().WriteHeader(http.StatusCreated)
+	return ctx.Text(http.StatusCreated, "Article created successfully")
+}
+
+var router *nova.Router
+
+func main() {
+	router = nova.NewRouter()
+	router.Use(requestIDMiddleware)
+
+	router.GetFunc("/", handleHome)
+	router.GetFunc("/users/{id:[0-9]+}", handleGetUser)
+
+	api := router.Group("/api/v1")
+	api.Use(authMiddleware)
+
+	api.GetFunc("/articles", handleGetArticles)
+	api.PostFunc("/articles", handleCreateArticle)
+
+	router.SetNotFoundHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "Oops! Route '%s' not found.", r.URL.Path)
+	}))
+
+	cli, err := nova.NewCLI(&amp;nova.CLI{
+		Name:    "example",
+		Version: "0.0.1",
+		Action: func(ctx *nova.Context) error {
+			return nova.Serve(ctx, router)
+		},
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := cli.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <a rel="prev" href="scaffolding.html" class="mobile-nav-chapters previous"
+                            title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+
+                        <a rel="next prefetch" href="database_migrations.html" class="mobile-nav-chapters next"
+                            title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                <a rel="prev" href="scaffolding.html" class="nav-chapters previous" title="Previous chapter"
+                    aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+
+                <a rel="next prefetch" href="database_migrations.html" class="nav-chapters next" title="Next chapter"
+                    aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function () {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE HTML>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+
+<head>
+    <!-- Book generated using mdBook -->
+    <meta charset="UTF-8">
+    <title>Design - nova</title>
+
+
+    <!-- Custom HTML head -->
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/chrome.css">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+    <link rel="stylesheet" href="fonts/fonts.css">
+
+    <!-- Highlight.js Stylesheets -->
+    <link rel="stylesheet" href="highlight.css">
+    <link rel="stylesheet" href="tomorrow-night.css">
+    <link rel="stylesheet" href="ayu-highlight.css">
+
+    <!-- Custom theme stylesheets -->
+
+    <!-- MathJax -->
+    <script async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <!-- Provide site root to javascript -->
+    <script>
+        var path_to_root = "";
+        var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+    </script>
+    <!-- Start loading toc.js asap -->
+    <script src="toc.js"></script>
+</head>
+
+<body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch (e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch (e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor"
+                            title="Toggle Table of Contents" aria-label="Toggle Table of Contents"
+                            aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)"
+                            aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S"
+                            aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">nova</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..."
+                            aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function (link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="design"><a class="header" href="#design">Design</a></h1>
+<p>This document describes the design of the Nova framework and its architecture.</p>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="#design-philosophy">Design Philosophy</a>
+<ul>
+<li><a href="#design-principles">Design Principles</a></li>
+</ul>
+</li>
+<li><a href="#architecture--flow">Architecture &amp; Flow</a>
+<ul>
+<li><a href="#cli">CLI</a>
+<ul>
+<li><a href="#main-cli-execution-flow-initialization--global-flags">Main CLI Execution Flow: Initialization &amp; Global Flags</a></li>
+<li><a href="#helper-parseflagset">Helper: <code>parseFlagSet</code></a></li>
+<li><a href="#helper-validateflags">Helper: <code>validateFlags</code></a></li>
+<li><a href="#command-processing-flow">Command Processing Flow</a></li>
+<li><a href="#fallback-flow-global-action--unknown-command--main-help">Fallback Flow: Global Action / Unknown Command / Main Help</a></li>
+</ul>
+</li>
+<li><a href="#router">Router</a>
+<ul>
+<li><a href="#main-router-operations">Main Router Operations</a></li>
+<li><a href="#flow-router-initialization-newrouter">Flow: Router Initialization (<code>NewRouter</code>)</a></li>
+<li><a href="#flow-route-registration-routerhandle">Flow: Route Registration (<code>Router.Handle</code>)</a></li>
+<li><a href="#flow-group-creation--handling-routergroup--grouphandle">Flow: Group Creation &amp; Handling (<code>Router.Group</code> &amp; <code>Group.Handle</code>)</a></li>
+<li><a href="#flow-middleware-registration-routeruse">Flow: Middleware Registration (<code>Router.Use</code>)</a></li>
+<li><a href="#flow-subrouter-creation-routersubrouter">Flow: Subrouter Creation (<code>Router.Subrouter</code>)</a></li>
+<li><a href="#flow-request-dispatching-routerservehttp">Flow: Request Dispatching - (<code>Router.ServeHTTP</code>)</a></li>
+<li><a href="#flow-url-parameter-retrieval-routerurlparam">Flow: URL Parameter Retrieval (<code>Router.URLParam</code>)</a></li>
+</ul>
+</li>
+<li><a href="#scaffolding">Scaffolding</a></li>
+<li><a href="#migrations">Migrations</a>
+<ul>
+<li><a href="#migration-actions">Migration Actions</a></li>
+<li><a href="#flow-createnewmigration">Flow: CreateNewMigration</a></li>
+<li><a href="#flow-migrateup">Flow: MigrateUp</a></li>
+<li><a href="#flow-migratedown">Flow: MigrateDown</a></li>
+</ul>
+</li>
+<li><a href="#openapi">OpenAPI</a>
+<ul>
+<li><a href="#overall-openapi-process">Overall OpenAPI Process</a></li>
+<li><a href="#flow-generateopenapispec">Flow: Generate OpenAPI Spec</a></li>
+<li><a href="#flow-collectroutes-recursive">Flow: collect routes (recursive)</a></li>
+<li><a href="#flow-buildoperation">Flow: build operation</a></li>
+<li><a href="#flow-generateschema-recursive--type-handling">Flow: generate schema (recursive &amp; type handling)</a></li>
+<li><a href="#flow-serveswaggerui">Flow: serve swagger ui</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="design-philosophy"><a class="header" href="#design-philosophy">Design Philosophy</a></h2>
+<p>Nova is designed to be lightweight and flexible. It’s built on top of the standard library,
+without any external dependencies except <a href="https://github.com/fsnotify/fsnotify">fsnotify</a>
+for file watching and database drivers for migrations and <code>database/sql</code> support.</p>
+<p>The supported database drivers are:</p>
+<ul>
+<li><a href="https://github.com/mattn/go-sqlite3">SQLite</a></li>
+<li><a href="https://github.com/lib/pq">PostgreSQL</a></li>
+<li><a href="https://github.com/go-sql-driver/mysql">MySQL/MariaDB</a></li>
+</ul>
+<p>it is very easy to add a new databse driver
+to nova if requested, as long as it follows the design philosophy of the framework.</p>
+<p>The goal of the framework is to be modular and extensible, so it is designed to follow as many
+standards as possible wihtin the Go community, with the goal being able to plug and play different components within the framework.</p>
+<h3 id="design-principles"><a class="header" href="#design-principles">Design Principles</a></h3>
+<ul>
+<li><strong>Minimal Dependencies:</strong> Nova is designed to have as few dependencies as possible.</li>
+<li><strong>Simplicity:</strong> Nova is designed to be simple and easy to use. Follow pattenrs that Golang developers are already familiar with.</li>
+<li><strong>Stable:</strong> Nova is designed to be stable and reliable. That is another benifit of only using the standard library which is known to be stable.</li>
+<li><strong>Reduce Boilerplate:</strong> Nova is designed to reduce boilerplate code, so the developr can focus on what is the most important: the business logic.</li>
+<li><strong>Batteries Included:</strong> Nova comes with batteries included. It comes with many components like a CLI and router, removing decision fatique, needing to write boilerplate code or installing external dependencies.</li>
+<li><strong>Undocumented features are bugs:</strong> Undocmunted code or unwritten documentation is concidered a bug, allowing for <em>actual</em> up to date documentation.</li>
+</ul>
+<h2 id="architecture--flow"><a class="header" href="#architecture--flow">Architecture &amp; Flow</a></h2>
+<p>In this chapter you will find diagrams of the architecture of the Nova framework.</p>
+<h3 id="cli"><a class="header" href="#cli">CLI</a></h3>
+<p>One of the core components of the Nova framework is the CLI.
+The CLI is able to parse any command line arguments and flags, and execute actions based on the provided flags.</p>
+<p>The overall execution flow can be broken down into several key stages:</p>
+<h4 id="main-cli-execution-flow-initialization--global-flags"><a class="header" href="#main-cli-execution-flow-initialization--global-flags">Main CLI Execution Flow: Initialization &amp; Global Flags</a></h4>
+<p>This initial stage of <code>CLI.Run</code> handles the setup and processing of global aspects of the command.
+It verifies that the CLI has been properly initialized. Then, it separates the provided arguments into global flags and the remaining arguments (which might contain a command and its specific flags).
+Global flags are parsed and validated. A special check for a <code>--version</code> flag is performed to allow for quick version printing without further processing.
+If global flag parsing or validation fails, the process terminates with an error. Otherwise, it proceeds to find and execute a command.</p>
+<pre class="mermaid">flowchart TB
+    A[&quot;CLI.Run(args)&quot;] --&gt; B{&quot;CLI Initialized?&quot;}
+    B -- No --&gt; B_ERR[&quot;ERR: CLI not initialized&quot;]
+    B_ERR --&gt; Z_END_INIT_ERR[&quot;End (Error)&quot;]
+    B -- Yes --&gt; C[&quot;Split args: global flags &amp; rest&quot;]
+    C --&gt; D[&quot;Parse Global Flags (uses parseFlagSet helper)&quot;]
+    D --&gt; D_CTX[&quot;Create initial Context (w/ globalSet)&quot;]
+    D_CTX --&gt; E{&quot;Global Parse Err?&quot;}
+    E -- Yes --&gt; E_ERR[&quot;ERR: Global parse failed&quot;]
+    E_ERR --&gt; Z_END_GLOBAL_PARSE_ERR[&quot;End (Error)&quot;]
+    E -- No --&gt; F{&quot;--version flag?&quot;}
+    F -- Yes --&gt; G[&quot;Print Version&quot;]
+    G --&gt; Z_SUCCESS_VERSION[&quot;End (Success)&quot;]
+    F -- No --&gt; H[&quot;Validate Global Flags (uses validateFlags helper)&quot;]
+    H --&gt; I{&quot;Global Validate Err?&quot;}
+    I -- Yes --&gt; I_ERR[&quot;ERR: Global validate failed&quot;]
+    I_ERR --&gt; Z_END_GLOBAL_VALIDATE_ERR[&quot;End (Error)&quot;]
+    I -- No --&gt; J_LINK[&quot;Proceed to: Command Search &amp; Execution&quot;]
+
+    subgraph subGraph0_ref[&quot;Ref: parseFlagSet Helper&quot;]
+        direction TB
+        REF_PF[&quot;(See 'Helper: parseFlagSet' diagram)&quot;]
+    end
+
+    subgraph subGraph1_ref[&quot;Ref: validateFlags Helper&quot;]
+        direction TB
+        REF_VF[&quot;(See 'Helper: validateFlags' diagram)&quot;]
+    end
+
+    D -.-&gt; REF_PF
+    H -.-&gt; REF_VF
+</pre>
+<h4 id="helper-parseflagset"><a class="header" href="#helper-parseflagset">Helper: <code>parseFlagSet</code></a></h4>
+<p>This helper function is responsible for the mechanics of parsing a set of flags.
+It takes a list of flag definitions, the arguments to parse, a name for the flag set (often “global” or the command name), and an output stream (for help messages).
+It creates a standard <code>flag.FlagSet</code> instance, applies the defined flags to this set, and then calls the <code>Parse</code> method on the set with the provided arguments.
+It returns the populated <code>FlagSet</code> and any error encountered during parsing.</p>
+<pre class="mermaid">flowchart TB
+ subgraph subGraph0[&quot;Helper: parseFlagSet&quot;]
+    direction TB
+        PF1[&quot;In: flags, args, name, out&quot;]
+        PF2[&quot;Create flag.FlagSet&quot;]
+        PF3[&quot;Apply Flags to Set&quot;]
+        PF4[&quot;FlagSet.Parse(args)&quot;]
+        PF5[&quot;Return FlagSet, err&quot;]
+  end
+    PF1 --&gt; PF2
+    PF2 --&gt; PF3
+    PF3 --&gt; PF4
+    PF4 --&gt; PF5
+</pre>
+<h4 id="helper-validateflags"><a class="header" href="#helper-validateflags">Helper: <code>validateFlags</code></a></h4>
+<p>After flags are parsed by <code>parseFlagSet</code>, this helper function is used to perform custom validation on each flag.
+It iterates through a list of flag definitions and, for each flag, calls its <code>Validate</code> method, passing in the <code>FlagSet</code> (which contains the parsed values).
+If any flag’s <code>Validate</code> method returns an error, these errors are combined and returned. If all flags validate successfully, it returns <code>nil</code>.</p>
+<pre class="mermaid">flowchart TB
+ subgraph subGraph1[&quot;Helper: validateFlags&quot;]
+    direction TB
+        VF1[&quot;In: flags, flagSet&quot;]
+        VF2[&quot;For each Flag&quot;]
+        VF3[&quot;Flag.Validate(flagSet)&quot;]
+        VF4{&quot;Any Errors?&quot;}
+        VF5[&quot;Return combined err&quot;]
+        VF6[&quot;Return nil&quot;]
+  end
+    VF1 --&gt; VF2
+    VF2 --&gt; VF3
+    VF3 --&gt; VF4
+    VF4 -- Yes --&gt; VF5
+    VF4 -- No --&gt; VF6
+</pre>
+<h4 id="command-processing-flow"><a class="header" href="#command-processing-flow">Command Processing Flow</a></h4>
+<p>Once global flags are successfully parsed and validated, the CLI attempts to identify and execute a specific command.
+It searches for a command based on the first argument in <code>restArgs</code> (the arguments remaining after global flags). This search includes registered commands, their aliases, and a built-in <code>help</code> command.</p>
+<p>If a command is found:</p>
+<ul>
+<li>If it’s the <code>help</code> command, the context is prepared for help output, and the help action is executed.</li>
+<li>If it’s a user-defined command, its specific flags are parsed (using <code>parseFlagSet</code>) and validated (using <code>validateFlags</code>). The CLI context is updated with command-specific information. If parsing or validation fails, an error is reported. Otherwise, the command’s action is executed.</li>
+</ul>
+<p>If no command is found matching the first argument, the flow proceeds to the fallback mechanisms.</p>
+<pre class="mermaid">flowchart TB
+    J_START[&quot;From: Global Flag Validation Success&quot;] --&gt; J_NODE
+    J_NODE[&quot;Find Command (in restArgs[0]). iterates cmds, aliases, 'help'&quot;] --&gt; K{&quot;Cmd Found?&quot;}
+    K -- Yes --&gt; L{&quot;Cmd is 'help'?&quot;}
+    L -- Yes --&gt; M[&quot;Ctx args for 'help', Exec 'help' Action&quot;]
+    M --&gt; Z_SUCCESS_HELP[&quot;End (Success)&quot;]
+    L -- No (User Cmd) --&gt; N[&quot;Parse Cmd Flags (uses parseFlagSet helper)&quot;]
+    N --&gt; N_CTX[&quot;Update Context (w/ Cmd, cmdSet)&quot;]
+    N_CTX --&gt; O{&quot;Cmd Parse Err?&quot;}
+    O -- Yes --&gt; O_ERR[&quot;ERR: Cmd parse failed&quot;]
+    O_ERR --&gt; Z_END_CMD_PARSE_ERR[&quot;End (Error)&quot;]
+    O -- No --&gt; P[&quot;Validate Cmd Flags (uses validateFlags helper)&quot;]
+    P --&gt; Q{&quot;Cmd Validate Err?&quot;}
+    Q -- Yes --&gt; Q_ERR[&quot;ERR: Cmd validate failed&quot;]
+    Q_ERR --&gt; Z_END_CMD_VALIDATE_ERR[&quot;End (Error)&quot;]
+    Q -- No --&gt; R[&quot;Set ctx args, Exec Cmd Action&quot;]
+    R --&gt; Z_SUCCESS_CMD_EXEC[&quot;End (Success)&quot;]
+
+    K -- No --&gt; S_LINK[&quot;Proceed to: Fallback Flow (Global Action / Unknown Cmd)&quot;]
+
+    subgraph subGraph0_ref_cmd[&quot;Ref: parseFlagSet Helper&quot;]
+        direction TB
+        REF_PF_CMD[&quot;(See 'Helper: parseFlagSet' diagram)&quot;]
+    end
+
+    subgraph subGraph1_ref_cmd[&quot;Ref: validateFlags Helper&quot;]
+        direction TB
+        REF_VF_CMD[&quot;(See 'Helper: validateFlags' diagram)&quot;]
+    end
+
+    N -.-&gt; REF_PF_CMD
+    P -.-&gt; REF_VF_CMD
+</pre>
+<h4 id="fallback-flow-global-action--unknown-command--main-help"><a class="header" href="#fallback-flow-global-action--unknown-command--main-help">Fallback Flow: Global Action / Unknown Command / Main Help</a></h4>
+<p>This flow is triggered if no specific command is identified from the arguments.
+The CLI checks if a global action (an action to be performed if no command is specified) has been defined.</p>
+<ul>
+<li>If a global action exists, the remaining arguments (<code>restArgs</code>) are set in the context, and the global action is executed.</li>
+<li>If no global action is defined, the CLI checks if there were any <code>restArgs</code>.
+<ul>
+<li>If <code>restArgs</code> exist, it implies the user tried to run a command that doesn’t exist, so an “Unknown command” error is shown.</li>
+<li>If no <code>restArgs</code> exist (meaning only global flags or no arguments were provided, and no command was matched), the main help message for the CLI application is displayed.</li>
+</ul>
+</li>
+</ul>
+<pre class="mermaid">flowchart TB
+    S_START[&quot;From: Command Not Found&quot;] --&gt; S{&quot;Global Action Defined?&quot;}
+    S -- Yes --&gt; T[&quot;Set ctx args (restArgs), Exec Global Action&quot;]
+    T --&gt; Z_SUCCESS_GLOBAL_ACTION[&quot;End (Success)&quot;]
+    S -- No --&gt; U{&quot;restArgs exist (unknown cmd)?&quot;}
+    U -- Yes --&gt; V[&quot;ERR: Unknown command&quot;]
+    V --&gt; Z_END_UNKNOWN_CMD_ERR[&quot;End (Error)&quot;]
+    U -- No --&gt; W[&quot;Show Main Help&quot;]
+    W --&gt; Z_SUCCESS_MAIN_HELP[&quot;End (Success)&quot;]
+</pre>
+<h3 id="router"><a class="header" href="#router">Router</a></h3>
+<p>The <code>nova</code> Router is responsible for directing incoming HTTP requests to the appropriate handler functions based on the request’s method and URL path.
+It supports dynamic path parameters with optional regex validation, middleware, sub-routers for modular organization, and route groups for applying common prefixes and middleware to a set of routes.</p>
+<h4 id="main-router-operations"><a class="header" href="#main-router-operations">Main Router Operations</a></h4>
+<p>Users primarily interact with the Router by creating a new instance,
+registering routes with associated handlers and middleware, potentially mounting sub-routers or creating route groups.</p>
+<pre class="mermaid">flowchart TD
+    A_USER_ACTION{&quot;User Configures &amp; Uses Router&quot;}
+    A_USER_ACTION --&gt; A1[&quot;Calls NewRouter()&quot;]
+    A_USER_ACTION --&gt; A2[&quot;Calls router.Handle() (or Get(), Post(), etc.)&quot;]
+    A_USER_ACTION --&gt; A3[&quot;Calls router.Use(middleware)&quot;]
+    A_USER_ACTION --&gt; A4[&quot;Calls router.Subrouter(prefix)&quot;]
+    A_USER_ACTION --&gt; A5[&quot;Calls router.Group(prefix)&quot;]
+    A_USER_ACTION --&gt; A6[&quot;Router used as http.Handler&quot;]
+
+    A1 --&gt; REF_NEW_ROUTER[&quot;(Details in 'Flow: Router Initialization')&quot;]
+    A2 --&gt; REF_HANDLE[&quot;(Details in 'Flow: Route Registration')&quot;]
+    A3 --&gt; REF_USE_MW[&quot;(Details in 'Flow: Middleware Registration')&quot;]
+    A4 --&gt; REF_SUBROUTER[&quot;(Details in 'Flow: Subrouter Creation')&quot;]
+    A5 --&gt; REF_GROUP[&quot;(Details in 'Flow: Group Creation &amp; Handling')&quot;]
+    A6 --&gt; REF_SERVE_HTTP[&quot;(Details in 'Flow: Request Dispatching - ServeHTTP')&quot;]
+
+    REF_NEW_ROUTER --&gt; Z_END_CONFIG[&quot;Router Configured&quot;]
+    REF_HANDLE --&gt; Z_END_CONFIG
+    REF_USE_MW --&gt; Z_END_CONFIG
+    REF_SUBROUTER --&gt; Z_END_CONFIG
+    REF_GROUP --&gt; Z_END_CONFIG
+    REF_SERVE_HTTP --&gt; Z_END_REQUEST_HANDLED[&quot;Request Handled / Error&quot;]
+</pre>
+<h4 id="flow-router-initialization-newrouter"><a class="header" href="#flow-router-initialization-newrouter">Flow: Router Initialization (<code>NewRouter</code>)</a></h4>
+<p>This function creates a new, empty <code>Router</code> instance. It initializes internal slices for routes and sub-routers, sets up a unique context key for URL parameters, and establishes a default (passthrough) middleware chain.</p>
+<pre class="mermaid">flowchart TD
+    NR_START[&quot;Start NewRouter()&quot;] --&gt; NR1[&quot;Initialize Router struct: empty routes, subrouters, middlewares&quot;]
+    NR1 --&gt; NR2[&quot;Set unique paramsKey for context&quot;]
+    NR2 --&gt; NR3[&quot;Set basePath to empty&quot;]
+    NR3 --&gt; NR4[&quot;Initialize middleware chain (default: passthrough)&quot;]
+    NR4 --&gt; NR_OUTPUT[&quot;Output: New Router Instance&quot;]
+    NR_OUTPUT --&gt; NR_END[&quot;End NewRouter&quot;]
+</pre>
+<h4 id="flow-route-registration-routerhandle"><a class="header" href="#flow-route-registration-routerhandle">Flow: Route Registration (<code>Router.Handle</code>)</a></h4>
+<p>This is the core method for defining a route. It takes an HTTP method, a URL pattern, and a handler function. The URL pattern is compiled into segments (literals or parameters with optional regex). If the router has a <code>basePath</code> (e.g., if it’s a subrouter), this path is prepended to the given pattern. The compiled route is then stored. Helper methods like <code>Get()</code>, <code>Post()</code> internally call <code>Handle()</code>.</p>
+<pre class="mermaid">flowchart TD
+    RH_START[&quot;Start router.Handle(method, pattern, handler, opts...)&quot;] --&gt; RH1[&quot;Check if router has basePath&quot;]
+    RH1 -- Yes --&gt; RH2_JOIN[&quot;Prepend router.basePath to pattern (uses joinPaths)&quot;]
+    RH1 -- No --&gt; RH2_COMPILE
+    RH2_JOIN --&gt; RH2_COMPILE[&quot;Compile fullPattern into segments (uses compilePattern)&quot;]
+    RH2_COMPILE -- Error (Invalid Pattern) --&gt; RH_PANIC[&quot;Panic: Invalid Route Pattern&quot;]
+    RH2_COMPILE -- Success (segments) --&gt; RH3[&quot;Create route struct (method, handler, segments, options)&quot;]
+    RH3 --&gt; RH4[&quot;Append new route to router.routes slice&quot;]
+    RH4 --&gt; RH_END[&quot;End router.Handle&quot;]
+</pre>
+<p><strong>Internal Detail: <code>compilePattern(pattern)</code></strong>
+This helper parses a URL pattern string (e.g., <code>/users/{id:\d+}</code>) into a sequence of <code>segment</code> structs. Each segment is either a literal string or a parameter (e.g., <code>id</code>). Parameters can include an optional regex (e.g., <code>\d+</code>) which is pre-compiled for efficient matching.</p>
+<h4 id="flow-group-creation--handling-routergroup--grouphandle"><a class="header" href="#flow-group-creation--handling-routergroup--grouphandle">Flow: Group Creation &amp; Handling (<code>Router.Group</code> &amp; <code>Group.Handle</code>)</a></h4>
+<p>A <code>Group</code> allows defining a common prefix and/or middleware for a set of routes. <code>Router.Group()</code> creates a <code>Group</code> instance, storing the prefix and any group-specific middleware. When <code>Group.Handle()</code> (or <code>group.Get()</code>, etc.) is called, it prepends the group’s prefix to the route pattern, wraps the handler with the group’s middleware, and then calls the underlying <code>router.Handle()</code> method.</p>
+<pre class="mermaid">flowchart TD
+    %% Router.Group
+    RG_START_ROUTER[&quot;Start router.Group(prefix, mws...)&quot;] --&gt; RG1[&quot;Join router.basePath with group prefix&quot;]
+    RG1 --&gt; RG2[&quot;Create Group struct (prefix, router instance, group middlewares)&quot;]
+    RG2 --&gt; RG_OUTPUT[&quot;Output: New Group Instance&quot;]
+    RG_OUTPUT --&gt; RG_END_ROUTER[&quot;End router.Group&quot;]
+
+    %% Group.Handle
+    GH_START[&quot;Start group.Handle(method, pattern, handler, opts...)&quot;] --&gt; GH1[&quot;Prepend group.prefix to pattern (uses joinPaths)&quot;]
+    GH1 --&gt; GH2_WRAP[&quot;Wrap provided handler with group's middlewares&quot;]
+    GH2_WRAP --&gt; GH3_FORWARD[&quot;Call underlying router.Handle(method, fullPattern, wrappedHandler, opts...)&quot;]
+    GH3_FORWARD --&gt; REF_ROUTER_HANDLE[&quot;(Uses 'Flow: Route Registration')&quot;]
+    REF_ROUTER_HANDLE --&gt; GH_END[&quot;End group.Handle&quot;]
+</pre>
+<h4 id="flow-middleware-registration-routeruse"><a class="header" href="#flow-middleware-registration-routeruse">Flow: Middleware Registration (<code>Router.Use</code>)</a></h4>
+<p>This method allows adding one or more <code>Middleware</code> functions to the router. These middlewares are applied globally to all routes handled by this router (and inherited by its subrouters). After adding new middleware, the router’s internal middleware <code>chain</code> is rebuilt.</p>
+<pre class="mermaid">flowchart TD
+    MWU_START[&quot;Start router.Use(mws...)&quot;] --&gt; MWU1[&quot;Append new middleware(s) to router.middlewares slice&quot;]
+    MWU1 --&gt; MWU2[&quot;Rebuild router's middleware chain (rebuildChain)&quot;]
+    MWU2 --&gt; MWU_END[&quot;End router.Use&quot;]
+</pre>
+<p><strong>Internal Detail: <code>rebuildChain()</code></strong>
+This function iterates through the registered middlewares in reverse order, wrapping the final handler (or the previously wrapped handler) with each middleware. This creates a single composed <code>http.Handler</code> that executes all middlewares in the correct sequence before reaching the route-specific handler.</p>
+<h4 id="flow-subrouter-creation-routersubrouter"><a class="header" href="#flow-subrouter-creation-routersubrouter">Flow: Subrouter Creation (<code>Router.Subrouter</code>)</a></h4>
+<p><code>Subrouter</code> allows mounting another <code>Router</code> instance at a specified path prefix. The new subrouter inherits the parent’s context key for parameters, its global middleware chain, and custom error handlers. The <code>basePath</code> of the subrouter is set by joining the parent’s <code>basePath</code> with the new prefix.</p>
+<pre class="mermaid">flowchart TD
+    SR_START[&quot;Start router.Subrouter(prefix)&quot;] --&gt; SR1[&quot;Initialize new Router instance&quot;]
+    SR1 --&gt; SR2[&quot;Inherit paramsKey from parent&quot;]
+    SR2 --&gt; SR3[&quot;Copy parent's middlewares &amp; rebuild chain for subrouter&quot;]
+    SR3 --&gt; SR4[&quot;Set subrouter.basePath (join parent.basePath + prefix)&quot;]
+    SR4 --&gt; SR5[&quot;Inherit notFoundHandler &amp; methodNotAllowedHandler&quot;]
+    SR5 --&gt; SR6[&quot;Append new subrouter to parent's subrouters slice&quot;]
+    SR6 --&gt; SR_OUTPUT[&quot;Output: New Subrouter Instance&quot;]
+    SR_OUTPUT --&gt; SR_END[&quot;End router.Subrouter&quot;]
+</pre>
+<h4 id="flow-request-dispatching-routerservehttp"><a class="header" href="#flow-request-dispatching-routerservehttp">Flow: Request Dispatching (<code>Router.ServeHTTP</code>)</a></h4>
+<p>This is the core of the router, implementing <code>http.Handler</code>. When a request arrives:</p>
+<ol>
+<li>It first checks if the request path matches the <code>basePath</code> of any registered subrouters. If so, the request is delegated to that subrouter’s <code>ServeHTTP</code> method.</li>
+<li>If no subrouter matches, it iterates through its own registered routes. For each route:
+<ul>
+<li>It attempts to match the request path against the route’s compiled segments (<code>matchSegments</code>).</li>
+<li>If the path pattern matches:
+<ul>
+<li>It then checks if the HTTP method matches.</li>
+<li>If both path and method match, URL parameters are extracted and added to the request’s context. The router’s middleware chain is applied to the route’s handler, and the resulting handler serves the request.</li>
+<li>If the path matches but the method does not, a 405 Method Not Allowed error is triggered.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>If no route pattern matches at all, a 404 Not Found error is triggered. Custom handlers for 404 and 405 errors can be set.</li>
+</ol>
+<pre class="mermaid">flowchart TD
+    SH_START[&quot;Start router.ServeHTTP(w, req)&quot;] --&gt; SH1_SUBROUTERS{&quot;Check Subrouters: Path matches subrouter.basePath?&quot;}
+    SH1_SUBROUTERS -- Yes, matches SR --&gt; SH2_DELEGATE_SR[&quot;Delegate to sr.ServeHTTP(w, req) &amp; return&quot;]
+    SH1_SUBROUTERS -- No subrouter match --&gt; SH3_LOOP_ROUTES{&quot;Loop own routes: Attempt to match req.URL.Path (matchSegments)&quot;}
+
+    SH3_LOOP_ROUTES -- No match in loop --&gt; SH_HANDLE_404[&quot;Pattern Not Matched: Trigger 404 Not Found (custom or default)&quot;]
+    SH_HANDLE_404 --&gt; SH_END_REQUEST[&quot;End Request&quot;]
+
+    SH3_LOOP_ROUTES -- Path Pattern Matched (ok, params) --&gt; SH4_CHECK_METHOD{&quot;Method Matches rt.method?&quot;}
+    SH4_CHECK_METHOD -- Yes (Full Match) --&gt; SH5_ADD_PARAMS[&quot;Add URL params to req.Context (if any)&quot;]
+    SH5_ADD_PARAMS --&gt; SH6_APPLY_CHAIN[&quot;Apply router's middleware chain to rt.handler&quot;]
+    SH6_APPLY_CHAIN --&gt; SH7_EXEC_HANDLER[&quot;Execute finalHandler.ServeHTTP(w, req) &amp; return&quot;]
+
+    SH4_CHECK_METHOD -- No (Path matched, method didn't) --&gt; SH_HANDLE_405[&quot;Pattern Matched, Method Mismatch: Trigger 405 Method Not Allowed (custom or default)&quot;]
+    SH_HANDLE_405 --&gt; SH_END_REQUEST
+
+    SH2_DELEGATE_SR --&gt; SH_END_REQUEST
+    SH7_EXEC_HANDLER --&gt; SH_END_REQUEST
+</pre>
+<p><strong>Internal Detail: <code>matchSegments(path, segments)</code></strong>
+This helper compares the parts of an incoming URL path against a route’s pre-compiled <code>segments</code>. It checks literal matches and, for parameter segments, validates against any compiled regex and extracts the parameter value. It returns <code>true</code> and a map of parameters if matched.</p>
+<h4 id="flow-url-parameter-retrieval-routerurlparam"><a class="header" href="#flow-url-parameter-retrieval-routerurlparam">Flow: URL Parameter Retrieval (<code>Router.URLParam</code>)</a></h4>
+<p>A simple utility to retrieve a named URL parameter that was extracted during routing. It accesses the parameters map stored in the request’s context using the router’s unique <code>paramsKey</code>.</p>
+<pre class="mermaid">flowchart TD
+    UP_START[&quot;Start router.URLParam(req, key)&quot;] --&gt; UP1[&quot;Get params map from req.Context using router.paramsKey&quot;]
+    UP1 --&gt; UP2{&quot;Params map found &amp; key exists?&quot;}
+    UP2 -- Yes --&gt; UP3_RETURN_VALUE[&quot;Output: Parameter value (string)&quot;]
+    UP2 -- No --&gt; UP4_RETURN_EMPTY[&quot;Output: Empty string&quot;]
+    UP3_RETURN_VALUE --&gt; UP_END[&quot;End URLParam&quot;]
+    UP4_RETURN_EMPTY --&gt; UP_END
+</pre>
+<h3 id="scaffolding"><a class="header" href="#scaffolding">Scaffolding</a></h3>
+<p>Scaffolding provides functionality to generate new Go project structures from predefined, embedded templates.
+It customizes directory names, filenames, and file contents based on user input (like project name and database choice),
+effectively bootstrapping a new application with a chosen layout.</p>
+<p>The core logic resides in the createFromTemplate function, w
+hich is invoked by higher-level functions like CreateMinimal, CreateStructured, or CreateTODO.
+It systematically processes template items to build the new project. If any step fails, the scaffolding process is halted, and an error is returned.</p>
+<pre class="mermaid">flowchart TD
+    A_USER_CALL[&quot;User calls CreateMinimal, CreateStructured, or CreateTODO&quot;] --&gt; B_INVOKE_CFT[&quot;Invoke createFromTemplate(name, templateConfig, dbImport)&quot;]
+
+    B_INVOKE_CFT --&gt; C_START_CFT[&quot;Start createFromTemplate&quot;]
+
+    C_START_CFT --&gt; D_MKDIR_ROOT[&quot;Create Project Root Directory (os.Mkdir)&quot;]
+    D_MKDIR_ROOT -- Error --&gt; Z_ERROR[&quot;Scaffolding Failed&quot;]
+    D_MKDIR_ROOT -- Success --&gt; E_PREPARE_DATA[&quot;Prepare Template Data (name, dbImport, getDBAdapter() -&gt; templateData)&quot;]
+
+    E_PREPARE_DATA --&gt; F_WALK_FS_SETUP[&quot;Setup fs.WalkDir to iterate over embedded templates&quot;]
+    F_WALK_FS_SETUP -- Walk Setup Error --&gt; Z_ERROR
+    F_WALK_FS_SETUP -- Start Iteration --&gt; G_WALK_CALLBACK{&quot;fs.WalkDir Callback for each entry (originalPath, dirEntry, err)&quot;}
+
+    G_WALK_CALLBACK -- Error from WalkDir itself --&gt; Z_ERROR
+    G_WALK_CALLBACK -- Process Entry --&gt; H_PROCESS_PATH[&quot;Process Path Template - Get relative path - Strip .tmpl - Execute path as template - Result: targetPath&quot;]
+    H_PROCESS_PATH -- Error --&gt; Z_ERROR_CALLBACK[&quot;Return error from callback&quot;]
+    H_PROCESS_PATH -- Success (targetPath) --&gt; I_IS_DIR{&quot;Is Entry a Directory?&quot;}
+
+    I_IS_DIR -- Yes --&gt; J_HANDLE_DIR[&quot;Create Directory (handleDirectory) (os.MkdirAll at targetPath, log if verbose)&quot;]
+    J_HANDLE_DIR -- Error --&gt; Z_ERROR_CALLBACK
+    J_HANDLE_DIR -- Success --&gt; G_WALK_CALLBACK_NEXT[&quot;Return nil (continue walk)&quot;]
+
+
+    I_IS_DIR -- No (File) --&gt; K_HANDLE_FILE_START[&quot;Process &amp; Write File (handleFile)&quot;]
+    K_HANDLE_FILE_START --&gt; L_READ_TEMPLATE[&quot;Read Template File Content (fs.ReadFile from originalPath)&quot;]
+    L_READ_TEMPLATE -- Error --&gt; Z_ERROR_CALLBACK
+    L_READ_TEMPLATE -- Success (rawContent) --&gt; M_PROCESS_CONTENT[&quot;Process Content Template (processContentTemplate) (Execute rawContent with templateData)&quot;]
+    M_PROCESS_CONTENT -- Error --&gt; Z_ERROR_CALLBACK
+    M_PROCESS_CONTENT -- Success (processedContent) --&gt; N_WRITE_FILE[&quot;Write Processed Content to disk (os.WriteFile at targetPath, log if verbose)&quot;]
+    N_WRITE_FILE -- Error --&gt; Z_ERROR_CALLBACK
+    N_WRITE_FILE -- Success --&gt; G_WALK_CALLBACK_NEXT
+
+    Z_ERROR_CALLBACK --&gt; G_WALK_TERMINATES_ERROR[&quot;fs.WalkDir terminates with error&quot;]
+    G_WALK_CALLBACK_NEXT --&gt; G_WALK_CALLBACK_CONTINUE[&quot;fs.WalkDir continues to next entry or finishes&quot;]
+
+    G_WALK_CALLBACK_CONTINUE -- More Entries --&gt; G_WALK_CALLBACK
+    G_WALK_CALLBACK_CONTINUE -- All Entries Processed (WalkDir returns nil) --&gt; Y_SUCCESS[&quot;createFromTemplate Successful&quot;]
+
+    G_WALK_TERMINATES_ERROR --&gt; Z_ERROR
+
+    Y_SUCCESS --&gt; Z_SUCCESS[&quot;Scaffolding Succeeded&quot;]
+
+    Z_SUCCESS --&gt; Z_END[&quot;End&quot;]
+    Z_ERROR --&gt; Z_END
+</pre>
+<h3 id="migrations"><a class="header" href="#migrations">Migrations</a></h3>
+<p>Nova provides database migrations through versioned SQL files. This allows for creating new migrations, applying pending changes (migrating up), and reverting applied changes (migrating down).</p>
+<h4 id="migration-actions"><a class="header" href="#migration-actions">Migration Actions</a></h4>
+<p>Users interact with the migration system by calling one of three main functions:
+<code>CreateNewMigration</code> to scaffold a new migration file, <code>MigrateUp</code> to apply pending schema changes to the database, or <code>MigrateDown</code> to roll back previously applied changes from the database.
+Each of these actions follows a distinct flow.</p>
+<pre class="mermaid">flowchart TD
+    A_USER_ACTION{&quot;User Initiates Migration Task&quot;}
+    A_USER_ACTION --&gt; A1[&quot;Calls CreateNewMigration(name)&quot;]
+    A_USER_ACTION --&gt; A2[&quot;Calls MigrateUp(db, steps)&quot;]
+    A_USER_ACTION --&gt; A3[&quot;Calls MigrateDown(db, steps)&quot;]
+
+    A1 --&gt; REF_CREATE[&quot;(Details in 'Flow: CreateNewMigration')&quot;]
+    A2 --&gt; REF_UP[&quot;(Details in 'Flow: MigrateUp')&quot;]
+    A3 --&gt; REF_DOWN[&quot;(Details in 'Flow: MigrateDown')&quot;]
+
+    REF_CREATE --&gt; Z_END_ACTION[&quot;End User Action&quot;]
+    REF_UP --&gt; Z_END_ACTION
+    REF_DOWN --&gt; Z_END_ACTION
+</pre>
+<h4 id="flow-createnewmigration"><a class="header" href="#flow-createnewmigration">Flow: <code>CreateNewMigration</code></a></h4>
+<p>This function is responsible for scaffolding a new SQL migration file.
+It generates a unique, timestamped filename, ensures the <code>migrations</code> directory exists (creating it if necessary),
+and then writes a basic template into the new file.
+This template includes the <code>"-- migrate:up"</code> and <code>"-- migrate:down"</code> delimiters to guide the user in adding their SQL statements.</p>
+<pre class="mermaid">flowchart TD
+    CNM_START[&quot;Start CreateNewMigration(name)&quot;] --&gt; CNM1[&quot;Generate Timestamped Filename (e.g., 123_name.sql)&quot;]
+    CNM1 --&gt; CNM2[&quot;Ensure 'migrations' Folder Exists (Create if not)&quot;]
+    CNM2 --&gt; CNM3[&quot;Write SQL Template (up/down sections) to New File&quot;]
+    CNM3 -- Success --&gt; CNM_SUCCESS[&quot;Output: New .sql File Created&quot;]
+    CNM3 -- Error --&gt; CNM_ERROR[&quot;Output: Error During File Creation&quot;]
+    CNM_SUCCESS --&gt; CNM_END[&quot;End CreateNewMigration&quot;]
+    CNM_ERROR --&gt; CNM_END
+</pre>
+<h4 id="flow-migrateup"><a class="header" href="#flow-migrateup">Flow: <code>MigrateUp</code></a></h4>
+<p>The <code>MigrateUp</code> function applies pending schema changes to the database.
+It first determines the current version of the database.
+Then, it identifies all migration files in the <code>migrations</code> folder that have a version number greater than the current database version.
+These pending migrations are sorted chronologically (oldest first) and applied sequentially, up to an optional <code>steps</code> limit.
+For each migration applied, its “up” SQL statements are executed, and the database version is updated.</p>
+<pre class="mermaid">flowchart TD
+    MU_START[&quot;Start MigrateUp(db, steps)&quot;] --&gt; MU1[&quot;Get Current DB Version&quot;]
+    MU1 -- Error --&gt; MU_END_ERROR_INIT[&quot;End (Error Initializing)&quot;]
+    MU1 -- Success (currentDBVer) --&gt; MU2[&quot;Get &amp; Sort Migration Files (Oldest First)&quot;]
+    MU2 -- Error --&gt; MU_END_ERROR_INIT
+    MU2 -- Success (sortedFiles) --&gt; MU3_LOOP_START{&quot;Loop: For each file (respect 'steps' limit)&quot;}
+
+    MU3_LOOP_START -- No More Applicable Files / Limit Reached --&gt; MU_REPORT[&quot;Report Status (Applied count or No pending)&quot;]
+    MU_REPORT --&gt; MU_END_SUCCESS[&quot;End (MigrateUp Finished)&quot;]
+
+    MU3_LOOP_START -- Next File --&gt; MU4_CHECK_VER{&quot;Check: File Version &gt; currentDBVer?&quot;}
+    MU4_CHECK_VER -- No (Skip) --&gt; MU3_LOOP_START
+    MU4_CHECK_VER -- Yes (Pending) --&gt; MU5_APPLY[&quot;Action: Read File &amp; Apply 'Up' SQL Statements&quot;]
+    MU5_APPLY -- Error --&gt; MU_END_ERROR_APPLY[&quot;End (Error Applying SQL)&quot;]
+    MU5_APPLY -- Success --&gt; MU6_UPDATE_DB[&quot;Action: Update DB Version to This File's Version&quot;]
+    MU6_UPDATE_DB -- Error --&gt; MU_END_ERROR_DBUPDATE[&quot;End (Error Updating DB Version)&quot;]
+    MU6_UPDATE_DB -- Success --&gt; MU7_LOG[&quot;Action: Log Applied &amp; Increment Count&quot;]
+    MU7_LOG --&gt; MU3_LOOP_START
+</pre>
+<h4 id="flow-migratedown"><a class="header" href="#flow-migratedown">Flow: <code>MigrateDown</code></a></h4>
+<p>The <code>MigrateDown</code> function reverts previously applied migrations.
+It starts by getting the current database version.
+It then considers migration files sorted in reverse chronological order (newest first).
+For each migration whose version is less than or equal to the current database version (and within the <code>steps</code> limit, which defaults to 1),
+its “down” SQL statements are executed. After a successful rollback, the database version is updated to reflect the state before that migration was applied.</p>
+<pre class="mermaid">flowchart TD
+    MD_START[&quot;Start MigrateDown(db, steps)&quot;] --&gt; MD0[&quot;1. Set 'steps' (default 1 if 0 or less)&quot;]
+    MD0 --&gt; MD1[&quot;2. Get Current DB Version&quot;]
+    MD1 -- Error --&gt; MD_END_ERROR_INIT[&quot;End (Error Initializing)&quot;]
+    MD1 -- Success (currentDBVer) --&gt; MD2[&quot;3. Get &amp; Sort Migration Files (Newest First)&quot;]
+    MD2 -- Error --&gt; MD_END_ERROR_INIT
+    MD2 -- Success (sortedFiles) --&gt; MD3_LOOP_START{&quot;4. Loop: For each file (respect 'steps' limit)&quot;}
+
+    MD3_LOOP_START -- No More Applicable Files / Limit Reached --&gt; MD_REPORT[&quot;7. Report Status (Rolled back count or None)&quot;]
+    MD_REPORT --&gt; MD_END_SUCCESS[&quot;End (MigrateDown Finished)&quot;]
+
+    MD3_LOOP_START -- Next File --&gt; MD4_CHECK_VER{&quot;5a. File Version &lt;= currentDBVer AND currentDBVer &gt; 0?&quot;}
+    MD4_CHECK_VER -- No (Skip) --&gt; MD3_LOOP_START
+    MD4_CHECK_VER -- Yes (Can Rollback) --&gt; MD5_APPLY[&quot;5b. Read File &amp; Apply 'Down' SQL Statements&quot;]
+    MD5_APPLY -- Error --&gt; MD_END_ERROR_APPLY[&quot;End (Error Applying SQL)&quot;]
+    MD5_APPLY -- Success --&gt; MD6_UPDATE_DB[&quot;5c. Update DB Version (to version before this file)&quot;]
+    MD6_UPDATE_DB -- Error --&gt; MD_END_ERROR_DBUPDATE[&quot;End (Error Updating DB Version)&quot;]
+    MD6_UPDATE_DB -- Success --&gt; MD7_LOG[&quot;5d. Log Rolled Back &amp; Increment Count&quot;]
+    MD7_LOG --&gt; MD3_LOOP_START
+</pre>
+<h3 id="openapi"><a class="header" href="#openapi">OpenAPI</a></h3>
+<p>The <code>nova</code> framework can automatically generate an OpenAPI 3.0 specification from your router definitions and associated Go types.
+This allows for easy documentation and client generation. The process involves collecting route information, building operation details,
+and generating JSON schemas for request/response bodies and parameters.
+The generated specification can then be served as a JSON file, and an embedded Swagger UI can be hosted to visualize and interact with the API.</p>
+<h4 id="overall-openapi-process"><a class="header" href="#overall-openapi-process">Overall OpenAPI Process</a></h4>
+<p>The generation of the OpenAPI specification is primarily orchestrated by <code>GenerateOpenAPISpec</code>.
+This function initializes the spec and then recursively traverses the router structure using <code>collectRoutes</code> to populate path and operation details.
+Once generated, <code>ServeOpenAPISpec</code> can expose it via an HTTP endpoint, and <code>ServeSwaggerUI</code> can provide an interactive API console.</p>
+<pre class="mermaid">flowchart TD
+    A_USER_CALLS[&quot;User calls Router.ServeOpenAPISpec() or Router.ServeSwaggerUI()&quot;]
+
+    A_USER_CALLS --&gt; B_SERVE_SPEC_OR_UI{&quot;Serve Spec or UI?&quot;}
+
+    B_SERVE_SPEC_OR_UI -- ServeOpenAPISpec --&gt; C1_GEN_SPEC[&quot;Invoke GenerateOpenAPISpec(router, config)&quot;]
+    C1_GEN_SPEC --&gt; REF_GEN_SPEC[&quot;(Details in 'Flow: GenerateOpenAPISpec')&quot;]
+    REF_GEN_SPEC --&gt; C2_MARSHAL[&quot;Marshal Spec to JSON&quot;]
+    C2_MARSHAL --&gt; C3_SERVE_JSON[&quot;Register Handler to Serve JSON at specified path&quot;]
+    C3_SERVE_JSON --&gt; Z_END_ACTION[&quot;End User Action&quot;]
+
+    B_SERVE_SPEC_OR_UI -- ServeSwaggerUI --&gt; D1_SERVE_UI[&quot;Invoke ServeSwaggerUI(prefix)&quot;]
+    D1_SERVE_UI --&gt; REF_SERVE_UI[&quot;(Details in 'Flow: ServeSwaggerUI')&quot;]
+    REF_SERVE_UI --&gt; Z_END_ACTION
+</pre>
+<h4 id="flow-generateopenapispec"><a class="header" href="#flow-generateopenapispec">Flow: <code>GenerateOpenAPISpec</code></a></h4>
+<p>This is the main function responsible for constructing the complete OpenAPI specification object.
+It initializes the basic structure of the spec (like OpenAPI version, info)
+and then kicks off the route collection process.
+It uses a <code>schemaGenCtx</code> to manage and reuse generated schemas in the <code>components</code> section.</p>
+<pre class="mermaid">flowchart TD
+    GEN_START[&quot;Start GenerateOpenAPISpec(router, config)&quot;] --&gt; GEN1[&quot;Initialize OpenAPI Spec (Version, Info, Servers, empty Paths, empty Components)&quot;]
+    GEN1 --&gt; GEN2[&quot;Initialize schemaGenCtx (for managing component schemas)&quot;]
+    GEN2 --&gt; GEN3_COLLECT[&quot;Call collectRoutes&quot;]
+    GEN3_COLLECT --&gt; REF_COLLECT_ROUTES[&quot;(Details in 'Flow: collectRoutes')&quot;]
+    REF_COLLECT_ROUTES --&gt; GEN4[&quot;Populate spec.Components.Schemas from schemaCtx (if any)&quot;]
+    GEN4 --&gt; GEN_OUTPUT[&quot;Output: Populated OpenAPI Spec Object&quot;]
+    GEN_OUTPUT --&gt; GEN_END[&quot;End GenerateOpenAPISpec&quot;]
+</pre>
+<h4 id="flow-collectroutes-recursive"><a class="header" href="#flow-collectroutes-recursive">Flow: <code>collectRoutes</code> (Recursive)</a></h4>
+<p>This function recursively traverses the router and its sub-routers.
+For each route it encounters, it constructs the full path string,
+creates or retrieves the corresponding <code>PathItem</code> in the OpenAPI spec,
+and then builds the <code>Operation</code> object for that specific HTTP method and path.</p>
+<pre class="mermaid">flowchart TD
+    CR_START[&quot;Start collectRoutes(router, spec, schemaCtx, parentPath)&quot;]
+    CR_START --&gt; CR1_LOOP_ROUTES{&quot;For each route in router.routes&quot;}
+    CR1_LOOP_ROUTES -- Next Route --&gt; CR2_BUILD_PATH[&quot;Build Full Path String (uses buildPathString)&quot;]
+    CR2_BUILD_PATH --&gt; CR3_GET_PATHITEM[&quot;Get/Create PathItem in spec.Paths&quot;]
+    CR3_GET_PATHITEM --&gt; CR4_BUILD_OP[&quot;Build Operation (uses buildOperation)&quot;]
+    CR4_BUILD_OP --&gt; REF_BUILD_OP[&quot;(Details in 'Flow: buildOperation')&quot;]
+    REF_BUILD_OP --&gt; CR5_ASSIGN_OP[&quot;Assign Operation to PathItem (e.g., pathItem.Get = op)&quot;]
+    CR5_ASSIGN_OP --&gt; CR1_LOOP_ROUTES
+    CR1_LOOP_ROUTES -- All Routes Processed --&gt; CR6_LOOP_SUBROUTERS{&quot;For each subrouter in router.subrouters&quot;}
+
+    CR6_LOOP_SUBROUTERS -- Next Subrouter --&gt; CR7_RECURSE[&quot;Recursive Call: collectRoutes(subrouter, spec, schemaCtx, subrouter.basePath)&quot;]
+    CR7_RECURSE --&gt; CR6_LOOP_SUBROUTERS
+    CR6_LOOP_SUBROUTERS -- All Subrouters Processed --&gt; CR_END[&quot;End collectRoutes&quot;]
+</pre>
+<h4 id="flow-buildoperation"><a class="header" href="#flow-buildoperation">Flow: <code>buildOperation</code></a></h4>
+<p>For a given route, this function constructs an OpenAPI <code>Operation</code> object.
+It populates details like tags, summary, description, and parameters based on <code>route.options</code>.
+It also handles the generation of schemas for request bodies and responses by calling <code>generateSchema</code>.
+Path parameters defined in the route segments are also ensured to be part of the operation’s parameters.</p>
+<pre class="mermaid">flowchart TD
+    BO_START[&quot;Start buildOperation(route, schemaCtx)&quot;] --&gt; BO1[&quot;Initialize Operation Object (empty Responses, Parameters)&quot;]
+    BO1 --&gt; BO2_CHECK_OPTS{&quot;Route Options Defined?&quot;}
+    BO2_CHECK_OPTS -- No --&gt; BO_PROCESS_PATH_PARAMS
+    BO2_CHECK_OPTS -- Yes (opts exist) --&gt; BO3_POPULATE_META[&quot;Populate Meta (Tags, Summary, Desc, OpID, Deprecated)&quot;]
+    BO3_POPULATE_META --&gt; BO4_REQ_BODY{&quot;RequestBody Option?&quot;}
+    BO4_REQ_BODY -- Yes --&gt; BO5_BUILD_REQ_BODY[&quot;Create RequestBodyObject, call generateSchema for its content&quot;]
+    BO5_BUILD_REQ_BODY --&gt; REF_GEN_SCHEMA_REQ[&quot;(Uses 'Flow: generateSchema')&quot;]
+    REF_GEN_SCHEMA_REQ --&gt; BO6_RESPONSES
+    BO4_REQ_BODY -- No --&gt; BO6_RESPONSES
+
+    BO6_RESPONSES{&quot;Loop Response Options&quot;}
+    BO6_RESPONSES -- Next ResponseOpt --&gt; BO7_BUILD_RESP[&quot;Create ResponseObject, call generateSchema for body&quot;]
+    BO7_BUILD_RESP --&gt; REF_GEN_SCHEMA_RESP[&quot;(Uses 'Flow: generateSchema')&quot;]
+    REF_GEN_SCHEMA_RESP --&gt; BO6_RESPONSES
+    BO6_RESPONSES -- Done --&gt; BO8_PARAMS{&quot;Loop Parameter Options&quot;}
+
+    BO8_PARAMS -- Next ParamOpt --&gt; BO9_BUILD_PARAM[&quot;Create ParameterObject, call generateSchema for schema&quot;]
+    BO9_BUILD_PARAM --&gt; REF_GEN_SCHEMA_PARAM[&quot;(Uses 'Flow: generateSchema')&quot;]
+    REF_GEN_SCHEMA_PARAM --&gt; BO8_PARAMS
+    BO8_PARAMS -- Done --&gt; BO_PROCESS_PATH_PARAMS
+
+    BO_PROCESS_PATH_PARAMS[&quot;Ensure Path Parameters from route.segments are added (if not already from options)&quot;]
+    BO_PROCESS_PATH_PARAMS --&gt; BO10_DEFAULT_RESP{&quot;Add Default '200 OK' Response if none specified&quot;}
+    BO10_DEFAULT_RESP --&gt; BO_OUTPUT[&quot;Output: Populated Operation Object&quot;]
+    BO_OUTPUT --&gt; BO_END[&quot;End buildOperation&quot;]
+</pre>
+<h4 id="flow-generateschema-recursive--type-handling"><a class="header" href="#flow-generateschema-recursive--type-handling">Flow: <code>generateSchema</code> (Recursive &amp; Type Handling)</a></h4>
+<p>This is the core schema generation logic.
+Given a Go interface{} instance,
+it uses reflection to determine its type and generate a corresponding OpenAPI <code>SchemaObject</code>.
+It handles basic Go types (string, int, bool, etc.), structs, slices/arrays, and maps.
+For structs, it generates named schemas and stores them in <code>schemaCtx.componentsSchemas</code> to allow for reuse via <code>$ref</code> pointers, preventing duplication and handling circular dependencies.</p>
+<pre class="mermaid">flowchart TD
+    GS_START[&quot;Start generateSchema(instance, schemaCtx)&quot;] --&gt; GS1{&quot;Handle nil/ptr, Get reflect.Type &amp; Value&quot;}
+    GS1 --&gt; GS2_CHECK_CACHE{&quot;Struct &amp; Already Generated (in schemaCtx)?&quot;}
+    GS2_CHECK_CACHE -- Yes --&gt; GS_RETURN_REF[&quot;Output: SchemaObject with $ref&quot;]
+
+    GS2_CHECK_CACHE -- No --&gt; GS3_SWITCH_KIND{&quot;Switch on Type Kind&quot;}
+    GS3_SWITCH_KIND -- Struct --&gt; GS_STRUCT[&quot;Handle Struct&quot;]
+    GS_STRUCT --&gt; GS_STRUCT_TIME{&quot;time.Time?&quot;}
+    GS_STRUCT_TIME -- Yes --&gt; GS_TIME_SCHEMA[&quot;Set type:string, format:date-time&quot;]
+    GS_STRUCT_TIME -- No --&gt; GS_STRUCT_NAME[&quot;Generate/Get Unique Schema Name&quot;]
+    GS_STRUCT_NAME --&gt; GS_STRUCT_RESERVE[&quot;Add to schemaCtx (initially nil for cycle breaking)&quot;]
+    GS_STRUCT_RESERVE --&gt; GS_STRUCT_PROPS[&quot;Iterate Fields: Get JSON name, recursively call generateSchema for field type, add to Properties&quot;]
+    GS_STRUCT_PROPS --&gt; REF_GS_FIELD[&quot;(Recursive calls use 'Flow: generateSchema')&quot;]
+    REF_GS_FIELD --&gt; GS_STRUCT_REQ[&quot;Determine Required Fields&quot;]
+    GS_STRUCT_REQ --&gt; GS_STRUCT_STORE[&quot;Store final schema in schemaCtx&quot;]
+    GS_STRUCT_STORE --&gt; GS_RETURN_REF
+
+    GS3_SWITCH_KIND -- Slice/Array --&gt; GS_ARRAY[&quot;Handle Slice/Array: Set type:array, recursively call generateSchema for Items&quot;]
+    GS_ARRAY --&gt; REF_GS_ITEMS[&quot;(Recursive call uses 'Flow: generateSchema')&quot;]
+    REF_GS_ITEMS --&gt; GS_SCHEMA_BUILT
+
+    GS3_SWITCH_KIND -- Map --&gt; GS_MAP[&quot;Handle Map: Set type:object, recursively call generateSchema for AdditionalProperties&quot;]
+    GS_MAP --&gt; REF_GS_ADD_PROPS[&quot;(Recursive call uses 'Flow: generateSchema')&quot;]
+    REF_GS_ADD_PROPS --&gt; GS_SCHEMA_BUILT
+
+    GS3_SWITCH_KIND -- Primitives (string, int, bool, etc.) --&gt; GS_PRIMITIVE[&quot;Handle Primitives: Set type &amp; format&quot;]
+    GS_PRIMITIVE --&gt; GS_SCHEMA_BUILT
+
+    GS3_SWITCH_KIND -- Other/Unsupported --&gt; GS_UNSUPPORTED[&quot;Handle Unsupported: Log warning, set basic object type&quot;]
+    GS_UNSUPPORTED --&gt; GS_SCHEMA_BUILT
+
+    GS_TIME_SCHEMA --&gt; GS_SCHEMA_BUILT
+    GS_SCHEMA_BUILT[&quot;Schema Object Constructed (without $ref)&quot;] --&gt; GS_OUTPUT_DIRECT[&quot;Output: SchemaObject&quot;]
+
+    GS_OUTPUT_DIRECT --&gt; GS_END[&quot;End generateSchema&quot;]
+    GS_RETURN_REF --&gt; GS_END
+</pre>
+<h4 id="flow-serveswaggerui"><a class="header" href="#flow-serveswaggerui">Flow: <code>ServeSwaggerUI</code></a></h4>
+<p>This function sets up HTTP handlers to serve the embedded Swagger UI static assets. It handles requests for the UI’s root path (redirecting if necessary), the <code>index.html</code> file, and other assets like CSS and JavaScript files, serving them from the embedded filesystem.</p>
+<pre class="mermaid">flowchart TD
+    SSUI_START[&quot;Start ServeSwaggerUI(prefix)&quot;] --&gt; SSUI1[&quot;Get Sub-Filesystem for embedded 'swagger-ui' assets&quot;]
+    SSUI1 -- Error --&gt; SSUI_PANIC[&quot;Panic: Failed to locate assets&quot;]
+    SSUI1 -- Success --&gt; SSUI2_HANDLE_ROOT[&quot;Register Handler for 'prefix': Redirects to 'prefix/'&quot;]
+    SSUI2_HANDLE_ROOT --&gt; SSUI3_HANDLE_INDEX[&quot;Register Handler for 'prefix/': Serves 'index.html' from embedded FS&quot;]
+    SSUI3_HANDLE_INDEX --&gt; SSUI4_HANDLE_ASSETS[&quot;Register Handler for 'prefix/{file}': Serves other static assets (CSS, JS, etc.) from embedded FS with correct Content-Type&quot;]
+    SSUI4_HANDLE_ASSETS --&gt; SSUI5_LOG[&quot;Log Swagger UI served&quot;]
+    SSUI5_LOG --&gt; SSUI_END[&quot;End ServeSwaggerUI&quot;]
+</pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <a rel="prev" href="middleware.html" class="mobile-nav-chapters previous"
+                            title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+
+                        <a rel="next prefetch" href="faq.html" class="mobile-nav-chapters next"
+                            title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                <a rel="prev" href="middleware.html" class="nav-chapters previous" title="Previous chapter"
+                    aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+
+                <a rel="next prefetch" href="faq.html" class="nav-chapters next" title="Next chapter"
+                    aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function () {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+    </div>
+</body>
+
+</html>

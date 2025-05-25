@@ -1,0 +1,2767 @@
+<!DOCTYPE HTML>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+
+<head>
+    <!-- Book generated using mdBook -->
+    <meta charset="UTF-8">
+    <title>Reference - nova</title>
+
+
+    <!-- Custom HTML head -->
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/chrome.css">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+    <link rel="stylesheet" href="fonts/fonts.css">
+
+    <!-- Highlight.js Stylesheets -->
+    <link rel="stylesheet" href="highlight.css">
+    <link rel="stylesheet" href="tomorrow-night.css">
+    <link rel="stylesheet" href="ayu-highlight.css">
+
+    <!-- Custom theme stylesheets -->
+
+    <!-- MathJax -->
+    <script async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <!-- Provide site root to javascript -->
+    <script>
+        var path_to_root = "";
+        var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+    </script>
+    <!-- Start loading toc.js asap -->
+    <script src="toc.js"></script>
+</head>
+
+<body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch (e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch (e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor"
+                            title="Toggle Table of Contents" aria-label="Toggle Table of Contents"
+                            aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)"
+                            aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S"
+                            aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">nova</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..."
+                            aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function (link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ul>
+<li><a href="#variables">Variables</a>
+<ul>
+<li><a href="#errmissingcontenttype"><code>ErrMissingContentType</code></a></li>
+<li><a href="#errunsupportedcontenttype"><code>ErrUnsupportedContentType</code></a></li>
+</ul>
+</li>
+<li><a href="#functions">Functions</a>
+<ul>
+<li><a href="#createnewmigration"><code>CreateNewMigration</code></a></li>
+<li><a href="#getbasicauthuser"><code>GetBasicAuthUser</code></a></li>
+<li><a href="#getbasicauthuserwithkey"><code>GetBasicAuthUserWithKey</code></a></li>
+<li><a href="#getcsrftoken"><code>GetCSRFToken</code></a></li>
+<li><a href="#getcsrftokenwithkey"><code>GetCSRFTokenWithKey</code></a></li>
+<li><a href="#getrealip"><code>GetRealIP</code></a></li>
+<li><a href="#getrealipwithkey"><code>GetRealIPWithKey</code></a></li>
+<li><a href="#getrequestid"><code>GetRequestID</code></a></li>
+<li><a href="#getrequestidwithkey"><code>GetRequestIDWithKey</code></a></li>
+<li><a href="#loaddotenv"><code>LoadDotenv</code></a></li>
+<li><a href="#migratedown"><code>MigrateDown</code></a></li>
+<li><a href="#migrateup"><code>MigrateUp</code></a></li>
+<li><a href="#newbufferingresponsewriterinterceptor"><code>NewBufferingResponseWriterInterceptor</code></a></li>
+<li><a href="#newresponsewriterinterceptor"><code>NewResponseWriterInterceptor</code></a></li>
+<li><a href="#serve"><code>Serve</code></a></li>
+</ul>
+</li>
+<li><a href="#types">Types</a>
+<ul>
+<li><a href="#actionfunc"><code>ActionFunc</code></a></li>
+<li><a href="#authvalidator"><code>AuthValidator</code></a></li>
+<li><a href="#basicauthconfig"><code>BasicAuthConfig</code></a></li>
+<li><a href="#boolflag"><code>BoolFlag</code></a>
+<ul>
+<li><a href="#boolflagapply"><code>BoolFlag.Apply</code></a></li>
+<li><a href="#boolflaggetaliases"><code>BoolFlag.GetAliases</code></a></li>
+<li><a href="#boolflaggetname"><code>BoolFlag.GetName</code></a></li>
+<li><a href="#boolflagisrequired"><code>BoolFlag.IsRequired</code></a></li>
+<li><a href="#boolflagstring"><code>BoolFlag.String</code></a></li>
+<li><a href="#boolflagvalidate"><code>BoolFlag.Validate</code></a></li>
+</ul>
+</li>
+<li><a href="#cli"><code>CLI</code></a>
+<ul>
+<li><a href="#newcli"><code>NewCLI</code></a></li>
+<li><a href="#cliaddcommand"><code>CLI.AddCommand</code></a></li>
+<li><a href="#clirun"><code>CLI.Run</code></a></li>
+<li><a href="#clishowhelp"><code>CLI.ShowHelp</code></a></li>
+</ul>
+</li>
+<li><a href="#corsconfig"><code>CORSConfig</code></a></li>
+<li><a href="#csrfconfig"><code>CSRFConfig</code></a></li>
+<li><a href="#cachecontrolconfig"><code>CacheControlConfig</code></a></li>
+<li><a href="#command"><code>Command</code></a>
+<ul>
+<li><a href="#commandshowhelp"><code>Command.ShowHelp</code></a></li>
+</ul>
+</li>
+<li><a href="#components"><code>Components</code></a></li>
+<li><a href="#concurrencylimiterconfig"><code>ConcurrencyLimiterConfig</code></a></li>
+<li><a href="#context"><code>Context</code></a>
+<ul>
+<li><a href="#contextargs"><code>Context.Args</code></a></li>
+<li><a href="#contextbool"><code>Context.Bool</code></a></li>
+<li><a href="#contextfloat64"><code>Context.Float64</code></a></li>
+<li><a href="#contextint"><code>Context.Int</code></a></li>
+<li><a href="#contextstring"><code>Context.String</code></a></li>
+<li><a href="#contextstringslice"><code>Context.StringSlice</code></a></li>
+</ul>
+</li>
+<li><a href="#documentconfig"><code>DocumentConfig</code></a></li>
+<li><a href="#etagconfig"><code>ETagConfig</code></a></li>
+<li><a href="#element"><code>Element</code></a>
+<ul>
+<li><a href="#a"><code>A</code></a></li>
+<li><a href="#abbr"><code>Abbr</code></a></li>
+<li><a href="#address"><code>Address</code></a></li>
+<li><a href="#article"><code>Article</code></a></li>
+<li><a href="#aside"><code>Aside</code></a></li>
+<li><a href="#audio"><code>Audio</code></a></li>
+<li><a href="#b"><code>B</code></a></li>
+<li><a href="#base"><code>Base</code></a></li>
+<li><a href="#blockquote"><code>Blockquote</code></a></li>
+<li><a href="#body"><code>Body</code></a></li>
+<li><a href="#br"><code>Br</code></a></li>
+<li><a href="#button"><code>Button</code></a></li>
+<li><a href="#buttoninput"><code>ButtonInput</code></a></li>
+<li><a href="#caption"><code>Caption</code></a></li>
+<li><a href="#checkboxinput"><code>CheckboxInput</code></a></li>
+<li><a href="#cite"><code>Cite</code></a></li>
+<li><a href="#code"><code>Code</code></a></li>
+<li><a href="#col"><code>Col</code></a></li>
+<li><a href="#colgroup"><code>Colgroup</code></a></li>
+<li><a href="#colorinput"><code>ColorInput</code></a></li>
+<li><a href="#datalist"><code>Datalist</code></a></li>
+<li><a href="#dateinput"><code>DateInput</code></a></li>
+<li><a href="#datetimelocalinput"><code>DateTimeLocalInput</code></a></li>
+<li><a href="#details"><code>Details</code></a></li>
+<li><a href="#dfn"><code>Dfn</code></a></li>
+<li><a href="#dialogel"><code>DialogEl</code></a></li>
+<li><a href="#div"><code>Div</code></a></li>
+<li><a href="#em"><code>Em</code></a></li>
+<li><a href="#emailinput"><code>EmailInput</code></a></li>
+<li><a href="#embedel"><code>EmbedEl</code></a></li>
+<li><a href="#favicon"><code>Favicon</code></a></li>
+<li><a href="#fieldset"><code>Fieldset</code></a></li>
+<li><a href="#figcaption"><code>Figcaption</code></a></li>
+<li><a href="#figure"><code>Figure</code></a></li>
+<li><a href="#fileinput"><code>FileInput</code></a></li>
+<li><a href="#footer"><code>Footer</code></a></li>
+<li><a href="#form"><code>Form</code></a></li>
+<li><a href="#h1"><code>H1</code></a></li>
+<li><a href="#h2"><code>H2</code></a></li>
+<li><a href="#h3"><code>H3</code></a></li>
+<li><a href="#h4"><code>H4</code></a></li>
+<li><a href="#h5"><code>H5</code></a></li>
+<li><a href="#h6"><code>H6</code></a></li>
+<li><a href="#head"><code>Head</code></a></li>
+<li><a href="#header"><code>Header</code></a></li>
+<li><a href="#hiddeninput"><code>HiddenInput</code></a></li>
+<li><a href="#hr"><code>Hr</code></a></li>
+<li><a href="#html"><code>Html</code></a></li>
+<li><a href="#i"><code>I</code></a></li>
+<li><a href="#iframe"><code>Iframe</code></a></li>
+<li><a href="#image"><code>Image</code></a></li>
+<li><a href="#img"><code>Img</code></a></li>
+<li><a href="#inlinescript"><code>InlineScript</code></a></li>
+<li><a href="#input"><code>Input</code></a></li>
+<li><a href="#kbd"><code>Kbd</code></a></li>
+<li><a href="#label"><code>Label</code></a></li>
+<li><a href="#legend"><code>Legend</code></a></li>
+<li><a href="#li"><code>Li</code></a></li>
+<li><a href="#link"><code>Link</code></a></li>
+<li><a href="#linktag"><code>LinkTag</code></a></li>
+<li><a href="#main"><code>Main</code></a></li>
+<li><a href="#mark"><code>Mark</code></a></li>
+<li><a href="#meta"><code>Meta</code></a></li>
+<li><a href="#metacharset"><code>MetaCharset</code></a></li>
+<li><a href="#metanamecontent"><code>MetaNameContent</code></a></li>
+<li><a href="#metapropertycontent"><code>MetaPropertyContent</code></a></li>
+<li><a href="#metaviewport"><code>MetaViewport</code></a></li>
+<li><a href="#meterel"><code>MeterEl</code></a></li>
+<li><a href="#monthinput"><code>MonthInput</code></a></li>
+<li><a href="#nav"><code>Nav</code></a></li>
+<li><a href="#noscript"><code>NoScript</code></a></li>
+<li><a href="#numberinput"><code>NumberInput</code></a></li>
+<li><a href="#objectel"><code>ObjectEl</code></a></li>
+<li><a href="#ol"><code>Ol</code></a></li>
+<li><a href="#optgroup"><code>Optgroup</code></a></li>
+<li><a href="#option"><code>Option</code></a></li>
+<li><a href="#outputel"><code>OutputEl</code></a></li>
+<li><a href="#p"><code>P</code></a></li>
+<li><a href="#param"><code>Param</code></a></li>
+<li><a href="#passwordinput"><code>PasswordInput</code></a></li>
+<li><a href="#pre"><code>Pre</code></a></li>
+<li><a href="#preload"><code>Preload</code></a></li>
+<li><a href="#progressel"><code>ProgressEl</code></a></li>
+<li><a href="#q"><code>Q</code></a></li>
+<li><a href="#radioinput"><code>RadioInput</code></a></li>
+<li><a href="#rangeinput"><code>RangeInput</code></a></li>
+<li><a href="#resetbutton"><code>ResetButton</code></a></li>
+<li><a href="#samp"><code>Samp</code></a></li>
+<li><a href="#script"><code>Script</code></a></li>
+<li><a href="#searchinput"><code>SearchInput</code></a></li>
+<li><a href="#section"><code>Section</code></a></li>
+<li><a href="#select"><code>Select</code></a></li>
+<li><a href="#small"><code>Small</code></a></li>
+<li><a href="#source"><code>Source</code></a></li>
+<li><a href="#span"><code>Span</code></a></li>
+<li><a href="#strong"><code>Strong</code></a></li>
+<li><a href="#stylesheet"><code>StyleSheet</code></a></li>
+<li><a href="#styletag"><code>StyleTag</code></a></li>
+<li><a href="#sub"><code>Sub</code></a></li>
+<li><a href="#submitbutton"><code>SubmitButton</code></a></li>
+<li><a href="#summary"><code>Summary</code></a></li>
+<li><a href="#sup"><code>Sup</code></a></li>
+<li><a href="#table"><code>Table</code></a></li>
+<li><a href="#tbody"><code>Tbody</code></a></li>
+<li><a href="#td"><code>Td</code></a></li>
+<li><a href="#telinput"><code>TelInput</code></a></li>
+<li><a href="#textinput"><code>TextInput</code></a></li>
+<li><a href="#textarea"><code>Textarea</code></a></li>
+<li><a href="#th"><code>Th</code></a></li>
+<li><a href="#thead"><code>Thead</code></a></li>
+<li><a href="#timeel"><code>TimeEl</code></a></li>
+<li><a href="#timeinput"><code>TimeInput</code></a></li>
+<li><a href="#titleel"><code>TitleEl</code></a></li>
+<li><a href="#tr"><code>Tr</code></a></li>
+<li><a href="#track"><code>Track</code></a></li>
+<li><a href="#u"><code>U</code></a></li>
+<li><a href="#ul"><code>Ul</code></a></li>
+<li><a href="#urlinput"><code>UrlInput</code></a></li>
+<li><a href="#varel"><code>VarEl</code></a></li>
+<li><a href="#video"><code>Video</code></a></li>
+<li><a href="#wbr"><code>Wbr</code></a></li>
+<li><a href="#weekinput"><code>WeekInput</code></a></li>
+<li><a href="#elementadd"><code>Element.Add</code></a></li>
+<li><a href="#elementattr"><code>Element.Attr</code></a></li>
+<li><a href="#elementboolattr"><code>Element.BoolAttr</code></a></li>
+<li><a href="#elementclass"><code>Element.Class</code></a></li>
+<li><a href="#elementid"><code>Element.ID</code></a></li>
+<li><a href="#elementrender"><code>Element.Render</code></a></li>
+<li><a href="#elementstyle"><code>Element.Style</code></a></li>
+<li><a href="#elementtext"><code>Element.Text</code></a></li>
+</ul>
+</li>
+<li><a href="#enforcecontenttypeconfig"><code>EnforceContentTypeConfig</code></a></li>
+<li><a href="#flag"><code>Flag</code></a></li>
+<li><a href="#float64flag"><code>Float64Flag</code></a>
+<ul>
+<li><a href="#float64flagapply"><code>Float64Flag.Apply</code></a></li>
+<li><a href="#float64flaggetaliases"><code>Float64Flag.GetAliases</code></a></li>
+<li><a href="#float64flaggetname"><code>Float64Flag.GetName</code></a></li>
+<li><a href="#float64flagisrequired"><code>Float64Flag.IsRequired</code></a></li>
+<li><a href="#float64flagstring"><code>Float64Flag.String</code></a></li>
+<li><a href="#float64flagvalidate"><code>Float64Flag.Validate</code></a></li>
+</ul>
+</li>
+<li><a href="#forcehttpsconfig"><code>ForceHTTPSConfig</code></a></li>
+<li><a href="#group"><code>Group</code></a>
+<ul>
+<li><a href="#groupdelete"><code>Group.Delete</code></a></li>
+<li><a href="#groupdeletefunc"><code>Group.DeleteFunc</code></a></li>
+<li><a href="#groupget"><code>Group.Get</code></a></li>
+<li><a href="#groupgetfunc"><code>Group.GetFunc</code></a></li>
+<li><a href="#grouphandle"><code>Group.Handle</code></a></li>
+<li><a href="#grouphandlefunc"><code>Group.HandleFunc</code></a></li>
+<li><a href="#grouppatch"><code>Group.Patch</code></a></li>
+<li><a href="#grouppatchfunc"><code>Group.PatchFunc</code></a></li>
+<li><a href="#grouppost"><code>Group.Post</code></a></li>
+<li><a href="#grouppostfunc"><code>Group.PostFunc</code></a></li>
+<li><a href="#groupput"><code>Group.Put</code></a></li>
+<li><a href="#groupputfunc"><code>Group.PutFunc</code></a></li>
+<li><a href="#groupuse"><code>Group.Use</code></a></li>
+</ul>
+</li>
+<li><a href="#gzipconfig"><code>GzipConfig</code></a></li>
+<li><a href="#htmldocument"><code>HTMLDocument</code></a>
+<ul>
+<li><a href="#document"><code>Document</code></a></li>
+<li><a href="#htmldocumentrender"><code>HTMLDocument.Render</code></a></li>
+</ul>
+</li>
+<li><a href="#htmlelement"><code>HTMLElement</code></a>
+<ul>
+<li><a href="#text"><code>Text</code></a></li>
+</ul>
+</li>
+<li><a href="#handlerfunc"><code>HandlerFunc</code></a></li>
+<li><a href="#headerobject"><code>HeaderObject</code></a></li>
+<li><a href="#healthcheckconfig"><code>HealthCheckConfig</code></a></li>
+<li><a href="#ipfilterconfig"><code>IPFilterConfig</code></a></li>
+<li><a href="#info"><code>Info</code></a></li>
+<li><a href="#intflag"><code>IntFlag</code></a>
+<ul>
+<li><a href="#intflagapply"><code>IntFlag.Apply</code></a></li>
+<li><a href="#intflaggetaliases"><code>IntFlag.GetAliases</code></a></li>
+<li><a href="#intflaggetname"><code>IntFlag.GetName</code></a></li>
+<li><a href="#intflagisrequired"><code>IntFlag.IsRequired</code></a></li>
+<li><a href="#intflagstring"><code>IntFlag.String</code></a></li>
+<li><a href="#intflagvalidate"><code>IntFlag.Validate</code></a></li>
+</ul>
+</li>
+<li><a href="#loggingconfig"><code>LoggingConfig</code></a></li>
+<li><a href="#maintenancemodeconfig"><code>MaintenanceModeConfig</code></a></li>
+<li><a href="#maxrequestbodysizeconfig"><code>MaxRequestBodySizeConfig</code></a></li>
+<li><a href="#mediatypeobject"><code>MediaTypeObject</code></a></li>
+<li><a href="#methodoverrideconfig"><code>MethodOverrideConfig</code></a></li>
+<li><a href="#middleware"><code>Middleware</code></a>
+<ul>
+<li><a href="#basicauthmiddleware"><code>BasicAuthMiddleware</code></a></li>
+<li><a href="#corsmiddleware"><code>CORSMiddleware</code></a></li>
+<li><a href="#csrfmiddleware"><code>CSRFMiddleware</code></a></li>
+<li><a href="#cachecontrolmiddleware"><code>CacheControlMiddleware</code></a></li>
+<li><a href="#concurrencylimitermiddleware"><code>ConcurrencyLimiterMiddleware</code></a></li>
+<li><a href="#etagmiddleware"><code>ETagMiddleware</code></a></li>
+<li><a href="#enforcecontenttypemiddleware"><code>EnforceContentTypeMiddleware</code></a></li>
+<li><a href="#forcehttpsmiddleware"><code>ForceHTTPSMiddleware</code></a></li>
+<li><a href="#gzipmiddleware"><code>GzipMiddleware</code></a></li>
+<li><a href="#healthcheckmiddleware"><code>HealthCheckMiddleware</code></a></li>
+<li><a href="#ipfiltermiddleware"><code>IPFilterMiddleware</code></a></li>
+<li><a href="#loggingmiddleware"><code>LoggingMiddleware</code></a></li>
+<li><a href="#maintenancemodemiddleware"><code>MaintenanceModeMiddleware</code></a></li>
+<li><a href="#maxrequestbodysizemiddleware"><code>MaxRequestBodySizeMiddleware</code></a></li>
+<li><a href="#methodoverridemiddleware"><code>MethodOverrideMiddleware</code></a></li>
+<li><a href="#ratelimitmiddleware"><code>RateLimitMiddleware</code></a></li>
+<li><a href="#realipmiddleware"><code>RealIPMiddleware</code></a></li>
+<li><a href="#recoverymiddleware"><code>RecoveryMiddleware</code></a></li>
+<li><a href="#requestidmiddleware"><code>RequestIDMiddleware</code></a></li>
+<li><a href="#securityheadersmiddleware"><code>SecurityHeadersMiddleware</code></a></li>
+<li><a href="#timeoutmiddleware"><code>TimeoutMiddleware</code></a></li>
+<li><a href="#trailingslashredirectmiddleware"><code>TrailingSlashRedirectMiddleware</code></a></li>
+</ul>
+</li>
+<li><a href="#openapi"><code>OpenAPI</code></a>
+<ul>
+<li><a href="#generateopenapispec"><code>GenerateOpenAPISpec</code></a></li>
+</ul>
+</li>
+<li><a href="#openapiconfig"><code>OpenAPIConfig</code></a></li>
+<li><a href="#operation"><code>Operation</code></a></li>
+<li><a href="#parameterobject"><code>ParameterObject</code></a></li>
+<li><a href="#parameteroption"><code>ParameterOption</code></a></li>
+<li><a href="#pathitem"><code>PathItem</code></a></li>
+<li><a href="#ratelimiterconfig"><code>RateLimiterConfig</code></a></li>
+<li><a href="#realipconfig"><code>RealIPConfig</code></a></li>
+<li><a href="#recoveryconfig"><code>RecoveryConfig</code></a></li>
+<li><a href="#requestbodyobject"><code>RequestBodyObject</code></a></li>
+<li><a href="#requestidconfig"><code>RequestIDConfig</code></a></li>
+<li><a href="#responsecontext"><code>ResponseContext</code></a>
+<ul>
+<li><a href="#responsecontextbind"><code>ResponseContext.Bind</code></a></li>
+<li><a href="#responsecontextbindform"><code>ResponseContext.BindForm</code></a></li>
+<li><a href="#responsecontextbindjson"><code>ResponseContext.BindJSON</code></a></li>
+<li><a href="#responsecontextbindvalidated"><code>ResponseContext.BindValidated</code></a></li>
+<li><a href="#responsecontexthtml"><code>ResponseContext.HTML</code></a></li>
+<li><a href="#responsecontextjson"><code>ResponseContext.JSON</code></a></li>
+<li><a href="#responsecontextjsonerror"><code>ResponseContext.JSONError</code></a></li>
+<li><a href="#responsecontextredirect"><code>ResponseContext.Redirect</code></a></li>
+<li><a href="#responsecontextrequest"><code>ResponseContext.Request</code></a></li>
+<li><a href="#responsecontexttext"><code>ResponseContext.Text</code></a></li>
+<li><a href="#responsecontexturlparam"><code>ResponseContext.URLParam</code></a></li>
+<li><a href="#responsecontextwantsjson"><code>ResponseContext.WantsJSON</code></a></li>
+<li><a href="#responsecontextwriter"><code>ResponseContext.Writer</code></a></li>
+</ul>
+</li>
+<li><a href="#responseobject"><code>ResponseObject</code></a></li>
+<li><a href="#responseoption"><code>ResponseOption</code></a></li>
+<li><a href="#routeoptions"><code>RouteOptions</code></a></li>
+<li><a href="#router"><code>Router</code></a>
+<ul>
+<li><a href="#newrouter"><code>NewRouter</code></a></li>
+<li><a href="#routerdelete"><code>Router.Delete</code></a></li>
+<li><a href="#routerdeletefunc"><code>Router.DeleteFunc</code></a></li>
+<li><a href="#routerget"><code>Router.Get</code></a></li>
+<li><a href="#routergetfunc"><code>Router.GetFunc</code></a></li>
+<li><a href="#routergroup"><code>Router.Group</code></a></li>
+<li><a href="#routerhandle"><code>Router.Handle</code></a></li>
+<li><a href="#routerhandlefunc"><code>Router.HandleFunc</code></a></li>
+<li><a href="#routerpatch"><code>Router.Patch</code></a></li>
+<li><a href="#routerpatchfunc"><code>Router.PatchFunc</code></a></li>
+<li><a href="#routerpost"><code>Router.Post</code></a></li>
+<li><a href="#routerpostfunc"><code>Router.PostFunc</code></a></li>
+<li><a href="#routerput"><code>Router.Put</code></a></li>
+<li><a href="#routerputfunc"><code>Router.PutFunc</code></a></li>
+<li><a href="#routerservehttp"><code>Router.ServeHTTP</code></a></li>
+<li><a href="#routerserveopenapispec"><code>Router.ServeOpenAPISpec</code></a></li>
+<li><a href="#routerserveswaggerui"><code>Router.ServeSwaggerUI</code></a></li>
+<li><a href="#routersetmethodnotallowedhandler"><code>Router.SetMethodNotAllowedHandler</code></a></li>
+<li><a href="#routersetnotfoundhandler"><code>Router.SetNotFoundHandler</code></a></li>
+<li><a href="#routerstatic"><code>Router.Static</code></a></li>
+<li><a href="#routersubrouter"><code>Router.Subrouter</code></a></li>
+<li><a href="#routerurlparam"><code>Router.URLParam</code></a></li>
+<li><a href="#routeruse"><code>Router.Use</code></a></li>
+</ul>
+</li>
+<li><a href="#schemaobject"><code>SchemaObject</code></a></li>
+<li><a href="#securityheadersconfig"><code>SecurityHeadersConfig</code></a></li>
+<li><a href="#stringflag"><code>StringFlag</code></a>
+<ul>
+<li><a href="#stringflagapply"><code>StringFlag.Apply</code></a></li>
+<li><a href="#stringflaggetaliases"><code>StringFlag.GetAliases</code></a></li>
+<li><a href="#stringflaggetname"><code>StringFlag.GetName</code></a></li>
+<li><a href="#stringflagisrequired"><code>StringFlag.IsRequired</code></a></li>
+<li><a href="#stringflagstring"><code>StringFlag.String</code></a></li>
+<li><a href="#stringflagvalidate"><code>StringFlag.Validate</code></a></li>
+</ul>
+</li>
+<li><a href="#stringsliceflag"><code>StringSliceFlag</code></a>
+<ul>
+<li><a href="#stringsliceflagapply"><code>StringSliceFlag.Apply</code></a></li>
+<li><a href="#stringsliceflaggetaliases"><code>StringSliceFlag.GetAliases</code></a></li>
+<li><a href="#stringsliceflaggetname"><code>StringSliceFlag.GetName</code></a></li>
+<li><a href="#stringsliceflagisrequired"><code>StringSliceFlag.IsRequired</code></a></li>
+<li><a href="#stringsliceflagstring"><code>StringSliceFlag.String</code></a></li>
+<li><a href="#stringsliceflagvalidate"><code>StringSliceFlag.Validate</code></a></li>
+</ul>
+</li>
+<li><a href="#timeoutconfig"><code>TimeoutConfig</code></a></li>
+<li><a href="#trailingslashredirectconfig"><code>TrailingSlashRedirectConfig</code></a></li>
+<li><a href="#validationerrors"><code>ValidationErrors</code></a>
+<ul>
+<li><a href="#validationerrorserror"><code>ValidationErrors.Error</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="variables"><a class="header" href="#variables">Variables</a></h2>
+<h3 id="errmissingcontenttype"><a class="header" href="#errmissingcontenttype"><code>ErrMissingContentType</code></a></h3>
+<pre><code class="language-go">var ErrMissingContentType = fmt.Errorf("missing Content-Type header")
+</code></pre>
+<p>ErrMissingContentType indicates the Content-Type header was absent.</p>
+<hr />
+<h3 id="errunsupportedcontenttype"><a class="header" href="#errunsupportedcontenttype"><code>ErrUnsupportedContentType</code></a></h3>
+<pre><code class="language-go">var ErrUnsupportedContentType = fmt.Errorf("unsupported Content-Type")
+</code></pre>
+<p>ErrUnsupportedContentType indicates the Content-Type was not in the allowed list.</p>
+<hr />
+<h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
+<h3 id="createnewmigration"><a class="header" href="#createnewmigration"><code>CreateNewMigration</code></a></h3>
+<pre><code class="language-go">func CreateNewMigration(name string) error
+</code></pre>
+<p>CreateNewMigration creates a new migration file with a basic “up” and “down” template. The new file is named using the current Unix timestamp followed by an underscore and the provided name. The migration file is saved in the migrationsFolder and contains two sections separated by “– migrate:up” (for the migration) and “– migrate:down” (for the rollback).</p>
+<p>Parameters:</p>
+<pre><code class="language-text">name - A descriptive name for the migration (e.g., "create_users_table").
+</code></pre>
+<p>Returns an error if the file creation fails, otherwise nil.</p>
+<hr />
+<h3 id="getbasicauthuser"><a class="header" href="#getbasicauthuser"><code>GetBasicAuthUser</code></a></h3>
+<pre><code class="language-go">func GetBasicAuthUser(ctx context.Context) string
+</code></pre>
+<p>GetBasicAuthUser retrieves the authenticated username from the context, if available via BasicAuthMiddleware using the default key and if configured to store it.</p>
+<hr />
+<h3 id="getbasicauthuserwithkey"><a class="header" href="#getbasicauthuserwithkey"><code>GetBasicAuthUserWithKey</code></a></h3>
+<pre><code class="language-go">func GetBasicAuthUserWithKey(ctx context.Context, key contextKey) string
+</code></pre>
+<p>GetBasicAuthUserWithKey retrieves the authenticated username from the context using a specific key.</p>
+<hr />
+<h3 id="getcsrftoken"><a class="header" href="#getcsrftoken"><code>GetCSRFToken</code></a></h3>
+<pre><code class="language-go">func GetCSRFToken(ctx context.Context) string
+</code></pre>
+<p>GetCSRFToken retrieves the CSRF token from the context, if available via CSRFMiddleware using the default key. This is the token expected in subsequent unsafe requests.</p>
+<hr />
+<h3 id="getcsrftokenwithkey"><a class="header" href="#getcsrftokenwithkey"><code>GetCSRFTokenWithKey</code></a></h3>
+<pre><code class="language-go">func GetCSRFTokenWithKey(ctx context.Context, key contextKey) string
+</code></pre>
+<p>GetCSRFTokenWithKey retrieves the CSRF token from the context using a specific key.</p>
+<hr />
+<h3 id="getrealip"><a class="header" href="#getrealip"><code>GetRealIP</code></a></h3>
+<pre><code class="language-go">func GetRealIP(ctx context.Context) string
+</code></pre>
+<p>GetRealIP retrieves the client’s real IP from the context, if available via RealIPMiddleware using the default key.</p>
+<hr />
+<h3 id="getrealipwithkey"><a class="header" href="#getrealipwithkey"><code>GetRealIPWithKey</code></a></h3>
+<pre><code class="language-go">func GetRealIPWithKey(ctx context.Context, key contextKey) string
+</code></pre>
+<p>GetRealIPWithKey retrieves the client’s real IP from the context using a specific key.</p>
+<hr />
+<h3 id="getrequestid"><a class="header" href="#getrequestid"><code>GetRequestID</code></a></h3>
+<pre><code class="language-go">func GetRequestID(ctx context.Context) string
+</code></pre>
+<p>GetRequestID retrieves the request ID from the context, if available via RequestIDMiddleware using the default key.</p>
+<hr />
+<h3 id="getrequestidwithkey"><a class="header" href="#getrequestidwithkey"><code>GetRequestIDWithKey</code></a></h3>
+<pre><code class="language-go">func GetRequestIDWithKey(ctx context.Context, key contextKey) string
+</code></pre>
+<p>GetRequestIDWithKey retrieves the request ID from the context using a specific key.</p>
+<hr />
+<h3 id="loaddotenv"><a class="header" href="#loaddotenv"><code>LoadDotenv</code></a></h3>
+<pre><code class="language-go">func LoadDotenv(paths ...string) error
+</code></pre>
+<p>LoadDotenv loads variables from a .env file, expands them, and sets them as environment variables. If no path is provided, “.env” is used. If the specified file doesn’t exist, it is silently ignored.</p>
+<hr />
+<h3 id="migratedown"><a class="header" href="#migratedown"><code>MigrateDown</code></a></h3>
+<pre><code class="language-go">func MigrateDown(db *sql.DB, steps int) error
+</code></pre>
+<p>MigrateDown rolls back migrations on the provided database. It reads migration files from the migrations folder, sorts them in descending order, and applies the rollback (down) statements for each migration file where the migration version is less than or equal to the current version. The parameter steps indicates how many migrations to roll back: if steps is 0 the function rolls back one migration by default.</p>
+<p>Parameters:</p>
+<pre><code class="language-text">db    - The database handle (from database/sql).
+steps - The number of migrations to roll back (0 means 1 migration).
+</code></pre>
+<p>Returns an error if rollback fails, otherwise nil.</p>
+<hr />
+<h3 id="migrateup"><a class="header" href="#migrateup"><code>MigrateUp</code></a></h3>
+<pre><code class="language-go">func MigrateUp(db *sql.DB, steps int) error
+</code></pre>
+<p>MigrateUp applies pending migrations to the provided database. It reads migration files from the migrations folder, sorts them in ascending order, and applies each migration with a version greater than the current database version. The parameter steps indicates how many migrations to apply: if steps is 0 the function applies all pending migrations.</p>
+<p>Parameters:</p>
+<pre><code class="language-text">db    - The database handle (from database/sql).
+steps - The maximum number of migrations to apply (0 means apply all).
+</code></pre>
+<p>Returns an error if migration fails, otherwise nil.</p>
+<hr />
+<h3 id="newbufferingresponsewriterinterceptor"><a class="header" href="#newbufferingresponsewriterinterceptor"><code>NewBufferingResponseWriterInterceptor</code></a></h3>
+<pre><code class="language-go">func NewBufferingResponseWriterInterceptor(w http.ResponseWriter) *bufferingResponseWriterInterceptor
+</code></pre>
+<p>NewBufferingResponseWriterInterceptor creates a new buffering interceptor.</p>
+<hr />
+<h3 id="newresponsewriterinterceptor"><a class="header" href="#newresponsewriterinterceptor"><code>NewResponseWriterInterceptor</code></a></h3>
+<pre><code class="language-go">func NewResponseWriterInterceptor(w http.ResponseWriter) *responseWriterInterceptor
+</code></pre>
+<p>NewResponseWriterInterceptor creates a new interceptor.</p>
+<hr />
+<h3 id="serve"><a class="header" href="#serve"><code>Serve</code></a></h3>
+<pre><code class="language-go">func Serve(ctx *Context, router http.Handler) error
+</code></pre>
+<p>Serve launches the web server (concurrently) with graceful shutdown and live reloading (if enabled). It wraps key goroutines with recovery blocks to avoid crashes due to unexpected errors. It also allows for logging customization via context options.</p>
+<hr />
+<h2 id="types"><a class="header" href="#types">Types</a></h2>
+<h3 id="actionfunc"><a class="header" href="#actionfunc"><code>ActionFunc</code></a></h3>
+<pre><code class="language-go">type ActionFunc func(ctx *Context) error
+</code></pre>
+<p>ActionFunc defines the function signature for CLI actions (both global and command-specific). It receives a Context containing parsed flags and arguments.</p>
+<hr />
+<h3 id="authvalidator"><a class="header" href="#authvalidator"><code>AuthValidator</code></a></h3>
+<pre><code class="language-go">type AuthValidator func(username, password string) bool
+</code></pre>
+<p>AuthValidator is a function type that validates the provided username and password. It returns true if the credentials are valid.</p>
+<hr />
+<h3 id="basicauthconfig"><a class="header" href="#basicauthconfig"><code>BasicAuthConfig</code></a></h3>
+<pre><code class="language-go">type BasicAuthConfig struct {
+	// Realm is the authentication realm presented to the client. Defaults to "Restricted".
+	Realm string
+	// Validator is the function used to validate username/password combinations. Required.
+	Validator AuthValidator
+	// StoreUserInContext determines whether to store the validated username in the request context.
+	// Defaults to false.
+	StoreUserInContext bool
+	// ContextKey is the key used to store the username if StoreUserInContext is true.
+	// Defaults to the package's internal basicAuthUserKey.
+	ContextKey contextKey
+}
+</code></pre>
+<p>BasicAuthConfig holds configuration for BasicAuthMiddleware.</p>
+<hr />
+<h3 id="boolflag"><a class="header" href="#boolflag"><code>BoolFlag</code></a></h3>
+<pre><code class="language-go">type BoolFlag struct {
+	// Name is the primary identifier for the flag (e.g., "verbose"). Used as --name. (Required)
+	Name string
+	// Aliases provide alternative names (e.g., "V"). Single letters are used as -V.
+	Aliases []string
+	// Usage provides a brief description of the flag's purpose for help text. (Required)
+	Usage string
+	// Default sets the default value. Note: Presence of the flag usually implies true.
+	Default bool
+	// Required is ignored for BoolFlag as presence implies the value.
+	Required bool
+}
+</code></pre>
+<p>BoolFlag defines a flag that acts as a boolean switch (true if present, false otherwise).</p>
+<hr />
+<h4 id="methods"><a class="header" href="#methods">Methods</a></h4>
+<h3 id="apply"><a class="header" href="#apply"><code>Apply</code></a></h3>
+<pre><code class="language-go">func (f *BoolFlag) Apply(set *flag.FlagSet, cli *CLI) error
+</code></pre>
+<p>Apply registers the bool flag with the flag.FlagSet.</p>
+<hr />
+<h3 id="getaliases"><a class="header" href="#getaliases"><code>GetAliases</code></a></h3>
+<pre><code class="language-go">func (f *BoolFlag) GetAliases() []string
+</code></pre>
+<p>GetAliases returns the aliases for the flag.</p>
+<hr />
+<h3 id="getname"><a class="header" href="#getname"><code>GetName</code></a></h3>
+<pre><code class="language-go">func (f *BoolFlag) GetName() string
+</code></pre>
+<p>GetName returns the primary name of the flag.</p>
+<hr />
+<h3 id="isrequired"><a class="header" href="#isrequired"><code>IsRequired</code></a></h3>
+<pre><code class="language-go">func (f *BoolFlag) IsRequired() bool
+</code></pre>
+<p>IsRequired always returns false for boolean flags.</p>
+<hr />
+<h3 id="string"><a class="header" href="#string"><code>String</code></a></h3>
+<pre><code class="language-go">func (f *BoolFlag) String() string
+</code></pre>
+<p>String returns the help text representation of the flag.</p>
+<hr />
+<h3 id="validate"><a class="header" href="#validate"><code>Validate</code></a></h3>
+<pre><code class="language-go">func (f *BoolFlag) Validate(set *flag.FlagSet) error
+</code></pre>
+<p>Validate always returns nil for boolean flags.</p>
+<hr />
+<h3 id="cli"><a class="header" href="#cli"><code>CLI</code></a></h3>
+<pre><code class="language-go">type CLI struct {
+	// Name of the application (Required).
+	Name string
+	// Version string for the application (Required). Displayed with the --version flag.
+	Version string
+	// Description provides a brief explanation of the application's purpose, shown in help text.
+	Description string
+	// Commands is a list of commands the application supports.
+	Commands []*Command
+	// Action is the default function to run when no command is specified.
+	// If nil and no command is given, help is shown.
+	Action ActionFunc
+	// GlobalFlags are flags applicable to the application as a whole, before any command.
+	// Flags named "version" or aliased "v" are reserved and cannot be used.
+	// The "help" flag/alias is handled solely by the built-in 'help' command.
+	GlobalFlags []Flag
+	// Authors lists the application's authors, shown in the main help text.
+	Authors string
+	// contains filtered or unexported fields
+}
+</code></pre>
+<p>CLI represents the command-line application structure. It holds the application’s metadata, commands, global flags, and the main action. Name and Version are required fields when creating a CLI instance via NewCLI.</p>
+<hr />
+<h4 id="associated-functions"><a class="header" href="#associated-functions">Associated Functions</a></h4>
+<h3 id="newcli"><a class="header" href="#newcli"><code>NewCLI</code></a></h3>
+<pre><code class="language-go">func NewCLI(cli *CLI) (*CLI, error)
+</code></pre>
+<p>NewCLI creates and validates a new CLI application instance based on the provided configuration. The Name and Version fields in the input CLI struct are required. It checks for conflicts with reserved names/aliases (help command, h alias, version flag, v alias) and basic flag/command requirements. Returns the validated CLI instance or an error if validation fails.</p>
+<hr />
+<h4 id="methods-1"><a class="header" href="#methods-1">Methods</a></h4>
+<h3 id="addcommand"><a class="header" href="#addcommand"><code>AddCommand</code></a></h3>
+<pre><code class="language-go">func (c *CLI) AddCommand(cmd *Command) error
+</code></pre>
+<p>AddCommand registers a new command with the application <em>after</em> initial NewCLI() validation. It performs the same conflict checks as NewCLI(). It is generally recommended to define all commands and flags within the struct passed to NewCLI().</p>
+<hr />
+<h3 id="run"><a class="header" href="#run"><code>Run</code></a></h3>
+<pre><code class="language-go">func (c *CLI) Run(arguments []string) error
+</code></pre>
+<p>Run executes the CLI application based on the provided command-line arguments. Call NewCLI() to create and validate the CLI instance before calling Run. Run parses flags, handles the built-in version flag and help command, validates required flags, and executes the appropriate action (global or command-specific).</p>
+<hr />
+<h3 id="showhelp"><a class="header" href="#showhelp"><code>ShowHelp</code></a></h3>
+<pre><code class="language-go">func (c *CLI) ShowHelp(w io.Writer)
+</code></pre>
+<p>ShowHelp prints the main help message for the application to the specified writer.</p>
+<hr />
+<h3 id="corsconfig"><a class="header" href="#corsconfig"><code>CORSConfig</code></a></h3>
+<pre><code class="language-go">type CORSConfig struct {
+	// AllowedOrigins is a list of origins that are allowed to make cross-site requests.
+	// An origin of "*" allows any origin. Defaults to allowing no origins (empty list).
+	AllowedOrigins []string
+	// AllowedMethods is a list of HTTP methods that are allowed.
+	// Defaults to "GET, POST, PUT, DELETE, PATCH, OPTIONS".
+	AllowedMethods []string
+	// AllowedHeaders is a list of request headers that clients are allowed to send.
+	// Defaults to "Content-Type, Authorization, X-Request-ID". Use "*" to allow any header.
+	AllowedHeaders []string
+	// ExposedHeaders is a list of response headers that clients can access.
+	// Defaults to an empty list.
+	ExposedHeaders []string
+	// AllowCredentials indicates whether the browser should include credentials (like cookies)
+	// with the request. Cannot be used with AllowedOrigins = ["*"]. Defaults to false.
+	AllowCredentials bool
+	// MaxAgeSeconds specifies how long the result of a preflight request can be cached
+	// in seconds. Defaults to 86400 (24 hours). A value of -1 disables caching.
+	MaxAgeSeconds int
+}
+</code></pre>
+<p>CORSConfig holds configuration for CORSMiddleware.</p>
+<hr />
+<h3 id="csrfconfig"><a class="header" href="#csrfconfig"><code>CSRFConfig</code></a></h3>
+<pre><code class="language-go">type CSRFConfig struct {
+	// Logger specifies the logger instance for errors. Defaults to log.Default().
+	Logger *log.Logger
+	// FieldName is the name of the form field to check for the CSRF token.
+	// Defaults to "csrf_token".
+	FieldName string
+	// HeaderName is the name of the HTTP header to check for the CSRF token.
+	// Defaults to "X-CSRF-Token".
+	HeaderName string
+	// CookieName is the name of the cookie used to store the CSRF secret.
+	// Defaults to "_csrf". It should be HttpOnly.
+	CookieName string
+	// ContextKey is the key used to store the generated token in the request context.
+	// Defaults to the package's internal csrfTokenKey.
+	ContextKey contextKey
+	// ErrorHandler is called when CSRF validation fails.
+	// Defaults to sending a 403 Forbidden response.
+	ErrorHandler http.HandlerFunc
+	// CookiePath sets the path attribute of the CSRF cookie. Defaults to "/".
+	CookiePath string
+	// CookieDomain sets the domain attribute of the CSRF cookie. Defaults to "".
+	CookieDomain string
+	// CookieMaxAge sets the max-age attribute of the CSRF cookie.
+	// Defaults to 12 hours.
+	CookieMaxAge time.Duration
+	// CookieSecure sets the secure attribute of the CSRF cookie.
+	// Defaults to false (for HTTP testing). Set to true in production with HTTPS.
+	CookieSecure bool
+	// CookieSameSite sets the SameSite attribute of the CSRF cookie.
+	// Defaults to http.SameSiteLaxMode.
+	CookieSameSite http.SameSite
+	// TokenLength is the byte length of the generated token. Defaults to 32.
+	TokenLength int
+	// SkipMethods is a list of HTTP methods to skip CSRF checks for.
+	// Defaults to ["GET", "HEAD", "OPTIONS", "TRACE"].
+	SkipMethods []string
+}
+</code></pre>
+<p>CSRFConfig holds configuration for CSRFMiddleware.</p>
+<hr />
+<h3 id="cachecontrolconfig"><a class="header" href="#cachecontrolconfig"><code>CacheControlConfig</code></a></h3>
+<pre><code class="language-go">type CacheControlConfig struct {
+	// CacheControlValue is the string to set for the Cache-Control header. Required.
+	// Example values: "no-store", "no-cache", "public, max-age=3600"
+	CacheControlValue string
+}
+</code></pre>
+<p>CacheControlConfig holds configuration for CacheControlMiddleware.</p>
+<hr />
+<h3 id="command"><a class="header" href="#command"><code>Command</code></a></h3>
+<pre><code class="language-go">type Command struct {
+	// Name is the primary identifier for the command (Required).
+	Name string
+	// Aliases provide alternative names for invoking the command. "h" is reserved.
+	Aliases []string
+	// Usage provides a short description of the command's purpose, shown in the main help list.
+	Usage string
+	// Description gives a more detailed explanation of the command, shown in the command's help.
+	Description string
+	// ArgsUsage describes the expected arguments for the command, shown in the command's help.
+	// Example: "&lt;input-file&gt; [output-file]"
+	ArgsUsage string
+	// Action is the function executed when this command is invoked (Required).
+	Action ActionFunc
+	// Flags are the options specific to this command.
+	// Flags named "help" or aliased "h" are reserved and cannot be used.
+	Flags []Flag
+}
+</code></pre>
+<p>Command defines a specific action the CLI application can perform. It includes metadata, flags specific to the command, and the action function. Commands named “help” or aliased “h” are reserved.</p>
+<hr />
+<h4 id="methods-2"><a class="header" href="#methods-2">Methods</a></h4>
+<h3 id="showhelp"><a class="header" href="#showhelp"><code>ShowHelp</code></a></h3>
+<pre><code class="language-go">func (cmd *Command) ShowHelp(w io.Writer, appName string)
+</code></pre>
+<p>ShowHelp prints the help message for a specific command to the specified writer.</p>
+<hr />
+<h3 id="components"><a class="header" href="#components"><code>Components</code></a></h3>
+<pre><code class="language-go">type Components struct {
+	Schemas map[string]*SchemaObject `json:"schemas,omitempty"`
+}
+</code></pre>
+<p>Components holds reusable schema definitions for the OpenAPI spec.</p>
+<hr />
+<h3 id="concurrencylimiterconfig"><a class="header" href="#concurrencylimiterconfig"><code>ConcurrencyLimiterConfig</code></a></h3>
+<pre><code class="language-go">type ConcurrencyLimiterConfig struct {
+	// MaxConcurrent is the maximum number of requests allowed to be processed concurrently. Required.
+	MaxConcurrent int
+	// WaitTimeout is the maximum duration a request will wait for a slot before failing.
+	// If zero or negative, requests wait indefinitely.
+	WaitTimeout time.Duration
+	// OnLimitExceeded allows custom handling when the concurrency limit is hit and timeout occurs (if set).
+	// If nil, sends 503 Service Unavailable.
+	OnLimitExceeded func(w http.ResponseWriter, r *http.Request)
+}
+</code></pre>
+<p>ConcurrencyLimiterConfig holds configuration for ConcurrencyLimiterMiddleware.</p>
+<hr />
+<h3 id="context"><a class="header" href="#context"><code>Context</code></a></h3>
+<pre><code class="language-go">type Context struct {
+	// CLI points to the parent application instance.
+	CLI *CLI
+	// Command points to the specific command being executed (nil for the global action).
+	Command *Command
+	// contains filtered or unexported fields
+}
+</code></pre>
+<p>Context provides access to parsed flags, arguments, and application/command metadata within an ActionFunc.</p>
+<hr />
+<h4 id="methods-3"><a class="header" href="#methods-3">Methods</a></h4>
+<h3 id="args"><a class="header" href="#args"><code>Args</code></a></h3>
+<pre><code class="language-go">func (c *Context) Args() []string
+</code></pre>
+<p>Args returns the non-flag arguments remaining after parsing for the current context.</p>
+<hr />
+<h3 id="bool"><a class="header" href="#bool"><code>Bool</code></a></h3>
+<pre><code class="language-go">func (c *Context) Bool(name string) bool
+</code></pre>
+<p>Bool returns the boolean value of a flag specified by name. It checks command flags first, then global flags. Returns false if not found or type mismatch.</p>
+<hr />
+<h3 id="float64"><a class="header" href="#float64"><code>Float64</code></a></h3>
+<pre><code class="language-go">func (c *Context) Float64(name string) float64
+</code></pre>
+<p>Float64 returns the float64 value of a flag specified by name. It checks command flags first, then global flags. Returns 0.0 if not found or type mismatch.</p>
+<hr />
+<h3 id="int"><a class="header" href="#int"><code>Int</code></a></h3>
+<pre><code class="language-go">func (c *Context) Int(name string) int
+</code></pre>
+<p>Int returns the integer value of a flag specified by name. It checks command flags first, then global flags. Returns 0 if not found or type mismatch.</p>
+<hr />
+<h3 id="string"><a class="header" href="#string"><code>String</code></a></h3>
+<pre><code class="language-go">func (c *Context) String(name string) string
+</code></pre>
+<p>String returns the string value of a flag specified by name. It checks command flags first, then global flags. Returns “” if not found or type mismatch.</p>
+<hr />
+<h3 id="stringslice"><a class="header" href="#stringslice"><code>StringSlice</code></a></h3>
+<pre><code class="language-go">func (c *Context) StringSlice(name string) []string
+</code></pre>
+<p>StringSlice returns the []string value of a flag specified by name. It checks command flags first, then global flags. Returns nil if not found or type mismatch.</p>
+<hr />
+<h3 id="documentconfig"><a class="header" href="#documentconfig"><code>DocumentConfig</code></a></h3>
+<pre><code class="language-go">type DocumentConfig struct {
+	Lang        string        // Lang attribute for &lt;html&gt; tag, defaults to "en".
+	Title       string        // Content for &lt;title&gt; tag, defaults to "Document".
+	Charset     string        // Charset for &lt;meta charset&gt;, defaults to "utf-8".
+	Viewport    string        // Content for &lt;meta name="viewport"&gt;, defaults to "width=device-width, initial-scale=1".
+	Description string        // Content for &lt;meta name="description"&gt;. If empty, tag is omitted.
+	Keywords    string        // Content for &lt;meta name="keywords"&gt;. If empty, tag is omitted.
+	Author      string        // Content for &lt;meta name="author"&gt;. If empty, tag is omitted.
+	HeadExtras  []HTMLElement // Additional HTMLElements to be included in the &lt;head&gt; section.
+}
+</code></pre>
+<p>DocumentConfig provides configuration options for creating a new HTML document. Fields left as zero-values (e.g., empty strings) will use sensible defaults or be omitted if optional (like Description, Keywords, Author).</p>
+<hr />
+<h3 id="etagconfig"><a class="header" href="#etagconfig"><code>ETagConfig</code></a></h3>
+<pre><code class="language-go">type ETagConfig struct {
+	// Weak determines if weak ETags (prefixed with W/) should be generated.
+	// Weak ETags indicate semantic equivalence, not byte-for-byte identity.
+	// Defaults to false (strong ETags).
+	Weak bool
+	// SkipNoContent determines whether to skip ETag generation/checking for
+	// responses with status 204 No Content. Defaults to true.
+	SkipNoContent bool
+}
+</code></pre>
+<p>ETagConfig holds configuration for ETagMiddleware.</p>
+<hr />
+<h3 id="element"><a class="header" href="#element"><code>Element</code></a></h3>
+<pre><code class="language-go">type Element struct {
+	// contains filtered or unexported fields
+}
+</code></pre>
+<p>Element represents an HTML element with attributes, content, and child elements. It supports both self-closing elements (like <img>) and container elements (like <div>). Elements can be chained using fluent API methods for convenient construction.</p>
+<hr />
+<h4 id="associated-functions-1"><a class="header" href="#associated-functions-1">Associated Functions</a></h4>
+<h3 id="a"><a class="header" href="#a"><code>A</code></a></h3>
+<pre><code class="language-go">func A(href string, content ...HTMLElement) *Element
+</code></pre>
+<p>A creates an <a> anchor element.</p>
+<hr />
+<h3 id="abbr"><a class="header" href="#abbr"><code>Abbr</code></a></h3>
+<pre><code class="language-go">func Abbr(content ...HTMLElement) *Element
+</code></pre>
+<p>Abbr creates an <abbr> abbreviation element.</p>
+<hr />
+<h3 id="address"><a class="header" href="#address"><code>Address</code></a></h3>
+<pre><code class="language-go">func Address(content ...HTMLElement) *Element
+</code></pre>
+<p>Address creates an <address> semantic element.</p>
+<hr />
+<h3 id="article"><a class="header" href="#article"><code>Article</code></a></h3>
+<pre><code class="language-go">func Article(content ...HTMLElement) *Element
+</code></pre>
+<p>Article creates an <article> semantic element.</p>
+<hr />
+<h3 id="aside"><a class="header" href="#aside"><code>Aside</code></a></h3>
+<pre><code class="language-go">func Aside(content ...HTMLElement) *Element
+</code></pre>
+<p>Aside creates an <aside> semantic element.</p>
+<hr />
+<h3 id="audio"><a class="header" href="#audio"><code>Audio</code></a></h3>
+<pre><code class="language-go">func Audio(content ...HTMLElement) *Element
+</code></pre>
+<p>Audio creates an <audio> element.</p>
+<hr />
+<h3 id="b"><a class="header" href="#b"><code>B</code></a></h3>
+<pre><code class="language-go">func B(content ...HTMLElement) *Element
+</code></pre>
+<p>B creates a <b> element for stylistically offset text.</p>
+<hr />
+<h3 id="base"><a class="header" href="#base"><code>Base</code></a></h3>
+<pre><code class="language-go">func Base(href string) *Element
+</code></pre>
+<p>Base creates a <base> element.</p>
+<hr />
+<h3 id="blockquote"><a class="header" href="#blockquote"><code>Blockquote</code></a></h3>
+<pre><code class="language-go">func Blockquote(content ...HTMLElement) *Element
+</code></pre>
+<p>Blockquote creates a <blockquote> element.</p>
+<hr />
+<h3 id="body"><a class="header" href="#body"><code>Body</code></a></h3>
+<pre><code class="language-go">func Body(content ...HTMLElement) *Element
+</code></pre>
+<p>Body creates a <body> element.</p>
+<hr />
+<h3 id="br"><a class="header" href="#br"><code>Br</code></a></h3>
+<pre><code class="language-go">func Br() *Element
+</code></pre>
+<p>Br creates a self-closing <br> line break element.</p>
+<hr />
+<h3 id="button"><a class="header" href="#button"><code>Button</code></a></h3>
+<pre><code class="language-go">func Button(content ...HTMLElement) *Element
+</code></pre>
+<p>Button creates a <button> element.</p>
+<hr />
+<h3 id="buttoninput"><a class="header" href="#buttoninput"><code>ButtonInput</code></a></h3>
+<pre><code class="language-go">func ButtonInput(valueText string) *Element
+</code></pre>
+<p>ButtonInput creates an <input type="button">.</p>
+<hr />
+<h3 id="caption"><a class="header" href="#caption"><code>Caption</code></a></h3>
+<pre><code class="language-go">func Caption(content ...HTMLElement) *Element
+</code></pre>
+<p>Caption creates a <caption> element for a table.</p>
+<hr />
+<h3 id="checkboxinput"><a class="header" href="#checkboxinput"><code>CheckboxInput</code></a></h3>
+<pre><code class="language-go">func CheckboxInput(name string) *Element
+</code></pre>
+<p>CheckboxInput creates an <input type="checkbox">.</p>
+<hr />
+<h3 id="cite"><a class="header" href="#cite"><code>Cite</code></a></h3>
+<pre><code class="language-go">func Cite(content ...HTMLElement) *Element
+</code></pre>
+<p>Cite creates a <cite> element.</p>
+<hr />
+<h3 id="code"><a class="header" href="#code"><code>Code</code></a></h3>
+<pre><code class="language-go">func Code(content ...HTMLElement) *Element
+</code></pre>
+<p>Code creates a <code> element.</p>
+<hr />
+<h3 id="col"><a class="header" href="#col"><code>Col</code></a></h3>
+<pre><code class="language-go">func Col() *Element
+</code></pre>
+<p>Col creates a <col> element. It’s self-closing.</p>
+<hr />
+<h3 id="colgroup"><a class="header" href="#colgroup"><code>Colgroup</code></a></h3>
+<pre><code class="language-go">func Colgroup(content ...HTMLElement) *Element
+</code></pre>
+<p>Colgroup creates a <colgroup> element.</p>
+<hr />
+<h3 id="colorinput"><a class="header" href="#colorinput"><code>ColorInput</code></a></h3>
+<pre><code class="language-go">func ColorInput(name string) *Element
+</code></pre>
+<p>ColorInput creates an <input type="color"> field.</p>
+<hr />
+<h3 id="datalist"><a class="header" href="#datalist"><code>Datalist</code></a></h3>
+<pre><code class="language-go">func Datalist(id string, content ...HTMLElement) *Element
+</code></pre>
+<p>Datalist creates a <datalist> element.</p>
+<hr />
+<h3 id="dateinput"><a class="header" href="#dateinput"><code>DateInput</code></a></h3>
+<pre><code class="language-go">func DateInput(name string) *Element
+</code></pre>
+<p>DateInput creates an <input type="date"> field.</p>
+<hr />
+<h3 id="datetimelocalinput"><a class="header" href="#datetimelocalinput"><code>DateTimeLocalInput</code></a></h3>
+<pre><code class="language-go">func DateTimeLocalInput(name string) *Element
+</code></pre>
+<p>DateTimeLocalInput creates an <input type="datetime-local"> field.</p>
+<hr />
+<h3 id="details"><a class="header" href="#details"><code>Details</code></a></h3>
+<pre><code class="language-go">func Details(content ...HTMLElement) *Element
+</code></pre>
+<p>Details creates a <details> element.</p>
+<hr />
+<h3 id="dfn"><a class="header" href="#dfn"><code>Dfn</code></a></h3>
+<pre><code class="language-go">func Dfn(content ...HTMLElement) *Element
+</code></pre>
+<p>Dfn creates a <dfn> definition element.</p>
+<hr />
+<h3 id="dialogel"><a class="header" href="#dialogel"><code>DialogEl</code></a></h3>
+<pre><code class="language-go">func DialogEl(content ...HTMLElement) *Element
+</code></pre>
+<p>DialogEl creates a <dialog> element. Renamed to avoid potential conflicts.</p>
+<hr />
+<h3 id="div"><a class="header" href="#div"><code>Div</code></a></h3>
+<pre><code class="language-go">func Div(content ...HTMLElement) *Element
+</code></pre>
+<p>Div creates a <div> element.</p>
+<hr />
+<h3 id="em"><a class="header" href="#em"><code>Em</code></a></h3>
+<pre><code class="language-go">func Em(content ...HTMLElement) *Element
+</code></pre>
+<p>Em creates an <em> emphasis element.</p>
+<hr />
+<h3 id="emailinput"><a class="header" href="#emailinput"><code>EmailInput</code></a></h3>
+<pre><code class="language-go">func EmailInput(name string) *Element
+</code></pre>
+<p>EmailInput creates an <input type="email"> field.</p>
+<hr />
+<h3 id="embedel"><a class="header" href="#embedel"><code>EmbedEl</code></a></h3>
+<pre><code class="language-go">func EmbedEl(src string, embedType string) *Element
+</code></pre>
+<p>EmbedEl creates an <embed> element. It’s self-closing. Renamed to avoid keyword conflict.</p>
+<hr />
+<h3 id="favicon"><a class="header" href="#favicon"><code>Favicon</code></a></h3>
+<pre><code class="language-go">func Favicon(href string, rel ...string) *Element
+</code></pre>
+<p>Favicon creates a <link> element for a favicon.</p>
+<hr />
+<h3 id="fieldset"><a class="header" href="#fieldset"><code>Fieldset</code></a></h3>
+<pre><code class="language-go">func Fieldset(content ...HTMLElement) *Element
+</code></pre>
+<p>Fieldset creates a <fieldset> element.</p>
+<hr />
+<h3 id="figcaption"><a class="header" href="#figcaption"><code>Figcaption</code></a></h3>
+<pre><code class="language-go">func Figcaption(content ...HTMLElement) *Element
+</code></pre>
+<p>Figcaption creates a <figcaption> element.</p>
+<hr />
+<h3 id="figure"><a class="header" href="#figure"><code>Figure</code></a></h3>
+<pre><code class="language-go">func Figure(content ...HTMLElement) *Element
+</code></pre>
+<p>Figure creates a <figure> element.</p>
+<hr />
+<h3 id="fileinput"><a class="header" href="#fileinput"><code>FileInput</code></a></h3>
+<pre><code class="language-go">func FileInput(name string) *Element
+</code></pre>
+<p>FileInput creates an <input type="file"> field.</p>
+<hr />
+<h3 id="footer"><a class="header" href="#footer"><code>Footer</code></a></h3>
+<pre><code class="language-go">func Footer(content ...HTMLElement) *Element
+</code></pre>
+<p>Footer creates a <footer> semantic element.</p>
+<hr />
+<h3 id="form"><a class="header" href="#form"><code>Form</code></a></h3>
+<pre><code class="language-go">func Form(content ...HTMLElement) *Element
+</code></pre>
+<p>Form creates a <form> element.</p>
+<hr />
+<h3 id="h1"><a class="header" href="#h1"><code>H1</code></a></h3>
+<pre><code class="language-go">func H1(content ...HTMLElement) *Element
+</code></pre>
+<p>H1 creates an <h1> heading element.</p>
+<hr />
+<h3 id="h2"><a class="header" href="#h2"><code>H2</code></a></h3>
+<pre><code class="language-go">func H2(content ...HTMLElement) *Element
+</code></pre>
+<p>H2 creates an <h2> heading element.</p>
+<hr />
+<h3 id="h3"><a class="header" href="#h3"><code>H3</code></a></h3>
+<pre><code class="language-go">func H3(content ...HTMLElement) *Element
+</code></pre>
+<p>H3 creates an <h3> heading element.</p>
+<hr />
+<h3 id="h4"><a class="header" href="#h4"><code>H4</code></a></h3>
+<pre><code class="language-go">func H4(content ...HTMLElement) *Element
+</code></pre>
+<p>H4 creates an <h4> heading element.</p>
+<hr />
+<h3 id="h5"><a class="header" href="#h5"><code>H5</code></a></h3>
+<pre><code class="language-go">func H5(content ...HTMLElement) *Element
+</code></pre>
+<p>H5 creates an <h5> heading element.</p>
+<hr />
+<h3 id="h6"><a class="header" href="#h6"><code>H6</code></a></h3>
+<pre><code class="language-go">func H6(content ...HTMLElement) *Element
+</code></pre>
+<p>H6 creates an <h6> heading element.</p>
+<hr />
+<h3 id="head"><a class="header" href="#head"><code>Head</code></a></h3>
+<pre><code class="language-go">func Head(content ...HTMLElement) *Element
+</code></pre>
+<p>Head creates a <head> element.</p>
+<hr />
+<h3 id="header"><a class="header" href="#header"><code>Header</code></a></h3>
+<pre><code class="language-go">func Header(content ...HTMLElement) *Element
+</code></pre>
+<p>Header creates a <header> semantic element.</p>
+<hr />
+<h3 id="hiddeninput"><a class="header" href="#hiddeninput"><code>HiddenInput</code></a></h3>
+<pre><code class="language-go">func HiddenInput(name string, value string) *Element
+</code></pre>
+<p>HiddenInput creates an <input type="hidden"> field.</p>
+<hr />
+<h3 id="hr"><a class="header" href="#hr"><code>Hr</code></a></h3>
+<pre><code class="language-go">func Hr() *Element
+</code></pre>
+<p>Hr creates a self-closing <hr> horizontal rule element.</p>
+<hr />
+<h3 id="html"><a class="header" href="#html"><code>Html</code></a></h3>
+<pre><code class="language-go">func Html(content ...HTMLElement) *Element
+</code></pre>
+<p>Html creates an <html> element.</p>
+<hr />
+<h3 id="i"><a class="header" href="#i"><code>I</code></a></h3>
+<pre><code class="language-go">func I(content ...HTMLElement) *Element
+</code></pre>
+<p>I creates an <i> idiomatic text element.</p>
+<hr />
+<h3 id="iframe"><a class="header" href="#iframe"><code>Iframe</code></a></h3>
+<pre><code class="language-go">func Iframe(src string) *Element
+</code></pre>
+<p>Iframe creates an <iframe> element.</p>
+<hr />
+<h3 id="image"><a class="header" href="#image"><code>Image</code></a></h3>
+<pre><code class="language-go">func Image(src, alt string) *Element
+</code></pre>
+<p>Image creates an <img> element (alias for Img).</p>
+<hr />
+<h3 id="img"><a class="header" href="#img"><code>Img</code></a></h3>
+<pre><code class="language-go">func Img(src, alt string) *Element
+</code></pre>
+<p>Img creates a self-closing <img> element.</p>
+<hr />
+<h3 id="inlinescript"><a class="header" href="#inlinescript"><code>InlineScript</code></a></h3>
+<pre><code class="language-go">func InlineScript(scriptContent string) *Element
+</code></pre>
+<p>InlineScript creates a <script> element with inline JavaScript content.</p>
+<hr />
+<h3 id="input"><a class="header" href="#input"><code>Input</code></a></h3>
+<pre><code class="language-go">func Input(inputType string) *Element
+</code></pre>
+<p>Input creates a self-closing <input> element.</p>
+<hr />
+<h3 id="kbd"><a class="header" href="#kbd"><code>Kbd</code></a></h3>
+<pre><code class="language-go">func Kbd(content ...HTMLElement) *Element
+</code></pre>
+<p>Kbd creates a <kbd> keyboard input element.</p>
+<hr />
+<h3 id="label"><a class="header" href="#label"><code>Label</code></a></h3>
+<pre><code class="language-go">func Label(content ...HTMLElement) *Element
+</code></pre>
+<p>Label creates a <label> element.</p>
+<hr />
+<h3 id="legend"><a class="header" href="#legend"><code>Legend</code></a></h3>
+<pre><code class="language-go">func Legend(content ...HTMLElement) *Element
+</code></pre>
+<p>Legend creates a <legend> element.</p>
+<hr />
+<h3 id="li"><a class="header" href="#li"><code>Li</code></a></h3>
+<pre><code class="language-go">func Li(content ...HTMLElement) *Element
+</code></pre>
+<p>Li creates a <li> list item element.</p>
+<hr />
+<h3 id="link"><a class="header" href="#link"><code>Link</code></a></h3>
+<pre><code class="language-go">func Link(href, textContent string) *Element
+</code></pre>
+<p>Link creates an <a> anchor element with href and text content.</p>
+<hr />
+<h3 id="linktag"><a class="header" href="#linktag"><code>LinkTag</code></a></h3>
+<pre><code class="language-go">func LinkTag() *Element
+</code></pre>
+<p>LinkTag creates a generic <link> element. It’s self-closing.</p>
+<hr />
+<h3 id="main"><a class="header" href="#main"><code>Main</code></a></h3>
+<pre><code class="language-go">func Main(content ...HTMLElement) *Element
+</code></pre>
+<p>Main creates a <main> semantic element.</p>
+<hr />
+<h3 id="mark"><a class="header" href="#mark"><code>Mark</code></a></h3>
+<pre><code class="language-go">func Mark(content ...HTMLElement) *Element
+</code></pre>
+<p>Mark creates a <mark> element.</p>
+<hr />
+<h3 id="meta"><a class="header" href="#meta"><code>Meta</code></a></h3>
+<pre><code class="language-go">func Meta() *Element
+</code></pre>
+<p>Meta creates a generic <meta> element. It’s self-closing.</p>
+<hr />
+<h3 id="metacharset"><a class="header" href="#metacharset"><code>MetaCharset</code></a></h3>
+<pre><code class="language-go">func MetaCharset(charset string) *Element
+</code></pre>
+<p>MetaCharset creates a <meta charset="..."> element.</p>
+<hr />
+<h3 id="metanamecontent"><a class="header" href="#metanamecontent"><code>MetaNameContent</code></a></h3>
+<pre><code class="language-go">func MetaNameContent(name, contentVal string) *Element
+</code></pre>
+<p>MetaNameContent creates a <meta name="..." content="..."> element.</p>
+<hr />
+<h3 id="metapropertycontent"><a class="header" href="#metapropertycontent"><code>MetaPropertyContent</code></a></h3>
+<pre><code class="language-go">func MetaPropertyContent(property, contentVal string) *Element
+</code></pre>
+<p>MetaPropertyContent creates a <meta property="..." content="..."> element.</p>
+<hr />
+<h3 id="metaviewport"><a class="header" href="#metaviewport"><code>MetaViewport</code></a></h3>
+<pre><code class="language-go">func MetaViewport(contentVal string) *Element
+</code></pre>
+<p>MetaViewport creates a <meta name="viewport" content="..."> element.</p>
+<hr />
+<h3 id="meterel"><a class="header" href="#meterel"><code>MeterEl</code></a></h3>
+<pre><code class="language-go">func MeterEl(content ...HTMLElement) *Element
+</code></pre>
+<p>MeterEl creates a <meter> element. Renamed to avoid potential conflicts.</p>
+<hr />
+<h3 id="monthinput"><a class="header" href="#monthinput"><code>MonthInput</code></a></h3>
+<pre><code class="language-go">func MonthInput(name string) *Element
+</code></pre>
+<p>MonthInput creates an <input type="month"> field.</p>
+<hr />
+<h3 id="nav"><a class="header" href="#nav"><code>Nav</code></a></h3>
+<pre><code class="language-go">func Nav(content ...HTMLElement) *Element
+</code></pre>
+<p>Nav creates a <nav> semantic element.</p>
+<hr />
+<h3 id="noscript"><a class="header" href="#noscript"><code>NoScript</code></a></h3>
+<pre><code class="language-go">func NoScript(content ...HTMLElement) *Element
+</code></pre>
+<p>NoScript creates a <noscript> element.</p>
+<hr />
+<h3 id="numberinput"><a class="header" href="#numberinput"><code>NumberInput</code></a></h3>
+<pre><code class="language-go">func NumberInput(name string) *Element
+</code></pre>
+<p>NumberInput creates an <input type="number"> field.</p>
+<hr />
+<h3 id="objectel"><a class="header" href="#objectel"><code>ObjectEl</code></a></h3>
+<pre><code class="language-go">func ObjectEl(content ...HTMLElement) *Element
+</code></pre>
+<p>ObjectEl creates an <object> element. Renamed to avoid keyword conflict.</p>
+<hr />
+<h3 id="ol"><a class="header" href="#ol"><code>Ol</code></a></h3>
+<pre><code class="language-go">func Ol(content ...HTMLElement) *Element
+</code></pre>
+<p>Ol creates an <ol> ordered list element.</p>
+<hr />
+<h3 id="optgroup"><a class="header" href="#optgroup"><code>Optgroup</code></a></h3>
+<pre><code class="language-go">func Optgroup(label string, content ...HTMLElement) *Element
+</code></pre>
+<p>Optgroup creates an <optgroup> element.</p>
+<hr />
+<h3 id="option"><a class="header" href="#option"><code>Option</code></a></h3>
+<pre><code class="language-go">func Option(value string, content ...HTMLElement) *Element
+</code></pre>
+<p>Option creates an <option> element.</p>
+<hr />
+<h3 id="outputel"><a class="header" href="#outputel"><code>OutputEl</code></a></h3>
+<pre><code class="language-go">func OutputEl(content ...HTMLElement) *Element
+</code></pre>
+<p>OutputEl creates an <output> element. Renamed to avoid potential conflicts.</p>
+<hr />
+<h3 id="p"><a class="header" href="#p"><code>P</code></a></h3>
+<pre><code class="language-go">func P(content ...HTMLElement) *Element
+</code></pre>
+<p>P creates a <p> paragraph element.</p>
+<hr />
+<h3 id="param"><a class="header" href="#param"><code>Param</code></a></h3>
+<pre><code class="language-go">func Param(name, value string) *Element
+</code></pre>
+<p>Param creates a <param> element. It’s self-closing.</p>
+<hr />
+<h3 id="passwordinput"><a class="header" href="#passwordinput"><code>PasswordInput</code></a></h3>
+<pre><code class="language-go">func PasswordInput(name string) *Element
+</code></pre>
+<p>PasswordInput creates an <input type="password"> field.</p>
+<hr />
+<h3 id="pre"><a class="header" href="#pre"><code>Pre</code></a></h3>
+<pre><code class="language-go">func Pre(content ...HTMLElement) *Element
+</code></pre>
+<p>Pre creates a <pre> element.</p>
+<hr />
+<h3 id="preload"><a class="header" href="#preload"><code>Preload</code></a></h3>
+<pre><code class="language-go">func Preload(href string, asType string) *Element
+</code></pre>
+<p>Preload creates a <link rel="preload"> element.</p>
+<hr />
+<h3 id="progressel"><a class="header" href="#progressel"><code>ProgressEl</code></a></h3>
+<pre><code class="language-go">func ProgressEl(content ...HTMLElement) *Element
+</code></pre>
+<p>ProgressEl creates a <progress> element. Renamed to avoid potential conflicts.</p>
+<hr />
+<h3 id="q"><a class="header" href="#q"><code>Q</code></a></h3>
+<pre><code class="language-go">func Q(content ...HTMLElement) *Element
+</code></pre>
+<p>Q creates a <q> inline quotation element.</p>
+<hr />
+<h3 id="radioinput"><a class="header" href="#radioinput"><code>RadioInput</code></a></h3>
+<pre><code class="language-go">func RadioInput(name, value string) *Element
+</code></pre>
+<p>RadioInput creates an <input type="radio">.</p>
+<hr />
+<h3 id="rangeinput"><a class="header" href="#rangeinput"><code>RangeInput</code></a></h3>
+<pre><code class="language-go">func RangeInput(name string) *Element
+</code></pre>
+<p>RangeInput creates an <input type="range"> field.</p>
+<hr />
+<h3 id="resetbutton"><a class="header" href="#resetbutton"><code>ResetButton</code></a></h3>
+<pre><code class="language-go">func ResetButton(text string) *Element
+</code></pre>
+<p>ResetButton creates a <button type="reset">.</p>
+<hr />
+<h3 id="samp"><a class="header" href="#samp"><code>Samp</code></a></h3>
+<pre><code class="language-go">func Samp(content ...HTMLElement) *Element
+</code></pre>
+<p>Samp creates a <samp> sample output element.</p>
+<hr />
+<h3 id="script"><a class="header" href="#script"><code>Script</code></a></h3>
+<pre><code class="language-go">func Script(src string) *Element
+</code></pre>
+<p>Script creates a <script> element for external JavaScript files.</p>
+<hr />
+<h3 id="searchinput"><a class="header" href="#searchinput"><code>SearchInput</code></a></h3>
+<pre><code class="language-go">func SearchInput(name string) *Element
+</code></pre>
+<p>SearchInput creates an <input type="search"> field.</p>
+<hr />
+<h3 id="section"><a class="header" href="#section"><code>Section</code></a></h3>
+<pre><code class="language-go">func Section(content ...HTMLElement) *Element
+</code></pre>
+<p>Section creates a <section> semantic element.</p>
+<hr />
+<h3 id="select"><a class="header" href="#select"><code>Select</code></a></h3>
+<pre><code class="language-go">func Select(content ...HTMLElement) *Element
+</code></pre>
+<p>Select creates a <select> dropdown element.</p>
+<hr />
+<h3 id="small"><a class="header" href="#small"><code>Small</code></a></h3>
+<pre><code class="language-go">func Small(content ...HTMLElement) *Element
+</code></pre>
+<p>Small creates a <small> element.</p>
+<hr />
+<h3 id="source"><a class="header" href="#source"><code>Source</code></a></h3>
+<pre><code class="language-go">func Source(src string, mediaType string) *Element
+</code></pre>
+<p>Source creates a <source> element. It’s self-closing.</p>
+<hr />
+<h3 id="span"><a class="header" href="#span"><code>Span</code></a></h3>
+<pre><code class="language-go">func Span(content ...HTMLElement) *Element
+</code></pre>
+<p>Span creates a <span> inline element.</p>
+<hr />
+<h3 id="strong"><a class="header" href="#strong"><code>Strong</code></a></h3>
+<pre><code class="language-go">func Strong(content ...HTMLElement) *Element
+</code></pre>
+<p>Strong creates a <strong> element.</p>
+<hr />
+<h3 id="stylesheet"><a class="header" href="#stylesheet"><code>StyleSheet</code></a></h3>
+<pre><code class="language-go">func StyleSheet(href string) *Element
+</code></pre>
+<p>StyleSheet creates a <link rel="stylesheet"> element.</p>
+<hr />
+<h3 id="styletag"><a class="header" href="#styletag"><code>StyleTag</code></a></h3>
+<pre><code class="language-go">func StyleTag(cssContent string) *Element
+</code></pre>
+<p>StyleTag creates a <style> element for embedding CSS.</p>
+<hr />
+<h3 id="sub"><a class="header" href="#sub"><code>Sub</code></a></h3>
+<pre><code class="language-go">func Sub(content ...HTMLElement) *Element
+</code></pre>
+<p>Sub creates a <sub> subscript element.</p>
+<hr />
+<h3 id="submitbutton"><a class="header" href="#submitbutton"><code>SubmitButton</code></a></h3>
+<pre><code class="language-go">func SubmitButton(text string) *Element
+</code></pre>
+<p>SubmitButton creates a <button type="submit">.</p>
+<hr />
+<h3 id="summary"><a class="header" href="#summary"><code>Summary</code></a></h3>
+<pre><code class="language-go">func Summary(content ...HTMLElement) *Element
+</code></pre>
+<p>Summary creates a <summary> element.</p>
+<hr />
+<h3 id="sup"><a class="header" href="#sup"><code>Sup</code></a></h3>
+<pre><code class="language-go">func Sup(content ...HTMLElement) *Element
+</code></pre>
+<p>Sup creates a <sup> superscript element.</p>
+<hr />
+<h3 id="table"><a class="header" href="#table"><code>Table</code></a></h3>
+<pre><code class="language-go">func Table(content ...HTMLElement) *Element
+</code></pre>
+<p>Table creates a <table> element.</p>
+<hr />
+<h3 id="tbody"><a class="header" href="#tbody"><code>Tbody</code></a></h3>
+<pre><code class="language-go">func Tbody(content ...HTMLElement) *Element
+</code></pre>
+<p>Tbody creates a <tbody> table body group element.</p>
+<hr />
+<h3 id="td"><a class="header" href="#td"><code>Td</code></a></h3>
+<pre><code class="language-go">func Td(content ...HTMLElement) *Element
+</code></pre>
+<p>Td creates a <td> table data cell element.</p>
+<hr />
+<h3 id="telinput"><a class="header" href="#telinput"><code>TelInput</code></a></h3>
+<pre><code class="language-go">func TelInput(name string) *Element
+</code></pre>
+<p>TelInput creates an <input type="tel"> field.</p>
+<hr />
+<h3 id="textinput"><a class="header" href="#textinput"><code>TextInput</code></a></h3>
+<pre><code class="language-go">func TextInput(name string) *Element
+</code></pre>
+<p>TextInput creates an <input type="text"> field.</p>
+<hr />
+<h3 id="textarea"><a class="header" href="#textarea"><code>Textarea</code></a></h3>
+<pre><code class="language-go">func Textarea(content ...HTMLElement) *Element
+</code></pre>
+<p>Textarea creates a <textarea> element.</p>
+<hr />
+<h3 id="th"><a class="header" href="#th"><code>Th</code></a></h3>
+<pre><code class="language-go">func Th(content ...HTMLElement) *Element
+</code></pre>
+<p>Th creates a <th> table header cell element.</p>
+<hr />
+<h3 id="thead"><a class="header" href="#thead"><code>Thead</code></a></h3>
+<pre><code class="language-go">func Thead(content ...HTMLElement) *Element
+</code></pre>
+<p>Thead creates a <thead> table header group element.</p>
+<hr />
+<h3 id="timeel"><a class="header" href="#timeel"><code>TimeEl</code></a></h3>
+<pre><code class="language-go">func TimeEl(content ...HTMLElement) *Element
+</code></pre>
+<p>TimeEl creates a <time> element. Renamed to avoid potential conflicts.</p>
+<hr />
+<h3 id="timeinput"><a class="header" href="#timeinput"><code>TimeInput</code></a></h3>
+<pre><code class="language-go">func TimeInput(name string) *Element
+</code></pre>
+<p>TimeInput creates an <input type="time"> field.</p>
+<hr />
+<h3 id="titleel"><a class="header" href="#titleel"><code>TitleEl</code></a></h3>
+<pre><code class="language-go">func TitleEl(titleText string) *Element
+</code></pre>
+<p>TitleEl creates a <title> element with the specified text. Renamed from Title to TitleEl to avoid conflict with (*Element).Title method if it existed.</p>
+<hr />
+<h3 id="tr"><a class="header" href="#tr"><code>Tr</code></a></h3>
+<pre><code class="language-go">func Tr(content ...HTMLElement) *Element
+</code></pre>
+<p>Tr creates a <tr> table row element.</p>
+<hr />
+<h3 id="track"><a class="header" href="#track"><code>Track</code></a></h3>
+<pre><code class="language-go">func Track(kind, src, srclang string) *Element
+</code></pre>
+<p>Track creates a <track> element. It’s self-closing.</p>
+<hr />
+<h3 id="u"><a class="header" href="#u"><code>U</code></a></h3>
+<pre><code class="language-go">func U(content ...HTMLElement) *Element
+</code></pre>
+<p>U creates a <u> unarticulated annotation element.</p>
+<hr />
+<h3 id="ul"><a class="header" href="#ul"><code>Ul</code></a></h3>
+<pre><code class="language-go">func Ul(content ...HTMLElement) *Element
+</code></pre>
+<p>Ul creates a <ul> unordered list element.</p>
+<hr />
+<h3 id="urlinput"><a class="header" href="#urlinput"><code>UrlInput</code></a></h3>
+<pre><code class="language-go">func UrlInput(name string) *Element
+</code></pre>
+<p>UrlInput creates an <input type="url"> field.</p>
+<hr />
+<h3 id="varel"><a class="header" href="#varel"><code>VarEl</code></a></h3>
+<pre><code class="language-go">func VarEl(content ...HTMLElement) *Element
+</code></pre>
+<p>VarEl creates a <var> variable element. Renamed to avoid keyword conflict.</p>
+<hr />
+<h3 id="video"><a class="header" href="#video"><code>Video</code></a></h3>
+<pre><code class="language-go">func Video(content ...HTMLElement) *Element
+</code></pre>
+<p>Video creates a <video> element.</p>
+<hr />
+<h3 id="wbr"><a class="header" href="#wbr"><code>Wbr</code></a></h3>
+<pre><code class="language-go">func Wbr() *Element
+</code></pre>
+<p>Wbr creates a <wbr> word break opportunity element. It’s self-closing.</p>
+<hr />
+<h3 id="weekinput"><a class="header" href="#weekinput"><code>WeekInput</code></a></h3>
+<pre><code class="language-go">func WeekInput(name string) *Element
+</code></pre>
+<p>WeekInput creates an <input type="week"> field.</p>
+<hr />
+<h4 id="methods-4"><a class="header" href="#methods-4">Methods</a></h4>
+<h3 id="add"><a class="header" href="#add"><code>Add</code></a></h3>
+<pre><code class="language-go">func (e *Element) Add(children ...HTMLElement) *Element
+</code></pre>
+<p>Add appends child elements to this element.</p>
+<hr />
+<h3 id="attr"><a class="header" href="#attr"><code>Attr</code></a></h3>
+<pre><code class="language-go">func (e *Element) Attr(key, value string) *Element
+</code></pre>
+<p>Attr sets an attribute on the element and returns the element for method chaining.</p>
+<hr />
+<h3 id="boolattr"><a class="header" href="#boolattr"><code>BoolAttr</code></a></h3>
+<pre><code class="language-go">func (e *Element) BoolAttr(key string, present bool) *Element
+</code></pre>
+<p>BoolAttr sets or removes a boolean attribute on the element. If present is true, the attribute is added (e.g., <input disabled>). If present is false, the attribute is removed if it exists.</p>
+<hr />
+<h3 id="class"><a class="header" href="#class"><code>Class</code></a></h3>
+<pre><code class="language-go">func (e *Element) Class(class string) *Element
+</code></pre>
+<p>Class sets the class attribute on the element.</p>
+<hr />
+<h3 id="id"><a class="header" href="#id"><code>ID</code></a></h3>
+<pre><code class="language-go">func (e *Element) ID(id string) *Element
+</code></pre>
+<p>ID sets the id attribute on the element.</p>
+<hr />
+<h3 id="render"><a class="header" href="#render"><code>Render</code></a></h3>
+<pre><code class="language-go">func (e *Element) Render() string
+</code></pre>
+<p>Render converts the element to its HTML string representation. It handles both self-closing and container elements, attributes, content, and children. The output is properly formatted HTML that can be sent to browsers. Content and attribute values are HTML-escaped to prevent XSS, except for specific tags like <script> and <style> whose content must be raw.</p>
+<hr />
+<h3 id="style"><a class="header" href="#style"><code>Style</code></a></h3>
+<pre><code class="language-go">func (e *Element) Style(style string) *Element
+</code></pre>
+<p>Style sets the style attribute on the element.</p>
+<hr />
+<h3 id="text"><a class="header" href="#text"><code>Text</code></a></h3>
+<pre><code class="language-go">func (e *Element) Text(text string) *Element
+</code></pre>
+<p>Text sets the text content of the element. This content is HTML-escaped during rendering.</p>
+<hr />
+<h3 id="enforcecontenttypeconfig"><a class="header" href="#enforcecontenttypeconfig"><code>EnforceContentTypeConfig</code></a></h3>
+<pre><code class="language-go">type EnforceContentTypeConfig struct {
+	// AllowedTypes is a list of allowed Content-Type values (e.g., "application/json").
+	// The check ignores parameters like "; charset=utf-8". Required.
+	AllowedTypes []string
+	// MethodsToCheck specifies which HTTP methods should have their Content-Type checked.
+	// Defaults to POST, PUT, PATCH.
+	MethodsToCheck []string
+	// OnError allows custom handling when the Content-Type is missing or unsupported.
+	// If nil, sends 400 Bad Request or 415 Unsupported Media Type.
+	OnError func(w http.ResponseWriter, r *http.Request, err error)
+}
+</code></pre>
+<p>EnforceContentTypeConfig holds configuration for EnforceContentTypeMiddleware.</p>
+<hr />
+<h3 id="flag"><a class="header" href="#flag"><code>Flag</code></a></h3>
+<pre><code class="language-go">type Flag interface {
+	fmt.Stringer // For generating help text representation.
+
+	// Apply binds the flag definition to a standard Go flag.FlagSet.
+	// It configures the flag's name, aliases, usage, and default value.
+	Apply(set *flag.FlagSet, cli *CLI) error
+	// GetName returns the primary name of the flag (e.g., "config").
+	GetName() string
+	// IsRequired indicates whether the flag must be provided by the user.
+	IsRequired() bool
+	// Validate checks if a required flag was provided correctly after parsing.
+	Validate(set *flag.FlagSet) error
+	// GetAliases returns the alternative names for the flag.
+	GetAliases() []string
+}
+</code></pre>
+<p>Flag defines the interface for command-line flags. Concrete types like StringFlag, IntFlag, BoolFlag implement this interface.</p>
+<hr />
+<h3 id="float64flag"><a class="header" href="#float64flag"><code>Float64Flag</code></a></h3>
+<pre><code class="language-go">type Float64Flag struct {
+	// Name is the primary identifier for the flag (e.g., "rate"). Used as --name. (Required)
+	Name string
+	// Aliases provide alternative names (e.g., "r"). Single letters are used as -r.
+	Aliases []string
+	// Usage provides a brief description of the flag's purpose for help text. (Required)
+	Usage string
+	// Default sets the default value if the flag is not provided.
+	Default float64
+	// Required indicates if the user must provide this flag.
+	Required bool
+}
+</code></pre>
+<p>Float64Flag defines a flag that accepts a float64 value.</p>
+<hr />
+<h4 id="methods-5"><a class="header" href="#methods-5">Methods</a></h4>
+<h3 id="apply"><a class="header" href="#apply"><code>Apply</code></a></h3>
+<pre><code class="language-go">func (f *Float64Flag) Apply(set *flag.FlagSet, cli *CLI) error
+</code></pre>
+<p>Apply registers the float64 flag with the flag.FlagSet.</p>
+<hr />
+<h3 id="getaliases"><a class="header" href="#getaliases"><code>GetAliases</code></a></h3>
+<pre><code class="language-go">func (f *Float64Flag) GetAliases() []string
+</code></pre>
+<p>GetAliases returns the aliases for the flag.</p>
+<hr />
+<h3 id="getname"><a class="header" href="#getname"><code>GetName</code></a></h3>
+<pre><code class="language-go">func (f *Float64Flag) GetName() string
+</code></pre>
+<p>GetName returns the primary name of the flag.</p>
+<hr />
+<h3 id="isrequired"><a class="header" href="#isrequired"><code>IsRequired</code></a></h3>
+<pre><code class="language-go">func (f *Float64Flag) IsRequired() bool
+</code></pre>
+<p>IsRequired returns true if the flag must be provided.</p>
+<hr />
+<h3 id="string"><a class="header" href="#string"><code>String</code></a></h3>
+<pre><code class="language-go">func (f *Float64Flag) String() string
+</code></pre>
+<p>String returns the help text representation of the flag.</p>
+<hr />
+<h3 id="validate"><a class="header" href="#validate"><code>Validate</code></a></h3>
+<pre><code class="language-go">func (f *Float64Flag) Validate(set *flag.FlagSet) error
+</code></pre>
+<p>Validate checks if the required flag was provided.</p>
+<hr />
+<h3 id="forcehttpsconfig"><a class="header" href="#forcehttpsconfig"><code>ForceHTTPSConfig</code></a></h3>
+<pre><code class="language-go">type ForceHTTPSConfig struct {
+	// TargetHost overrides the host used in the redirect URL. If empty, uses r.Host.
+	TargetHost string
+	// TargetPort overrides the port used in the redirect URL. If 0, omits the port (standard 443).
+	TargetPort int
+	// RedirectCode is the HTTP status code for redirection. Defaults to http.StatusMovedPermanently (301).
+	RedirectCode int
+	// ForwardedProtoHeader is the header name to check for the original protocol (e.g., "X-Forwarded-Proto").
+	// Defaults to "X-Forwarded-Proto".
+	ForwardedProtoHeader string
+	// TrustForwardedHeader explicitly enables trusting the ForwardedProtoHeader. Defaults to true.
+	// Set to false if your proxy setup doesn't reliably set this header.
+	TrustForwardedHeader *bool // Use pointer for explicit false vs unset
+}
+</code></pre>
+<p>ForceHTTPSConfig holds configuration for ForceHTTPSMiddleware.</p>
+<hr />
+<h3 id="group"><a class="header" href="#group"><code>Group</code></a></h3>
+<pre><code class="language-go">type Group struct {
+	// contains filtered or unexported fields
+}
+</code></pre>
+<p>Group is a lightweight helper that allows users to register a set of routes that share a common prefix and/or middleware. It delegates to the parent router while applying its own prefix and middleware chain.</p>
+<hr />
+<h4 id="methods-6"><a class="header" href="#methods-6">Methods</a></h4>
+<h3 id="delete"><a class="header" href="#delete"><code>Delete</code></a></h3>
+<pre><code class="language-go">func (g *Group) Delete(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Delete registers a new route for HTTP DELETE requests within the group.</p>
+<hr />
+<h3 id="deletefunc"><a class="header" href="#deletefunc"><code>DeleteFunc</code></a></h3>
+<pre><code class="language-go">func (g *Group) DeleteFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>DeleteFunc registers a new enhanced route for HTTP DELETE requests within the group.</p>
+<hr />
+<h3 id="get"><a class="header" href="#get"><code>Get</code></a></h3>
+<pre><code class="language-go">func (g *Group) Get(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Get registers a new route for HTTP GET requests within the group.</p>
+<hr />
+<h3 id="getfunc"><a class="header" href="#getfunc"><code>GetFunc</code></a></h3>
+<pre><code class="language-go">func (g *Group) GetFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>GetFunc registers a new enhanced route for HTTP GET requests within the group.</p>
+<hr />
+<h3 id="handle"><a class="header" href="#handle"><code>Handle</code></a></h3>
+<pre><code class="language-go">func (g *Group) Handle(method, pattern string, handler http.HandlerFunc, opts ...*RouteOptions)
+</code></pre>
+<p>Handle registers a new route within the group, applying the group’s prefix and middleware. The route is ultimately registered with the parent router after transformations.</p>
+<hr />
+<h3 id="handlefunc"><a class="header" href="#handlefunc"><code>HandleFunc</code></a></h3>
+<pre><code class="language-go">func (g *Group) HandleFunc(method, pattern string, handler HandlerFunc, opts ...*RouteOptions)
+</code></pre>
+<p>HandleFunc registers a new enhanced route within the group, applying the group’s prefix and middleware. Uses the enhanced handler signature for better error handling.</p>
+<hr />
+<h3 id="patch"><a class="header" href="#patch"><code>Patch</code></a></h3>
+<pre><code class="language-go">func (g *Group) Patch(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Patch registers a new route for HTTP PATCH requests within the group.</p>
+<hr />
+<h3 id="patchfunc"><a class="header" href="#patchfunc"><code>PatchFunc</code></a></h3>
+<pre><code class="language-go">func (g *Group) PatchFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>PatchFunc registers a new enhanced route for HTTP PATCH requests within the group.</p>
+<hr />
+<h3 id="post"><a class="header" href="#post"><code>Post</code></a></h3>
+<pre><code class="language-go">func (g *Group) Post(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Post registers a new route for HTTP POST requests within the group.</p>
+<hr />
+<h3 id="postfunc"><a class="header" href="#postfunc"><code>PostFunc</code></a></h3>
+<pre><code class="language-go">func (g *Group) PostFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>PostFunc registers a new enhanced route for HTTP POST requests within the group.</p>
+<hr />
+<h3 id="put"><a class="header" href="#put"><code>Put</code></a></h3>
+<pre><code class="language-go">func (g *Group) Put(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Put registers a new route for HTTP PUT requests within the group.</p>
+<hr />
+<h3 id="putfunc"><a class="header" href="#putfunc"><code>PutFunc</code></a></h3>
+<pre><code class="language-go">func (g *Group) PutFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>PutFunc registers a new enhanced route for HTTP PUT requests within the group.</p>
+<hr />
+<h3 id="use"><a class="header" href="#use"><code>Use</code></a></h3>
+<pre><code class="language-go">func (g *Group) Use(mws ...Middleware)
+</code></pre>
+<p>Use adds middleware functions to the group. These middleware functions apply only to routes registered through the group, not to the parent router.</p>
+<hr />
+<h3 id="gzipconfig"><a class="header" href="#gzipconfig"><code>GzipConfig</code></a></h3>
+<pre><code class="language-go">type GzipConfig struct {
+	// CompressionLevel specifies the gzip compression level.
+	// Accepts values from gzip.BestSpeed (1) to gzip.BestCompression (9).
+	// Defaults to gzip.DefaultCompression (-1).
+	CompressionLevel int
+
+	// AddVaryHeader indicates whether to add the "Vary: Accept-Encoding" header.
+	// A nil value defaults to true. Set explicitly to false to disable.
+	// Disabling is only recommended if caching behavior is fully understood.
+	AddVaryHeader *bool
+
+	// Logger specifies an optional logger for errors.
+	// Defaults to log.Default().
+	Logger *log.Logger
+
+	// Pool specifies an optional sync.Pool for gzip.Writer reuse.
+	// Can improve performance by reducing allocations.
+	Pool *sync.Pool // Optional: Pool for gzip.Writers
+}
+</code></pre>
+<p>GzipConfig holds configuration options for the GzipMiddleware.</p>
+<hr />
+<h3 id="htmldocument"><a class="header" href="#htmldocument"><code>HTMLDocument</code></a></h3>
+<pre><code class="language-go">type HTMLDocument struct {
+	// contains filtered or unexported fields
+}
+</code></pre>
+<p>HTMLDocument represents a full HTML document, including the DOCTYPE. Its Render method produces the complete HTML string.</p>
+<hr />
+<h4 id="associated-functions-2"><a class="header" href="#associated-functions-2">Associated Functions</a></h4>
+<h3 id="document"><a class="header" href="#document"><code>Document</code></a></h3>
+<pre><code class="language-go">func Document(config DocumentConfig, bodyContent ...HTMLElement) *HTMLDocument
+</code></pre>
+<p>Document creates a complete HTML5 document structure, encapsulated in an HTMLDocument. The returned HTMLDocument’s Render method will produce the full HTML string, including the DOCTYPE.</p>
+<p>It uses DocumentConfig to customize the document’s head and html attributes, and accepts variadic arguments for the body content. Sensible defaults are applied for common attributes and meta tags if not specified in the config.</p>
+<hr />
+<h4 id="methods-7"><a class="header" href="#methods-7">Methods</a></h4>
+<h3 id="render"><a class="header" href="#render"><code>Render</code></a></h3>
+<pre><code class="language-go">func (d *HTMLDocument) Render() string
+</code></pre>
+<p>Render converts the HTMLDocument to its full string representation, prepending the HTML5 DOCTYPE declaration.</p>
+<hr />
+<h3 id="htmlelement"><a class="header" href="#htmlelement"><code>HTMLElement</code></a></h3>
+<pre><code class="language-go">type HTMLElement interface {
+	Render() string
+}
+</code></pre>
+<p>HTMLElement represents any HTML element that can be rendered to a string. This interface allows for composition of complex HTML structures using both predefined elements and custom implementations.</p>
+<hr />
+<h4 id="associated-functions-3"><a class="header" href="#associated-functions-3">Associated Functions</a></h4>
+<h3 id="text"><a class="header" href="#text"><code>Text</code></a></h3>
+<pre><code class="language-go">func Text(text string) HTMLElement
+</code></pre>
+<p>Text creates a raw text node.</p>
+<hr />
+<h3 id="handlerfunc"><a class="header" href="#handlerfunc"><code>HandlerFunc</code></a></h3>
+<pre><code class="language-go">type HandlerFunc func(*ResponseContext) error
+</code></pre>
+<p>HandlerFunc is an enhanced handler function that receives a ResponseContext and returns an error. This allows for cleaner error handling and response management compared to standard http.HandlerFunc.</p>
+<hr />
+<h3 id="headerobject"><a class="header" href="#headerobject"><code>HeaderObject</code></a></h3>
+<pre><code class="language-go">type HeaderObject struct {
+	Description string        `json:"description,omitempty"`
+	Schema      *SchemaObject `json:"schema"`
+}
+</code></pre>
+<p>HeaderObject describes a response header in an Operation.</p>
+<hr />
+<h3 id="healthcheckconfig"><a class="header" href="#healthcheckconfig"><code>HealthCheckConfig</code></a></h3>
+<pre><code class="language-go">type HealthCheckConfig struct {
+	// Path is the URL path for the health check endpoint. Defaults to "/healthz".
+	Path string
+	// Handler is the handler function to execute for the health check.
+	// If nil, a default handler returning 200 OK with "OK" body is used.
+	// You can provide a custom handler to check database connections, etc.
+	Handler http.HandlerFunc
+}
+</code></pre>
+<p>HealthCheckConfig holds configuration for HealthCheckMiddleware.</p>
+<hr />
+<h3 id="ipfilterconfig"><a class="header" href="#ipfilterconfig"><code>IPFilterConfig</code></a></h3>
+<pre><code class="language-go">type IPFilterConfig struct {
+	// AllowedIPs is a list of allowed IPs or CIDRs.
+	AllowedIPs []string
+	// BlockedIPs is a list of blocked IPs or CIDRs. Takes precedence over AllowedIPs.
+	BlockedIPs []string
+	// BlockByDefault determines the behavior if an IP matches neither list.
+	// If true, the IP is blocked unless explicitly in AllowedIPs (and not in BlockedIPs).
+	// If false, the IP is allowed unless explicitly in BlockedIPs. Defaults to false.
+	BlockByDefault bool
+	// OnForbidden allows custom handling when an IP is forbidden.
+	// If nil, sends 403 Forbidden.
+	OnForbidden func(w http.ResponseWriter, r *http.Request)
+	// Logger for potential IP parsing errors. Defaults to log.Default().
+	Logger *log.Logger
+}
+</code></pre>
+<p>IPFilterConfig holds configuration for IP filtering.</p>
+<hr />
+<h3 id="info"><a class="header" href="#info"><code>Info</code></a></h3>
+<pre><code class="language-go">type Info struct {
+	Title       string `json:"title"`
+	Version     string `json:"version"`
+	Description string `json:"description,omitempty"`
+}
+</code></pre>
+<p>Info provides metadata about the API: title, version, and optional description.</p>
+<hr />
+<h3 id="intflag"><a class="header" href="#intflag"><code>IntFlag</code></a></h3>
+<pre><code class="language-go">type IntFlag struct {
+	// Name is the primary identifier for the flag (e.g., "port"). Used as --name. (Required)
+	Name string
+	// Aliases provide alternative names (e.g., "p"). Single letters are used as -p.
+	Aliases []string
+	// Usage provides a brief description of the flag's purpose for help text. (Required)
+	Usage string
+	// Default sets the default value if the flag is not provided.
+	Default int
+	// Required indicates if the user must provide this flag.
+	Required bool
+}
+</code></pre>
+<p>IntFlag defines a flag that accepts an integer value.</p>
+<hr />
+<h4 id="methods-8"><a class="header" href="#methods-8">Methods</a></h4>
+<h3 id="apply"><a class="header" href="#apply"><code>Apply</code></a></h3>
+<pre><code class="language-go">func (f *IntFlag) Apply(set *flag.FlagSet, cli *CLI) error
+</code></pre>
+<p>Apply registers the int flag with the flag.FlagSet.</p>
+<hr />
+<h3 id="getaliases"><a class="header" href="#getaliases"><code>GetAliases</code></a></h3>
+<pre><code class="language-go">func (f *IntFlag) GetAliases() []string
+</code></pre>
+<p>GetAliases returns the aliases for the flag.</p>
+<hr />
+<h3 id="getname"><a class="header" href="#getname"><code>GetName</code></a></h3>
+<pre><code class="language-go">func (f *IntFlag) GetName() string
+</code></pre>
+<p>GetName returns the primary name of the flag.</p>
+<hr />
+<h3 id="isrequired"><a class="header" href="#isrequired"><code>IsRequired</code></a></h3>
+<pre><code class="language-go">func (f *IntFlag) IsRequired() bool
+</code></pre>
+<p>IsRequired returns true if the flag must be provided.</p>
+<hr />
+<h3 id="string"><a class="header" href="#string"><code>String</code></a></h3>
+<pre><code class="language-go">func (f *IntFlag) String() string
+</code></pre>
+<p>String returns the help text representation of the flag.</p>
+<hr />
+<h3 id="validate"><a class="header" href="#validate"><code>Validate</code></a></h3>
+<pre><code class="language-go">func (f *IntFlag) Validate(set *flag.FlagSet) error
+</code></pre>
+<p>Validate checks if the required flag was provided.</p>
+<hr />
+<h3 id="loggingconfig"><a class="header" href="#loggingconfig"><code>LoggingConfig</code></a></h3>
+<pre><code class="language-go">type LoggingConfig struct {
+	// Logger specifies the logger instance to use. Defaults to log.Default().
+	Logger *log.Logger
+	// LogRequestID determines whether to include the request ID (if available)
+	// in log messages. Defaults to true.
+	LogRequestID bool
+	// RequestIDKey is the context key used to retrieve the request ID.
+	// Defaults to the package's internal requestIDKey.
+	RequestIDKey contextKey
+}
+</code></pre>
+<p>LoggingConfig holds configuration for LoggingMiddleware.</p>
+<hr />
+<h3 id="maintenancemodeconfig"><a class="header" href="#maintenancemodeconfig"><code>MaintenanceModeConfig</code></a></h3>
+<pre><code class="language-go">type MaintenanceModeConfig struct {
+	// EnabledFlag is a pointer to an atomic boolean. If true, maintenance mode is active. Required.
+	EnabledFlag *atomic.Bool
+	// AllowedIPs is a list of IPs or CIDRs that can bypass maintenance mode.
+	AllowedIPs []string
+	// StatusCode is the HTTP status code returned during maintenance. Defaults to 503.
+	StatusCode int
+	// RetryAfterSeconds sets the Retry-After header value in seconds. Defaults to 300.
+	RetryAfterSeconds int
+	// Message is the response body sent during maintenance. Defaults to a standard message.
+	Message string
+	// Logger for potential IP parsing errors. Defaults to log.Default().
+	Logger *log.Logger
+}
+</code></pre>
+<p>MaintenanceModeConfig holds configuration for MaintenanceModeMiddleware.</p>
+<hr />
+<h3 id="maxrequestbodysizeconfig"><a class="header" href="#maxrequestbodysizeconfig"><code>MaxRequestBodySizeConfig</code></a></h3>
+<pre><code class="language-go">type MaxRequestBodySizeConfig struct {
+	// LimitBytes is the maximum allowed size of the request body in bytes. Required.
+	LimitBytes int64
+	// OnError allows custom handling when the body size limit is exceeded.
+	// If nil, sends 413 Request Entity Too Large.
+	OnError func(w http.ResponseWriter, r *http.Request)
+}
+</code></pre>
+<p>MaxRequestBodySizeConfig holds configuration for MaxRequestBodySizeMiddleware.</p>
+<hr />
+<h3 id="mediatypeobject"><a class="header" href="#mediatypeobject"><code>MediaTypeObject</code></a></h3>
+<pre><code class="language-go">type MediaTypeObject struct {
+	Schema *SchemaObject `json:"schema,omitempty"`
+}
+</code></pre>
+<p>MediaTypeObject holds the schema defining the media type for a request or response.</p>
+<hr />
+<h3 id="methodoverrideconfig"><a class="header" href="#methodoverrideconfig"><code>MethodOverrideConfig</code></a></h3>
+<pre><code class="language-go">type MethodOverrideConfig struct {
+	// HeaderName is the name of the header checked for the method override value.
+	// Defaults to "X-HTTP-Method-Override".
+	HeaderName string
+	// FormFieldName is the name of the form field (used for POST requests)
+	// checked for the method override value if the header is not present.
+	// Set to "" to disable form field checking. Defaults to "_method".
+	FormFieldName string
+}
+</code></pre>
+<p>MethodOverrideConfig holds configuration for MethodOverrideMiddleware.</p>
+<hr />
+<h3 id="middleware"><a class="header" href="#middleware"><code>Middleware</code></a></h3>
+<pre><code class="language-go">type Middleware func(http.Handler) http.Handler
+</code></pre>
+<p>Middleware defines the function signature for middleware. A middleware is a function that wraps an http.Handler, adding extra behavior such as logging, authentication, or request modification.</p>
+<hr />
+<h4 id="associated-functions-4"><a class="header" href="#associated-functions-4">Associated Functions</a></h4>
+<h3 id="basicauthmiddleware"><a class="header" href="#basicauthmiddleware"><code>BasicAuthMiddleware</code></a></h3>
+<pre><code class="language-go">func BasicAuthMiddleware(config BasicAuthConfig) Middleware
+</code></pre>
+<p>BasicAuthMiddleware provides simple HTTP Basic Authentication.</p>
+<hr />
+<h3 id="corsmiddleware"><a class="header" href="#corsmiddleware"><code>CORSMiddleware</code></a></h3>
+<pre><code class="language-go">func CORSMiddleware(config CORSConfig) Middleware
+</code></pre>
+<p>CORSMiddleware sets Cross-Origin Resource Sharing headers.</p>
+<hr />
+<h3 id="csrfmiddleware"><a class="header" href="#csrfmiddleware"><code>CSRFMiddleware</code></a></h3>
+<pre><code class="language-go">func CSRFMiddleware(config *CSRFConfig) Middleware
+</code></pre>
+<p>CSRFMiddleware provides Cross-Site Request Forgery protection. It uses the “Double Submit Cookie” pattern. A random token is generated and set in a secure, HttpOnly cookie. For unsafe methods (POST, PUT, etc.), the middleware expects the same token to be present in a request header (e.g., X-CSRF-Token) or form field, sent by the frontend JavaScript.</p>
+<hr />
+<h3 id="cachecontrolmiddleware"><a class="header" href="#cachecontrolmiddleware"><code>CacheControlMiddleware</code></a></h3>
+<pre><code class="language-go">func CacheControlMiddleware(config CacheControlConfig) Middleware
+</code></pre>
+<p>CacheControlMiddleware sets the Cache-Control header for responses.</p>
+<hr />
+<h3 id="concurrencylimitermiddleware"><a class="header" href="#concurrencylimitermiddleware"><code>ConcurrencyLimiterMiddleware</code></a></h3>
+<pre><code class="language-go">func ConcurrencyLimiterMiddleware(config ConcurrencyLimiterConfig) Middleware
+</code></pre>
+<p>ConcurrencyLimiterMiddleware limits the number of concurrent requests.</p>
+<hr />
+<h3 id="etagmiddleware"><a class="header" href="#etagmiddleware"><code>ETagMiddleware</code></a></h3>
+<pre><code class="language-go">func ETagMiddleware(config *ETagConfig) Middleware
+</code></pre>
+<p>ETagMiddleware adds ETag headers to responses and handles If-None-Match conditional requests, potentially returning a 304 Not Modified status. Note: This middleware buffers the entire response body in memory to calculate the ETag hash. This may be inefficient for very large responses.</p>
+<hr />
+<h3 id="enforcecontenttypemiddleware"><a class="header" href="#enforcecontenttypemiddleware"><code>EnforceContentTypeMiddleware</code></a></h3>
+<pre><code class="language-go">func EnforceContentTypeMiddleware(config EnforceContentTypeConfig) Middleware
+</code></pre>
+<p>EnforceContentTypeMiddleware checks if the request’s Content-Type header is allowed.</p>
+<hr />
+<h3 id="forcehttpsmiddleware"><a class="header" href="#forcehttpsmiddleware"><code>ForceHTTPSMiddleware</code></a></h3>
+<pre><code class="language-go">func ForceHTTPSMiddleware(config ForceHTTPSConfig) Middleware
+</code></pre>
+<p>ForceHTTPSMiddleware redirects HTTP requests to HTTPS.</p>
+<hr />
+<h3 id="gzipmiddleware"><a class="header" href="#gzipmiddleware"><code>GzipMiddleware</code></a></h3>
+<pre><code class="language-go">func GzipMiddleware(config *GzipConfig) Middleware
+</code></pre>
+<p>GzipMiddleware returns middleware that compresses response bodies using gzip if the client indicates support via the Accept-Encoding header.</p>
+<hr />
+<h3 id="healthcheckmiddleware"><a class="header" href="#healthcheckmiddleware"><code>HealthCheckMiddleware</code></a></h3>
+<pre><code class="language-go">func HealthCheckMiddleware(config *HealthCheckConfig) Middleware
+</code></pre>
+<p>HealthCheckMiddleware provides a simple health check endpoint.</p>
+<hr />
+<h3 id="ipfiltermiddleware"><a class="header" href="#ipfiltermiddleware"><code>IPFilterMiddleware</code></a></h3>
+<pre><code class="language-go">func IPFilterMiddleware(config IPFilterConfig) Middleware
+</code></pre>
+<p>IPFilterMiddleware restricts access based on client IP address.</p>
+<hr />
+<h3 id="loggingmiddleware"><a class="header" href="#loggingmiddleware"><code>LoggingMiddleware</code></a></h3>
+<pre><code class="language-go">func LoggingMiddleware(config *LoggingConfig) Middleware
+</code></pre>
+<p>LoggingMiddleware logs request details including method, path, status, size, and duration.</p>
+<hr />
+<h3 id="maintenancemodemiddleware"><a class="header" href="#maintenancemodemiddleware"><code>MaintenanceModeMiddleware</code></a></h3>
+<pre><code class="language-go">func MaintenanceModeMiddleware(config MaintenanceModeConfig) Middleware
+</code></pre>
+<p>MaintenanceModeMiddleware returns a 503 Service Unavailable if enabled, allowing bypass for specific IPs.</p>
+<hr />
+<h3 id="maxrequestbodysizemiddleware"><a class="header" href="#maxrequestbodysizemiddleware"><code>MaxRequestBodySizeMiddleware</code></a></h3>
+<pre><code class="language-go">func MaxRequestBodySizeMiddleware(config MaxRequestBodySizeConfig) Middleware
+</code></pre>
+<p>MaxRequestBodySizeMiddleware limits the size of incoming request bodies.</p>
+<hr />
+<h3 id="methodoverridemiddleware"><a class="header" href="#methodoverridemiddleware"><code>MethodOverrideMiddleware</code></a></h3>
+<pre><code class="language-go">func MethodOverrideMiddleware(config *MethodOverrideConfig) Middleware
+</code></pre>
+<p>MethodOverrideMiddleware checks a header or form field to override the request method.</p>
+<hr />
+<h3 id="ratelimitmiddleware"><a class="header" href="#ratelimitmiddleware"><code>RateLimitMiddleware</code></a></h3>
+<pre><code class="language-go">func RateLimitMiddleware(config RateLimiterConfig) Middleware
+</code></pre>
+<p>RateLimitMiddleware provides basic in-memory rate limiting. Warning: This simple implementation has limitations:</p>
+<ul>
+<li>Memory usage can grow indefinitely without CleanupInterval set.</li>
+<li>Not suitable for distributed systems (limit is per instance).</li>
+<li>Accuracy decreases slightly under very high concurrency due to locking.</li>
+</ul>
+<hr />
+<h3 id="realipmiddleware"><a class="header" href="#realipmiddleware"><code>RealIPMiddleware</code></a></h3>
+<pre><code class="language-go">func RealIPMiddleware(config RealIPConfig) Middleware
+</code></pre>
+<p>RealIPMiddleware extracts the client’s real IP address from proxy headers. Warning: Only use this if you have a trusted proxy setting these headers correctly.</p>
+<hr />
+<h3 id="recoverymiddleware"><a class="header" href="#recoverymiddleware"><code>RecoveryMiddleware</code></a></h3>
+<pre><code class="language-go">func RecoveryMiddleware(config *RecoveryConfig) Middleware
+</code></pre>
+<p>RecoveryMiddleware recovers from panics in downstream handlers.</p>
+<hr />
+<h3 id="requestidmiddleware"><a class="header" href="#requestidmiddleware"><code>RequestIDMiddleware</code></a></h3>
+<pre><code class="language-go">func RequestIDMiddleware(config *RequestIDConfig) Middleware
+</code></pre>
+<p>RequestIDMiddleware retrieves a request ID from a header or generates one. It sets the ID in the response header and request context.</p>
+<hr />
+<h3 id="securityheadersmiddleware"><a class="header" href="#securityheadersmiddleware"><code>SecurityHeadersMiddleware</code></a></h3>
+<pre><code class="language-go">func SecurityHeadersMiddleware(config SecurityHeadersConfig) Middleware
+</code></pre>
+<p>SecurityHeadersMiddleware sets common security headers.</p>
+<hr />
+<h3 id="timeoutmiddleware"><a class="header" href="#timeoutmiddleware"><code>TimeoutMiddleware</code></a></h3>
+<pre><code class="language-go">func TimeoutMiddleware(config TimeoutConfig) Middleware
+</code></pre>
+<p>TimeoutMiddleware sets a maximum duration for handling requests.</p>
+<hr />
+<h3 id="trailingslashredirectmiddleware"><a class="header" href="#trailingslashredirectmiddleware"><code>TrailingSlashRedirectMiddleware</code></a></h3>
+<pre><code class="language-go">func TrailingSlashRedirectMiddleware(config TrailingSlashRedirectConfig) Middleware
+</code></pre>
+<p>TrailingSlashRedirectMiddleware redirects requests to add or remove a trailing slash.</p>
+<hr />
+<h3 id="openapi"><a class="header" href="#openapi"><code>OpenAPI</code></a></h3>
+<pre><code class="language-go">type OpenAPI struct {
+	OpenAPI    string               `json:"openapi"`
+	Info       Info                 `json:"info"`
+	Paths      map[string]*PathItem `json:"paths"`
+	Components *Components          `json:"components,omitempty"`
+}
+</code></pre>
+<p>OpenAPI is the root document object for an OpenAPI 3 specification.</p>
+<hr />
+<h4 id="associated-functions-5"><a class="header" href="#associated-functions-5">Associated Functions</a></h4>
+<h3 id="generateopenapispec"><a class="header" href="#generateopenapispec"><code>GenerateOpenAPISpec</code></a></h3>
+<pre><code class="language-go">func GenerateOpenAPISpec(router *Router, config OpenAPIConfig) *OpenAPI
+</code></pre>
+<p>GenerateOpenAPISpec constructs an OpenAPI 3.0 specification from the given router and configuration, including paths, operations, and components.</p>
+<hr />
+<h3 id="openapiconfig"><a class="header" href="#openapiconfig"><code>OpenAPIConfig</code></a></h3>
+<pre><code class="language-go">type OpenAPIConfig struct {
+	Title       string // Title of the API
+	Version     string // Version of the API
+	Description string // Description of the API
+}
+</code></pre>
+<p>OpenAPIConfig holds metadata for generating an OpenAPI specification.</p>
+<hr />
+<h3 id="operation"><a class="header" href="#operation"><code>Operation</code></a></h3>
+<pre><code class="language-go">type Operation struct {
+	Tags        []string                   `json:"tags,omitempty"`
+	Summary     string                     `json:"summary,omitempty"`
+	Description string                     `json:"description,omitempty"`
+	OperationID string                     `json:"operationId,omitempty"`
+	Parameters  []ParameterObject          `json:"parameters,omitempty"`
+	RequestBody *RequestBodyObject         `json:"requestBody,omitempty"`
+	Responses   map[string]*ResponseObject `json:"responses"`
+	Deprecated  bool                       `json:"deprecated,omitempty"`
+}
+</code></pre>
+<p>Operation describes a single API operation on a path.</p>
+<hr />
+<h3 id="parameterobject"><a class="header" href="#parameterobject"><code>ParameterObject</code></a></h3>
+<pre><code class="language-go">type ParameterObject struct {
+	Name        string        `json:"name"`
+	In          string        `json:"in"`
+	Description string        `json:"description,omitempty"`
+	Required    bool          `json:"required"`
+	Deprecated  bool          `json:"deprecated,omitempty"`
+	Schema      *SchemaObject `json:"schema"`
+	Example     any           `json:"example,omitempty"`
+}
+</code></pre>
+<p>ParameterObject describes a single parameter for an Operation or PathItem.</p>
+<hr />
+<h3 id="parameteroption"><a class="header" href="#parameteroption"><code>ParameterOption</code></a></h3>
+<pre><code class="language-go">type ParameterOption struct {
+	Name        string
+	In          string
+	Description string
+	Required    bool
+	Schema      any
+	Example     any
+}
+</code></pre>
+<p>ParameterOption configures an Operation parameter. Name and In (“query”, “header”, “path”, “cookie”) are required. Required, Schema and Example further customize the generated parameter.</p>
+<hr />
+<h3 id="pathitem"><a class="header" href="#pathitem"><code>PathItem</code></a></h3>
+<pre><code class="language-go">type PathItem struct {
+	Get         *Operation        `json:"get,omitempty"`
+	Post        *Operation        `json:"post,omitempty"`
+	Put         *Operation        `json:"put,omitempty"`
+	Delete      *Operation        `json:"delete,omitempty"`
+	Patch       *Operation        `json:"patch,omitempty"`
+	Parameters  []ParameterObject `json:"parameters,omitempty"`
+	Summary     string            `json:"summary,omitempty"`
+	Description string            `json:"description,omitempty"`
+}
+</code></pre>
+<p>PathItem describes the operations available on a single API path. One of Get, Post, Put, Delete, Patch may be non-nil.</p>
+<hr />
+<h3 id="ratelimiterconfig"><a class="header" href="#ratelimiterconfig"><code>RateLimiterConfig</code></a></h3>
+<pre><code class="language-go">type RateLimiterConfig struct {
+	// Requests is the maximum number of requests allowed within the Duration. Required.
+	Requests int
+	// Duration specifies the time window for the request limit. Required.
+	Duration time.Duration
+	// Burst allows temporary bursts exceeding the rate limit, up to this many requests.
+	// Defaults to the value of Requests (no extra burst capacity).
+	Burst int
+	// KeyFunc extracts a unique key from the request to identify the client.
+	// Defaults to using the client's IP address (r.RemoteAddr).
+	KeyFunc func(r *http.Request) string
+	// OnLimitExceeded allows custom handling when the rate limit is hit.
+	// If nil, sends 429 Too Many Requests.
+	OnLimitExceeded func(w http.ResponseWriter, r *http.Request)
+	// CleanupInterval specifies how often to scan and remove old entries from memory.
+	// If zero or negative, no automatic cleanup occurs (potential memory leak).
+	// A value like 10*time.Minute is reasonable.
+	CleanupInterval time.Duration
+	// Logger for potential errors during key extraction or IP parsing. Defaults to log.Default().
+	Logger *log.Logger
+}
+</code></pre>
+<p>RateLimiterConfig holds configuration for the simple rate limiter.</p>
+<hr />
+<h3 id="realipconfig"><a class="header" href="#realipconfig"><code>RealIPConfig</code></a></h3>
+<pre><code class="language-go">type RealIPConfig struct {
+	// TrustedProxyCIDRs is a list of CIDR notations for trusted proxies.
+	// If the direct connection (r.RemoteAddr) is from one of these, proxy headers are trusted.
+	TrustedProxyCIDRs []string
+	// IPHeaders is an ordered list of header names to check for the client's IP.
+	// The first non-empty, valid IP found is used.
+	// Defaults to ["X-Forwarded-For", "X-Real-IP"].
+	IPHeaders []string
+	// StoreInContext determines whether to store the found real IP in the request context.
+	// Defaults to true.
+	StoreInContext bool
+	// ContextKey is the key used if StoreInContext is true. Defaults to realIPKey.
+	ContextKey contextKey
+}
+</code></pre>
+<p>RealIPConfig holds configuration for RealIPMiddleware.</p>
+<hr />
+<h3 id="recoveryconfig"><a class="header" href="#recoveryconfig"><code>RecoveryConfig</code></a></h3>
+<pre><code class="language-go">type RecoveryConfig struct {
+	// Logger specifies the logger instance for panic messages. Defaults to log.Default().
+	Logger *log.Logger
+	// LogRequestID determines whether to include the request ID (if available)
+	// in log messages. Defaults to true.
+	LogRequestID bool
+	// RequestIDKey is the context key used to retrieve the request ID.
+	// Defaults to the package's internal requestIDKey.
+	RequestIDKey contextKey
+	// RecoveryHandler allows custom logic to run after a panic is recovered.
+	// It receives the response writer, request, and the recovered panic value.
+	// If nil, a default 500 Internal Server Error response is sent.
+	RecoveryHandler func(http.ResponseWriter, *http.Request, any)
+}
+</code></pre>
+<p>RecoveryConfig holds configuration for RecoveryMiddleware.</p>
+<hr />
+<h3 id="requestbodyobject"><a class="header" href="#requestbodyobject"><code>RequestBodyObject</code></a></h3>
+<pre><code class="language-go">type RequestBodyObject struct {
+	Description string                      `json:"description,omitempty"`
+	Content     map[string]*MediaTypeObject `json:"content"`
+	Required    bool                        `json:"required,omitempty"`
+}
+</code></pre>
+<p>RequestBodyObject describes a request body for an Operation.</p>
+<hr />
+<h3 id="requestidconfig"><a class="header" href="#requestidconfig"><code>RequestIDConfig</code></a></h3>
+<pre><code class="language-go">type RequestIDConfig struct {
+	// HeaderName is the name of the HTTP header to check for an existing ID
+	// and to set in the response. Defaults to "X-Request-ID".
+	HeaderName string
+	// ContextKey is the key used to store the request ID in the request context.
+	// Defaults to the package's internal requestIDKey.
+	ContextKey contextKey
+	// Generator is a function that generates a new request ID if one is not
+	// found in the header. Defaults to a nanosecond timestamp-based generator.
+	// Consider using a UUID library if external dependencies are acceptable.
+	Generator func() string
+}
+</code></pre>
+<p>RequestIDConfig holds configuration for RequestIDMiddleware.</p>
+<hr />
+<h3 id="responsecontext"><a class="header" href="#responsecontext"><code>ResponseContext</code></a></h3>
+<pre><code class="language-go">type ResponseContext struct {
+	// contains filtered or unexported fields
+}
+</code></pre>
+<p>ResponseContext provides helper methods for sending HTTP responses with reduced boilerplate. It wraps the http.ResponseWriter and http.Request along with router context to provide convenient methods for JSON, HTML, text responses, and automatic data binding.</p>
+<hr />
+<h4 id="methods-9"><a class="header" href="#methods-9">Methods</a></h4>
+<h3 id="bind"><a class="header" href="#bind"><code>Bind</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) Bind(v any) error
+</code></pre>
+<p>Bind automatically unmarshals and validates request data into the provided struct. It supports both JSON and form data, with automatic content-type detection. The struct should be a pointer. Validation is performed if validation middleware is active.</p>
+<hr />
+<h3 id="bindform"><a class="header" href="#bindform"><code>BindForm</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) BindForm(v any) error
+</code></pre>
+<p>BindForm binds form data into the provided struct using reflection. The struct should be a pointer. Field names are matched using JSON tags or struct field names. Supports string, bool, int, and float fields with automatic type conversion.</p>
+<hr />
+<h3 id="bindjson"><a class="header" href="#bindjson"><code>BindJSON</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) BindJSON(v any) error
+</code></pre>
+<p>BindJSON unmarshals JSON request body into the provided struct. The struct should be a pointer. Returns an error if the body is nil or JSON is invalid.</p>
+<hr />
+<h3 id="bindvalidated"><a class="header" href="#bindvalidated"><code>BindValidated</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) BindValidated(v any) error
+</code></pre>
+<p>BindValidated binds and validates request data (JSON or form) with comprehensive validation</p>
+<hr />
+<h3 id="html"><a class="header" href="#html"><code>HTML</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) HTML(statusCode int, content HTMLElement) error
+</code></pre>
+<p>HTML sends an HTML response with the given status code and content. It automatically sets the Content-Type header to “text/html; charset=utf-8” and renders the provided HTMLElement to string.</p>
+<hr />
+<h3 id="json"><a class="header" href="#json"><code>JSON</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) JSON(statusCode int, data any) error
+</code></pre>
+<p>JSON sends a JSON response with the given status code and data. It automatically sets the Content-Type header to “application/json” and handles JSON encoding. Returns an error if encoding fails.</p>
+<hr />
+<h3 id="jsonerror"><a class="header" href="#jsonerror"><code>JSONError</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) JSONError(statusCode int, message string) error
+</code></pre>
+<p>JSONError sends a JSON error response with the given status code and message. It creates a standardized error response format with an “error” field.</p>
+<hr />
+<h3 id="redirect"><a class="header" href="#redirect"><code>Redirect</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) Redirect(statusCode int, url string) error
+</code></pre>
+<p>Redirect sends an HTTP redirect response with the given status code and URL. Common status codes are 301 (permanent), 302 (temporary), and 307 (temporary, preserve method).</p>
+<hr />
+<h3 id="request"><a class="header" href="#request"><code>Request</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) Request() *http.Request
+</code></pre>
+<p>Request returns the underlying http.Request for advanced request handling when the ResponseContext helpers are not sufficient.</p>
+<hr />
+<h3 id="text"><a class="header" href="#text"><code>Text</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) Text(statusCode int, text string) error
+</code></pre>
+<p>Text sends a plain text response with the given status code and text content. It automatically sets the Content-Type header to “text/plain; charset=utf-8”.</p>
+<hr />
+<h3 id="urlparam"><a class="header" href="#urlparam"><code>URLParam</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) URLParam(key string) string
+</code></pre>
+<p>URLParam retrieves the URL parameter for the given key from the request context. Returns an empty string if the parameter is not present or if the request doesn’t contain URL parameters.</p>
+<hr />
+<h3 id="wantsjson"><a class="header" href="#wantsjson"><code>WantsJSON</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) WantsJSON() bool
+</code></pre>
+<p>WantsJSON returns true if the request expects a JSON response based on Content-Type or Accept headers. Useful for dual HTML/JSON endpoints.</p>
+<hr />
+<h3 id="writer"><a class="header" href="#writer"><code>Writer</code></a></h3>
+<pre><code class="language-go">func (rc *ResponseContext) Writer() http.ResponseWriter
+</code></pre>
+<p>Writer returns the underlying http.ResponseWriter for advanced response handling when the ResponseContext helpers are not sufficient.</p>
+<hr />
+<h3 id="responseobject"><a class="header" href="#responseobject"><code>ResponseObject</code></a></h3>
+<pre><code class="language-go">type ResponseObject struct {
+	Description string                      `json:"description"`
+	Headers     map[string]*HeaderObject    `json:"headers,omitempty"`
+	Content     map[string]*MediaTypeObject `json:"content,omitempty"`
+}
+</code></pre>
+<p>ResponseObject describes a single response in an Operation.</p>
+<hr />
+<h3 id="responseoption"><a class="header" href="#responseoption"><code>ResponseOption</code></a></h3>
+<pre><code class="language-go">type ResponseOption struct {
+	Description string
+	Body        any
+}
+</code></pre>
+<p>ResponseOption configures a single HTTP response in an Operation. Description is required; Body, if non-nil, is used to generate a schema.</p>
+<hr />
+<h3 id="routeoptions"><a class="header" href="#routeoptions"><code>RouteOptions</code></a></h3>
+<pre><code class="language-go">type RouteOptions struct {
+	Tags        []string
+	Summary     string
+	Description string
+	OperationID string
+	Deprecated  bool
+	RequestBody any
+	Responses   map[int]ResponseOption
+	Parameters  []ParameterOption
+}
+</code></pre>
+<p>RouteOptions holds OpenAPI metadata for a single route. Tags, Summary, Description, and OperationID map directly into the corresponding Operation fields. RequestBody, Responses, and Parameters drive schema generation for request bodies, responses, and parameters.</p>
+<hr />
+<h3 id="router"><a class="header" href="#router"><code>Router</code></a></h3>
+<pre><code class="language-go">type Router struct {
+	// contains filtered or unexported fields
+}
+</code></pre>
+<p>Router is a minimal HTTP router that supports dynamic routes with regex validation in path parameters and can mount subrouters. It provides middleware support, custom error handlers, and both traditional and enhanced handler functions.</p>
+<hr />
+<h4 id="associated-functions-6"><a class="header" href="#associated-functions-6">Associated Functions</a></h4>
+<h3 id="newrouter"><a class="header" href="#newrouter"><code>NewRouter</code></a></h3>
+<pre><code class="language-go">func NewRouter() *Router
+</code></pre>
+<p>NewRouter creates and returns a new Router instance with default configuration.</p>
+<hr />
+<h4 id="methods-10"><a class="header" href="#methods-10">Methods</a></h4>
+<h3 id="delete"><a class="header" href="#delete"><code>Delete</code></a></h3>
+<pre><code class="language-go">func (r *Router) Delete(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Delete registers a new route for HTTP DELETE requests using the standard handler signature.</p>
+<hr />
+<h3 id="deletefunc"><a class="header" href="#deletefunc"><code>DeleteFunc</code></a></h3>
+<pre><code class="language-go">func (r *Router) DeleteFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>DeleteFunc registers a new route for HTTP DELETE requests using the enhanced handler signature.</p>
+<hr />
+<h3 id="get"><a class="header" href="#get"><code>Get</code></a></h3>
+<pre><code class="language-go">func (r *Router) Get(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Get registers a new route for HTTP GET requests using the standard handler signature.</p>
+<hr />
+<h3 id="getfunc"><a class="header" href="#getfunc"><code>GetFunc</code></a></h3>
+<pre><code class="language-go">func (r *Router) GetFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>GetFunc registers a new route for HTTP GET requests using the enhanced handler signature.</p>
+<hr />
+<h3 id="group"><a class="header" href="#group"><code>Group</code></a></h3>
+<pre><code class="language-go">func (r *Router) Group(prefix string, mws ...Middleware) *Group
+</code></pre>
+<p>Group creates and returns a new Group with the given prefix. A group is a lightweight convenience wrapper that prefixes routes and can add its own middleware without creating a separate router instance.</p>
+<hr />
+<h3 id="handle"><a class="header" href="#handle"><code>Handle</code></a></h3>
+<pre><code class="language-go">func (r *Router) Handle(method, pattern string, handler http.HandlerFunc, opts ...*RouteOptions)
+</code></pre>
+<p>Handle registers a new route with the given HTTP method, URL pattern, and handler. If the router has a non-empty basePath, it is automatically prepended to the pattern. Optional RouteOptions can be provided for OpenAPI documentation.</p>
+<hr />
+<h3 id="handlefunc"><a class="header" href="#handlefunc"><code>HandleFunc</code></a></h3>
+<pre><code class="language-go">func (r *Router) HandleFunc(method, pattern string, handler HandlerFunc, opts ...*RouteOptions)
+</code></pre>
+<p>HandleFunc registers a new enhanced route that receives a ResponseContext instead of separate ResponseWriter and Request parameters. This enables cleaner error handling and response management with automatic data binding capabilities.</p>
+<hr />
+<h3 id="patch"><a class="header" href="#patch"><code>Patch</code></a></h3>
+<pre><code class="language-go">func (r *Router) Patch(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Patch registers a new route for HTTP PATCH requests using the standard handler signature.</p>
+<hr />
+<h3 id="patchfunc"><a class="header" href="#patchfunc"><code>PatchFunc</code></a></h3>
+<pre><code class="language-go">func (r *Router) PatchFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>PatchFunc registers a new route for HTTP PATCH requests using the enhanced handler signature.</p>
+<hr />
+<h3 id="post"><a class="header" href="#post"><code>Post</code></a></h3>
+<pre><code class="language-go">func (r *Router) Post(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Post registers a new route for HTTP POST requests using the standard handler signature.</p>
+<hr />
+<h3 id="postfunc"><a class="header" href="#postfunc"><code>PostFunc</code></a></h3>
+<pre><code class="language-go">func (r *Router) PostFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>PostFunc registers a new route for HTTP POST requests using the enhanced handler signature.</p>
+<hr />
+<h3 id="put"><a class="header" href="#put"><code>Put</code></a></h3>
+<pre><code class="language-go">func (r *Router) Put(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>Put registers a new route for HTTP PUT requests using the standard handler signature.</p>
+<hr />
+<h3 id="putfunc"><a class="header" href="#putfunc"><code>PutFunc</code></a></h3>
+<pre><code class="language-go">func (r *Router) PutFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
+</code></pre>
+<p>PutFunc registers a new route for HTTP PUT requests using the enhanced handler signature.</p>
+<hr />
+<h3 id="servehttp"><a class="header" href="#servehttp"><code>ServeHTTP</code></a></h3>
+<pre><code class="language-go">func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request)
+</code></pre>
+<p>ServeHTTP implements the http.Handler interface. It first checks subrouters based on their base path, then its own routes. If a URL pattern matches but the HTTP method does not, a 405 Method Not Allowed is returned. If no routes match, a 404 Not Found is returned.</p>
+<hr />
+<h3 id="serveopenapispec"><a class="header" href="#serveopenapispec"><code>ServeOpenAPISpec</code></a></h3>
+<pre><code class="language-go">func (r *Router) ServeOpenAPISpec(path string, config OpenAPIConfig)
+</code></pre>
+<p>ServeOpenAPISpec makes your OpenAPI specification available at <code>path</code> (e.g. “/openapi.json”)</p>
+<hr />
+<h3 id="serveswaggerui"><a class="header" href="#serveswaggerui"><code>ServeSwaggerUI</code></a></h3>
+<pre><code class="language-go">func (r *Router) ServeSwaggerUI(prefix string)
+</code></pre>
+<p>ServeSwaggerUI shows swaggerUI at <code>prefix</code> (e.g. “/docs”)</p>
+<hr />
+<h3 id="setmethodnotallowedhandler"><a class="header" href="#setmethodnotallowedhandler"><code>SetMethodNotAllowedHandler</code></a></h3>
+<pre><code class="language-go">func (r *Router) SetMethodNotAllowedHandler(h http.Handler)
+</code></pre>
+<p>SetMethodNotAllowedHandler allows users to supply a custom http.Handler for requests that match a route pattern but use an unsupported HTTP method. If not set, a default 405 Method Not Allowed response is returned.</p>
+<hr />
+<h3 id="setnotfoundhandler"><a class="header" href="#setnotfoundhandler"><code>SetNotFoundHandler</code></a></h3>
+<pre><code class="language-go">func (r *Router) SetNotFoundHandler(h http.Handler)
+</code></pre>
+<p>SetNotFoundHandler allows users to supply a custom http.Handler for requests that do not match any route. If not set, the standard http.NotFound handler is used.</p>
+<hr />
+<h3 id="static"><a class="header" href="#static"><code>Static</code></a></h3>
+<pre><code class="language-go">func (r *Router) Static(urlPathPrefix string, subFS fs.FS)
+</code></pre>
+<p>Static mounts an fs.FS under the given URL prefix.</p>
+<hr />
+<h3 id="subrouter"><a class="header" href="#subrouter"><code>Subrouter</code></a></h3>
+<pre><code class="language-go">func (r *Router) Subrouter(prefix string) *Router
+</code></pre>
+<p>Subrouter creates a new Router mounted at the given prefix. The subrouter inherits the parent’s context key, global middleware, and error handlers. Its routes will automatically receive the combined prefix.</p>
+<hr />
+<h3 id="urlparam"><a class="header" href="#urlparam"><code>URLParam</code></a></h3>
+<pre><code class="language-go">func (r *Router) URLParam(req *http.Request, key string) string
+</code></pre>
+<p>URLParam retrieves the URL parameter for the given key from the request context. It returns an empty string if the parameter is not present. This method should only be called within route handlers that were registered with this router.</p>
+<hr />
+<h3 id="use"><a class="header" href="#use"><code>Use</code></a></h3>
+<pre><code class="language-go">func (r *Router) Use(mws ...Middleware)
+</code></pre>
+<p>Use registers one or more middleware functions that will be applied globally to every matched route handler. Middleware is applied in the order it is registered.</p>
+<hr />
+<h3 id="schemaobject"><a class="header" href="#schemaobject"><code>SchemaObject</code></a></h3>
+<pre><code class="language-go">type SchemaObject struct {
+	Ref                  string                   `json:"$ref,omitempty"`
+	Type                 string                   `json:"type,omitempty"`
+	Format               string                   `json:"format,omitempty"`
+	Properties           map[string]*SchemaObject `json:"properties,omitempty"`
+	Items                *SchemaObject            `json:"items,omitempty"`
+	Description          string                   `json:"description,omitempty"`
+	Example              any                      `json:"example,omitempty"`
+	Required             []string                 `json:"required,omitempty"`
+	Nullable             bool                     `json:"nullable,omitempty"`
+	Enum                 any                      `json:"enum,omitempty"`
+	AdditionalProperties *SchemaObject            `json:"additionalProperties,omitempty"`
+}
+</code></pre>
+<p>SchemaObject represents an OpenAPI Schema or a reference to one.</p>
+<hr />
+<h3 id="securityheadersconfig"><a class="header" href="#securityheadersconfig"><code>SecurityHeadersConfig</code></a></h3>
+<pre><code class="language-go">type SecurityHeadersConfig struct {
+	// ContentTypeOptions sets the X-Content-Type-Options header.
+	// Defaults to "nosniff". Set to "" to disable.
+	ContentTypeOptions string
+	// FrameOptions sets the X-Frame-Options header.
+	// Defaults to "DENY". Other common values: "SAMEORIGIN". Set to "" to disable.
+	FrameOptions string
+	// XSSProtection sets the X-XSS-Protection header.
+	// Defaults to "1; mode=block". Set to "" to disable.
+	XSSProtection string
+	// ReferrerPolicy sets the Referrer-Policy header.
+	// Defaults to "strict-origin-when-cross-origin". Set to "" to disable.
+	ReferrerPolicy string
+	// HSTSMaxAgeSeconds sets the max-age for Strict-Transport-Security (HSTS).
+	// If &gt; 0, HSTS header is set for HTTPS requests. Defaults to 0 (disabled).
+	HSTSMaxAgeSeconds int
+	// HSTSIncludeSubdomains adds `includeSubDomains` to HSTS header. Defaults to true if HSTSMaxAgeSeconds &gt; 0.
+	HSTSIncludeSubdomains *bool // Use pointer for explicit false vs unset
+	// HSTSPreload adds `preload` to HSTS header. Use with caution. Defaults to false.
+	HSTSPreload bool
+	// ContentSecurityPolicy sets the Content-Security-Policy header.
+	// Defaults to "". This policy is complex and highly site-specific.
+	ContentSecurityPolicy string
+	// PermissionsPolicy sets the Permissions-Policy header (formerly Feature-Policy).
+	// Defaults to "". Example: "geolocation=(), microphone=()"
+	PermissionsPolicy string
+}
+</code></pre>
+<p>SecurityHeadersConfig holds configuration for SecurityHeadersMiddleware.</p>
+<hr />
+<h3 id="stringflag"><a class="header" href="#stringflag"><code>StringFlag</code></a></h3>
+<pre><code class="language-go">type StringFlag struct {
+	// Name is the primary identifier for the flag (e.g., "output"). Used as --name. (Required)
+	Name string
+	// Aliases provide alternative names (e.g., "o"). Single letters are used as -o.
+	Aliases []string
+	// Usage provides a brief description of the flag's purpose for help text. (Required)
+	Usage string
+	// Default sets the default value if the flag is not provided.
+	Default string
+	// Required indicates if the user must provide this flag.
+	Required bool
+}
+</code></pre>
+<p>StringFlag defines a flag that accepts a string value.</p>
+<hr />
+<h4 id="methods-11"><a class="header" href="#methods-11">Methods</a></h4>
+<h3 id="apply"><a class="header" href="#apply"><code>Apply</code></a></h3>
+<pre><code class="language-go">func (f *StringFlag) Apply(set *flag.FlagSet, cli *CLI) error
+</code></pre>
+<p>Apply registers the string flag with the flag.FlagSet.</p>
+<hr />
+<h3 id="getaliases"><a class="header" href="#getaliases"><code>GetAliases</code></a></h3>
+<pre><code class="language-go">func (f *StringFlag) GetAliases() []string
+</code></pre>
+<p>GetAliases returns the aliases for the flag.</p>
+<hr />
+<h3 id="getname"><a class="header" href="#getname"><code>GetName</code></a></h3>
+<pre><code class="language-go">func (f *StringFlag) GetName() string
+</code></pre>
+<p>GetName returns the primary name of the flag.</p>
+<hr />
+<h3 id="isrequired"><a class="header" href="#isrequired"><code>IsRequired</code></a></h3>
+<pre><code class="language-go">func (f *StringFlag) IsRequired() bool
+</code></pre>
+<p>IsRequired returns true if the flag must be provided.</p>
+<hr />
+<h3 id="string"><a class="header" href="#string"><code>String</code></a></h3>
+<pre><code class="language-go">func (f *StringFlag) String() string
+</code></pre>
+<p>String returns the help text representation of the flag.</p>
+<hr />
+<h3 id="validate"><a class="header" href="#validate"><code>Validate</code></a></h3>
+<pre><code class="language-go">func (f *StringFlag) Validate(set *flag.FlagSet) error
+</code></pre>
+<p>Validate checks if the required flag was provided and is not empty.</p>
+<hr />
+<h3 id="stringsliceflag"><a class="header" href="#stringsliceflag"><code>StringSliceFlag</code></a></h3>
+<pre><code class="language-go">type StringSliceFlag struct {
+	// Name is the primary identifier for the flag (e.g., "tag"). Used as --name. (Required)
+	Name string
+	// Aliases provide alternative names (e.g., "t"). Single letters are used as -t.
+	Aliases []string
+	// Usage provides a brief description of the flag's purpose for help text. (Required)
+	Usage string
+	// Default sets the default value if the flag is not provided.
+	Default []string
+	// Required indicates if the user must provide this flag at least once.
+	Required bool
+}
+</code></pre>
+<p>StringSliceFlag defines a flag that accepts multiple string values. The flag can be repeated on the command line (e.g., –tag foo –tag bar).</p>
+<hr />
+<h4 id="methods-12"><a class="header" href="#methods-12">Methods</a></h4>
+<h3 id="apply"><a class="header" href="#apply"><code>Apply</code></a></h3>
+<pre><code class="language-go">func (f *StringSliceFlag) Apply(set *flag.FlagSet, cli *CLI) error
+</code></pre>
+<p>Apply registers the string slice flag with the flag.FlagSet using a custom Value.</p>
+<hr />
+<h3 id="getaliases"><a class="header" href="#getaliases"><code>GetAliases</code></a></h3>
+<pre><code class="language-go">func (f *StringSliceFlag) GetAliases() []string
+</code></pre>
+<p>GetAliases returns the aliases for the flag.</p>
+<hr />
+<h3 id="getname"><a class="header" href="#getname"><code>GetName</code></a></h3>
+<pre><code class="language-go">func (f *StringSliceFlag) GetName() string
+</code></pre>
+<p>GetName returns the primary name of the flag.</p>
+<hr />
+<h3 id="isrequired"><a class="header" href="#isrequired"><code>IsRequired</code></a></h3>
+<pre><code class="language-go">func (f *StringSliceFlag) IsRequired() bool
+</code></pre>
+<p>IsRequired returns true if the flag must be provided.</p>
+<hr />
+<h3 id="string"><a class="header" href="#string"><code>String</code></a></h3>
+<pre><code class="language-go">func (f *StringSliceFlag) String() string
+</code></pre>
+<p>String returns the help text representation of the flag.</p>
+<hr />
+<h3 id="validate"><a class="header" href="#validate"><code>Validate</code></a></h3>
+<pre><code class="language-go">func (f *StringSliceFlag) Validate(set *flag.FlagSet) error
+</code></pre>
+<p>Validate checks if the required flag was provided and resulted in a non-empty slice.</p>
+<hr />
+<h3 id="timeoutconfig"><a class="header" href="#timeoutconfig"><code>TimeoutConfig</code></a></h3>
+<pre><code class="language-go">type TimeoutConfig struct {
+	// Duration is the maximum time allowed for the handler to process the request.
+	Duration time.Duration
+	// TimeoutMessage is the message sent in the response body on timeout.
+	// Defaults to "Service timed out".
+	TimeoutMessage string
+	// TimeoutHandler allows custom logic to run on timeout. If nil, the default
+	// http.TimeoutHandler behavior (503 Service Unavailable with message) is used.
+	TimeoutHandler http.Handler
+}
+</code></pre>
+<p>TimeoutConfig holds configuration for TimeoutMiddleware.</p>
+<hr />
+<h3 id="trailingslashredirectconfig"><a class="header" href="#trailingslashredirectconfig"><code>TrailingSlashRedirectConfig</code></a></h3>
+<pre><code class="language-go">type TrailingSlashRedirectConfig struct {
+	// AddSlash enforces trailing slashes (redirects /path to /path/). Defaults to false (removes slash).
+	AddSlash bool
+	// RedirectCode is the HTTP status code used for redirection.
+	// Defaults to http.StatusMovedPermanently (301). Use 308 for POST/PUT etc.
+	RedirectCode int
+}
+</code></pre>
+<p>TrailingSlashRedirectConfig holds configuration for TrailingSlashRedirectMiddleware.</p>
+<hr />
+<h3 id="validationerrors"><a class="header" href="#validationerrors"><code>ValidationErrors</code></a></h3>
+<pre><code class="language-go">type ValidationErrors []error
+</code></pre>
+<p>ValidationErrors collects one or more validation violations and implements error.</p>
+<hr />
+<h4 id="methods-13"><a class="header" href="#methods-13">Methods</a></h4>
+<h3 id="error"><a class="header" href="#error"><code>Error</code></a></h3>
+<pre><code class="language-go">func (ve ValidationErrors) Error() string
+</code></pre>
+<p>Error joins all contained error messages into a single string.</p>
+<hr />
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <a rel="prev" href="faq.html" class="mobile-nav-chapters previous"
+                            title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                <a rel="prev" href="faq.html" class="nav-chapters previous" title="Previous chapter"
+                    aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function () {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+    </div>
+</body>
+
+</html>

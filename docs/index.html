@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Nova - Lightweight REST API Framework</title>
+    <style>
+      :root {
+        --primary-color: #f9a825;
+        --primary-light: #ffcc66;
+        --secondary-color: #87ceeb;
+        --bg-color: #0a0f2a;
+        --bg-gradient-end: #2a1a40;
+        --text-color: #f0e6d2;
+        --heading-color: #ffffff;
+        --subtle-text: #cccccc;
+        --subtle-bg: #101535;
+        --border-color: #333858;
+        --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        --button-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        --code-bg: #1e222c;
+        --border-anim-speed: 2s;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        font-size: 16px;
+        scroll-behavior: smooth;
+        scroll-padding-top: 4rem;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.7;
+        color: var(--text-color);
+        background-color: var(--bg-color);
+        background-image: linear-gradient(
+          135deg,
+          var(--bg-color) 0%,
+          var(--bg-gradient-end) 100%
+        );
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1140px;
+        width: 90%;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .main-header {
+        background-color: rgba(10, 15, 42, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .main-header.scrolled {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .main-header .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-light);
+        text-decoration: none;
+      }
+
+      .logo span {
+        color: var(--secondary-color);
+      }
+
+      .main-nav ul {
+        list-style: none;
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      .main-nav a {
+        color: var(--text-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .main-nav a:hover {
+        color: var(--primary-color);
+      }
+
+      .main-nav a.active {
+        color: var(--primary-color);
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 0.8rem 1.8rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+        box-shadow: var(--button-shadow);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: var(--bg-color);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-light);
+        border: 1px solid var(--primary-light);
+      }
+
+      .btn-secondary:hover {
+        background-color: rgba(249, 168, 37, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .hero {
+        background: linear-gradient(
+          135deg,
+          var(--bg-color) 0%,
+          var(--bg-gradient-end) 100%
+        );
+        padding: 6rem 0 5rem;
+        overflow: hidden;
+        position: relative;
+        color: var(--heading-color);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .hero .container {
+        display: flex;
+        align-items: center;
+        gap: 3rem;
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-content {
+        flex: 1;
+        max-width: 55%;
+        text-align: left;
+        animation: fadeInLeft 1s ease-out;
+      }
+
+      .hero h1 {
+        font-size: 3.2rem;
+        font-weight: 800;
+        color: var(--heading-color);
+        margin-bottom: 1rem;
+        line-height: 1.2;
+      }
+
+      .hero h1 span {
+        color: var(--primary-color);
+      }
+
+      .hero p.subtitle {
+        font-size: 1.25rem;
+        color: var(--text-color);
+        max-width: 100%;
+        margin: 0 0 2.5rem 0;
+      }
+
+      .hero-cta {
+        display: flex;
+        justify-content: flex-start;
+        gap: 1rem;
+      }
+
+      .hero-image-container {
+        flex-shrink: 0;
+        width: 40%;
+        max-width: 450px;
+        animation: fadeInRight 1s ease-out;
+      }
+
+      .hero-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 99px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .features {
+        padding: 5rem 0;
+        background-color: var(--subtle-bg);
+        border-top: 1px solid var(--border-color);
+      }
+
+      .features h2 {
+        text-align: center;
+        margin-bottom: 3.5rem;
+        color: var(--heading-color);
+        font-size: 2.2rem;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+
+      .feature-card {
+        background-color: var(--bg-color);
+        padding: 2rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(
+          transparent,
+          rgba(249, 168, 37, 0.5),
+          transparent 30%
+        );
+        animation: rotate var(--border-anim-speed) linear infinite paused;
+        z-index: -2;
+        border-radius: inherit;
+      }
+
+      .feature-card::after {
+        content: "";
+        position: absolute;
+        inset: 1px;
+        background: var(--bg-color);
+        z-index: -1;
+        border-radius: inherit;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        border-color: transparent;
+      }
+
+      .feature-card:hover::before {
+        animation-play-state: running;
+      }
+
+      @keyframes rotate {
+        100% {
+          transform: rotate(1turn);
+        }
+      }
+
+      .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: inline-block;
+        position: relative;
+        z-index: 2;
+      }
+
+      .feature-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--primary-light);
+        position: relative;
+        z-index: 2;
+      }
+
+      .feature-card p {
+        font-size: 0.95rem;
+        color: var(--subtle-text);
+        position: relative;
+        z-index: 2;
+      }
+
+      .code-highlight {
+        padding: 5rem 0;
+        background-color: var(--bg-color);
+        border-top: 1px solid var(--border-color);
+      }
+
+      .code-highlight h2 {
+        text-align: center;
+        margin-bottom: 3rem;
+        color: var(--heading-color);
+        font-size: 2.2rem;
+      }
+
+      .code-highlight pre {
+        background-color: var(--code-bg);
+        color: #abb2bf;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        font-size: 0.95em;
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+        line-height: 1.5;
+      }
+
+      .code-highlight pre code .keyword {
+        color: #c678dd;
+      }
+      .code-highlight pre code .type {
+        color: #e5c07b;
+      }
+      .code-highlight pre code .string {
+        color: #98c379;
+      }
+      .code-highlight pre code .number {
+        color: #d19a66;
+      }
+      .code-highlight pre code .func {
+        color: #61afef;
+      }
+      .code-highlight pre code .package {
+        color: #56b6c2;
+      }
+      .code-highlight pre code .comment {
+        color: #5c6370;
+        font-style: italic;
+      }
+
+      .cta-section {
+        background-color: var(--subtle-bg);
+        color: var(--text-color);
+        padding: 5rem 0;
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .cta-section h2 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        color: var(--heading-color);
+      }
+
+      .cta-section p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        color: var(--subtle-text);
+      }
+
+      .cta-section .hero-cta {
+        justify-content: center;
+      }
+
+      .cta-section .btn-secondary {
+        background-color: var(--primary-color);
+        color: var(--bg-color);
+        border-color: var(--primary-color);
+      }
+
+      .cta-section .btn-secondary:hover {
+        background-color: var(--primary-light);
+        color: var(--bg-color);
+      }
+
+      .main-footer {
+        text-align: center;
+        padding: 2.5rem 0;
+        font-size: 0.9em;
+        color: var(--subtle-text);
+        background-color: var(--bg-color);
+        border-top: 1px solid var(--border-color);
+      }
+
+      @keyframes fadeInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes fadeInRight {
+        from {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @media (max-width: 992px) {
+        .hero .container {
+          flex-direction: column;
+          text-align: center;
+          gap: 2rem;
+        }
+
+        .hero-image-container {
+          display: none;
+        }
+
+        .hero-content {
+          max-width: 100%;
+          text-align: center;
+          animation: none;
+        }
+
+        .hero p.subtitle {
+          margin-left: auto;
+          margin-right: auto;
+          max-width: 650px;
+        }
+
+        .hero-cta {
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 768px) {
+        html {
+          font-size: 15px;
+        }
+
+        .main-header .container {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .main-nav ul {
+          justify-content: center;
+          gap: 1rem;
+        }
+
+        .hero {
+          padding: 4rem 0 3rem;
+        }
+
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero p.subtitle {
+          font-size: 1.1rem;
+        }
+
+        .hero-cta {
+          flex-direction: column;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .features,
+        .code-highlight,
+        .cta-section {
+          padding: 4rem 0;
+        }
+
+        .features h2,
+        .code-highlight h2,
+        .cta-section h2 {
+          font-size: 1.8rem;
+        }
+
+        .features h2 {
+          margin-bottom: 2.5rem;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="main-header" id="mainHeader">
+      <div class="container">
+        <a href="#" class="logo">Nova</a>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#example">Example</a></li>
+            <li><a href="#get-started">Get Started</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Build powerful web applications in Go <span>Faster</span></h1>
+          <p class="subtitle">
+            Nova is a flexible framework that simplifies creating both RESTful APIs and web UIs.
+            It extends Go's standard library with sensible defaults and helper utilities for components like
+            routing, middleware, OpenAPI, and HTML templating, minimizing decision fatique and boilerplate code.
+            Making it easier than ever to build powerful web applications in Go.
+          </p>
+          <div class="hero-cta">
+            <a href="http://localhost:3000" class="btn btn-primary">Get Started</a>
+            <a
+              href="https://github.com/xlc-dev/nova"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-secondary"
+              >View on GitLab</a
+            >
+          </div>
+        </div>
+        <div class="hero-image-container">
+          <img
+            src="nova.png"
+            alt="Nova Web Framework Logo Concept Art"
+            class="hero-image"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="container">
+        <h2>Why Choose Nova?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <span class="feature-icon">⚡</span>
+            <h3>Built around Go's Standard Library</h3>
+            <p>
+              Nova leverages Go's robust standard library while abstracting away
+              repetitive boilerplate.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🏗</span>
+            <h3>Built-in Project Scaffolding</h3>
+            <p>
+              Generate project structure and starter code instantly for a
+              seamless development experience.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🛠️</span>
+            <h3>Streamlined REST API Development</h3>
+            <p>
+              Simplify routing, middleware, and request handling to jumpstart
+              your API.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">💻</span>
+            <h3>Modern CLI Tooling Included</h3>
+            <p>
+              Manage your application with an intuitive CLI that complements
+              your REST API.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🗃</span>
+            <h3>Database Management</h3>
+            <p>
+              Integrated support for database connections and migrations to
+              simplify database management.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🚧</span>
+            <h3>Automatic Validation & OpenAPI</h3>
+            <p>
+              Automatically validate incoming requests to ensure data integrity with OpenAPI integration.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="code-highlight" id="example">
+      <div class="container">
+        <h2>Get started quickly</h2>
+        <pre>
+<code class="language-go"><span class="keyword">func</span> <span class="func">main</span>() {
+	cli, err := <span class="package">nova</span>.<span class="func">NewCLI</span>(&<span class="package">nova</span>.<span class="type">CLI</span>{
+		Name:        <span class="string">"api"</span>,
+		Version:     <span class="string">"0.0.1"</span>,
+		Description: <span class="string">"Hello Nova"</span>,
+		Action: <span class="keyword">func</span>(ctx *<span class="package">nova</span>.<span class="type">Context</span>) <span class="keyword">error</span> {
+			router := <span class="package">nova</span>.<span class="func">NewRouter</span>()
+
+			router.<span class="func">Get</span>(<span class="string">"/"</span>, <span class="keyword">func</span>(w <span class="package">http</span>.<span class="type">ResponseWriter</span>, r *<span class="package">http</span>.<span class="type">Request</span>) {
+				w.<span class="func">Write</span>([]<span class="keyword">byte</span>(<span class="string">"Hello, Nova!"</span>))
+			})
+
+			<span class="keyword">if</span> err := <span class="package">nova</span>.<span class="func">Serve</span>(ctx, router); err != <span class="keyword">nil</span> {
+				<span class="keyword">return</span> <span class="package">fmt</span>.<span class="func">Errorf</span>(<span class="string">"failed to start server: %s"</span>, err)
+			}
+
+			<span class="keyword">return</span> <span class="keyword">nil</span>
+		},
+	})
+
+	<span class="keyword">if</span> err != <span class="keyword">nil</span> {
+		<span class="package">log</span>.<span class="func">Fatalf</span>(<span class="string">"Error initializing CLI: %v"</span>, err)
+	}
+
+	<span class="keyword">if</span> err := cli.<span class="func">Run</span>(<span class="package">os</span>.Args); err != <span class="keyword">nil</span> {
+		<span class="package">log</span>.<span class="func">Fatalf</span>(<span class="string">"Error running CLI: %v"</span>, err)
+	}
+}
+</code></pre>
+      </div>
+    </section>
+
+    <section class="cta-section" id="get-started">
+      <div class="container">
+        <h2>Ready to Build Better Go webapps?</h2>
+        <p>
+          Explore the repository or dive into the documentation to get started
+          with Nova.
+        </p>
+        <div class="hero-cta">
+          <a
+            href="https://github.com/xlc-dev/nova"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-secondary"
+            >View on GitLab</a
+          >
+          <a href="https://github.com/xlc-dev/nova" class="btn btn-primary"
+            >Read the Docs</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <footer class="main-footer">
+      <div class="container">
+        <p>&copy; 2025 Nova Web Framework. Built with simplicity in mind.</p>
+      </div>
+    </footer>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const header = document.getElementById("mainHeader");
+        const navLinks = document.querySelectorAll(".main-nav a");
+        const sections = [];
+
+        navLinks.forEach((link) => {
+          const sectionId = link.getAttribute("href").substring(1);
+          const section = document.getElementById(sectionId);
+          if (section) {
+            sections.push({ link: link, element: section });
+          }
+        });
+
+        const updateActiveLink = () => {
+          const headerHeight = header ? header.offsetHeight : 0;
+          const scrollPosition = window.scrollY + headerHeight + 50;
+          let currentActiveSection = null;
+
+          sections.forEach((sectionData) => {
+            const sectionTop = sectionData.element.offsetTop;
+            const sectionBottom = sectionTop + sectionData.element.offsetHeight;
+
+            if (sectionTop <= scrollPosition) {
+              currentActiveSection = sectionData;
+            }
+          });
+
+          navLinks.forEach((link) => link.classList.remove("active"));
+
+          if (currentActiveSection) {
+            currentActiveSection.link.classList.add("active");
+          }
+        };
+
+        window.addEventListener("scroll", updateActiveLink);
+        updateActiveLink();
+
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 50) {
+            header.classList.add("scrolled");
+          } else {
+            header.classList.remove("scrolled");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
