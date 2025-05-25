@@ -39,7 +39,7 @@ go build # Or run `make` if you enabled the Makefile
 
 ## Docs
 
-The docs are created and built using [mdBook](https://github.com/rust-lang/mdBook). All documentation can be found in the docs/src folder written in Markdown.
+The docs are created and built using [mdBook](https://github.com/rust-lang/mdBook). All documentation can be found in the `docs/src` folder written in Markdown.
 
 Read the docs [here](https://xlc-dev.github.io/nova/book).
 
