@@ -60,7 +60,7 @@ jobs:
 
       - name: Install Nova
         run: |
-          go install github.com/xlc-dev/nova/cmd/nova@latest
+          go install github.com/xlc-dev/nova@latest
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Setup Rust and mdBook
