@@ -5,7 +5,7 @@
 </p>
 
 <p align="center" style="color: gray">
-  A modern do-it-all Golang framework to create REST APIs with ease.
+  Nova - Build Powerful Web Applications in Go.
 </p>
 
 ## Installation
@@ -42,7 +42,7 @@ go build # Or run `make` if you enabled the Makefile
 
 The docs are created and built using [mdBook](https://github.com/rust-lang/mdBook). All documentation can be found in the docs/src folder written in Markdown.
 
-Read the docs [here](http://localhost:3000/).
+Read the docs [here](https://xlc-dev.github.io/nova/book).
 
 ## License
 
