@@ -1,0 +1,115 @@
+name: Go CI & Docs Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Run gofmt
+        run: |
+          echo "Running gofmt..."
+          test -z "$(gofmt -l .)" || (echo "Go code is not formatted. Run 'gofmt -w .' and commit." && exit 1)
+          echo "gofmt check passed."
+
+      - name: Run Go Vet
+        run: go vet ./...
+
+      - name: Run Go Tests
+        run: go test -v ./...
+
+  deploy-docs:
+    name: Build and Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: lint-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Install Nova
+        run: |
+          go install github.com/xlc-dev/nova/cmd/nova@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Setup Rust and mdBook
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Cache mdBook and mdbook-mermaid
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/mdbook
+            ~/.cargo/bin/mdbook-mermaid
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-mdbook-mermaid
+      - name: Install mdBook
+        run: |
+          if ! command -v mdbook &> /dev/null
+          then
+            cargo install mdbook --locked
+          fi
+      - name: Install mdbook-mermaid
+        run: |
+          if ! command -v mdbook-mermaid &> /dev/null
+          then
+            cargo install mdbook-mermaid --locked
+          fi
+
+      - name: Generate Nova Documentation
+        run: |
+          echo "Running nova gendoc..."
+          nova gendoc
+          echo "Nova docs generated."
+
+      - name: Build mdBook
+        run: |
+          echo "Building mdBook..."
+          cd docs
+          mdbook build
+          cd ..
+          echo "mdBook build complete."
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./docs/"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
