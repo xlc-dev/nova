@@ -1,7 +1,7 @@
 # Nova
 
 <p align="center">
-  <img src="nova.png" width="30%" style="border-radius: 50%">
+  <img src="./docs/nova.png" width="30%" style="border-radius: 50%">
 </p>
 
 <p align="center" style="color: gray">
