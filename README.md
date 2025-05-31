@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/xlc-dev/nova/actions"><img src="https://img.shields.io/github/actions/workflow/status/xlc-dev/nova/cicd.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white" alt="Build Status"></a>
-  <a href="https://goreportcard.com/report/github.com/xlc-dev/nova"><img src="https://goreportcard.com/badge/github.com/xlc-dev/nova" alt="Go Report Card"></a>
+  <a href="https://goreportcard.com/report/github.com/xlc-dev/nova"><img src="https://img.shields.io/badge/Go%20Report%20Card-A%2B-brightgreen?style=for-the-badge&logo=go&logoColor=white" alt="Go Report Card"></a>
   <a href="https://pkg.go.dev/github.com/xlc-dev/nova"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&logo=go&logoColor=white" alt="GoDoc"></a>
   <a href="https://github.com/xlc-dev/nova/releases"><img src="https://img.shields.io/github/v/release/xlc-dev/nova?style=for-the-badge&logo=github&logoColor=white" alt="Release"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/xlc-dev/nova?style=for-the-badge&color=blue" alt="License"></a>
