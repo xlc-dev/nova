@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/xlc-dev/nova">
-    <img src="./docs/nova.png" alt="Nova Logo" width="250" style="border-radius: 50%;">
+    <img src="./docs/nova.png" alt="Nova Logo" width="350" style="border-radius: 50%;">
   </a>
 </p>
 
@@ -93,7 +93,7 @@ Documentation is available to guide you through Nova's features and usage, inclu
 
 ## 🤝 Contributing
 
-Contributions are welcome! Whether it's bug reports, feature requests, documentation improvements, or code contributions, please feel free to open an issue or submit a pull request. If you enjoy using Nova, we'd appreciate it if you could star the repository on GitHub to show your support!
+Contributions are welcome! Whether it's bug reports, feature requests, documentation improvements, or code contributions, please feel free to open an issue or submit a pull request.
 
 Please read the [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
