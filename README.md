@@ -11,8 +11,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xlc-dev/nova/actions"><img src="https://img.shields.io/github/actions/workflow/status/xlc-dev/nova/go.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white" alt="Build Status"></a>
-  <a href="https://goreportcard.com/report/github.com/xlc-dev/nova"><img src="https://img.shields.io/goreportcard/github/xlc-dev/nova?style=for-the-badge&logo=go&logoColor=white" alt="Go Report Card"></a>
+  <a href="https://github.com/xlc-dev/nova/actions"><img src="https://img.shields.io/github/actions/workflow/status/xlc-dev/nova/cicd.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white" alt="Build Status"></a>
+  <a href="https://goreportcard.com/report/github.com/xlc-dev/nova"><img src="https://goreportcard.com/badge/github.com/xlc-dev/nova" alt="Go Report Card"></a>
   <a href="https://pkg.go.dev/github.com/xlc-dev/nova"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&logo=go&logoColor=white" alt="GoDoc"></a>
   <a href="https://github.com/xlc-dev/nova/releases"><img src="https://img.shields.io/github/v/release/xlc-dev/nova?style=for-the-badge&logo=github&logoColor=white" alt="Release"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/xlc-dev/nova?style=for-the-badge&color=blue" alt="License"></a>
@@ -38,8 +38,6 @@ Nova consists of two main components:
 - 🚧 **Automatic Validation & OpenAPI:** Built-in support for request validation and OpenAPI (Swagger) spec generation.
 - 🧩 **Middleware Support:** Easily add and manage middleware for enhanced functionality.
 - 📄 **Templating Engine:** Built-in support for building HTML templates within Go files.
-
----
 
 ## 🚀 Getting Started
 
@@ -87,23 +85,17 @@ go install github.com/xlc-dev/nova/nova@latest
 
     Your application should now be running on `http://localhost:8080`. From here, you can explore the library's features like REST APIs and middleware.
 
----
-
 ## 📚 Documentation
 
 Documentation is available to guide you through Nova's features and usage, including how the binary and library work together. The docs are created and built using [mdBook](https://github.com/rust-lang/mdBook). All documentation can be found in the `docs/src` folder written in Markdown.
 
 ➡️ **[Read the full documentation here](https://xlc-dev.github.io/nova/book)**
 
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Whether it's bug reports, feature requests, documentation improvements, or code contributions, please feel free to open an issue or submit a pull request. If you enjoy using Nova, we'd appreciate it if you could star the repository on GitHub to show your support!
 
 Please read the [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
----
 
 ## 📜 License
 
