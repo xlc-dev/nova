@@ -1,6 +1,8 @@
 module github.com/xlc-dev/nova
 
-go 1.23.8
+go 1.23.0
+
+toolchain go1.24.3
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0
