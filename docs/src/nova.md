@@ -1,8 +1,10 @@
 # Nova
 
-Welcome to Nova, a modern, flexible web framework for building webapps for Go.
-The goal of Nova is to provide a foundation for building modern web applications in Go by
-providing a set of modules that can be plugged together to create a full-stack/REST API web application.
+Welcome to Nova.
+
+Nova is a flexible framework that simplifies creating both RESTful APIs and web UIs.
+It extends Go's standard library with sensible defaults and helper utilities for components like routing, middleware, OpenAPI, and HTML templating, minimizing decision fatique.
+Making it easier than ever to build powerful web applications in Go.
 
 ## Why Choose Nova?
 
@@ -13,12 +15,13 @@ Together with the CLI tool, Nova provides a streamlined development experience f
 
 ## Key Features:
 
-- ⚡ Built around Go's standard library
-- 🏗 Built-in project scaffolding
-- 🛠️ Streamlined REST API development
-- 💻 CLI tooling included
-- 🗃 Database Management
-- 🚧 Automatic validation & OpenAPI
+- 🛠️ **CLI Tooling:** Integrated command-line tooling to build any CLI for your application.
+- 🏗️ **Project Scaffolding:** Quickly generate new projects with a sensible default structure using `nova new`.
+- 🗃️ **Database Migrations:** Manage database migrations effortlessly with the `nova` binary.
+- 🛠️ **Streamlined REST APIs:** Simplified routing, request handling, and response generation.
+- 🚧 **OpenAPI:** Built-in support for request validation and OpenAPI (Swagger) spec generation.
+- 🧩 **Middleware Support:** Easily add and manage middleware for enhanced functionality.
+- 📄 **Templating Engine:** Built-in support for building HTML templates within Go files.
 
 ## Getting Started
 
