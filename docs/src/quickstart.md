@@ -5,7 +5,7 @@ To get started with Nova, follow these steps:
 1. Install Nova:
 
 ```sh
-go install github.com/xlc-dev/nova
+go install github.com/xlc-dev/nova/nova@latest
 ```
 
 2. Create a new project and follow the prompts:
@@ -22,7 +22,7 @@ go build # Or run `make` if you enabled the Makefile in the setup process
 ./myproject # Or ./myproject api to run the API server at localhost:8080
 ```
 
-That's it! Now you got a Nova project up and running.
+That's it! Now you got a Nova project up and running at `http://localhost:8080`.
 
 ## Next steps
 
