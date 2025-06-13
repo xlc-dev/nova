@@ -6,8 +6,8 @@ import (
 
 	"github.com/xlc-dev/nova/nova"
 
-	"{{.Name}}/internal/api"
-	"{{.Name}}/internal/config"
+	"{{.ProjectName}}/internal/api"
+	"{{.ProjectName}}/internal/config"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	cli, err := nova.NewCLI(&nova.CLI{
 		Name:        "Nova",
 		Version:     "0.0.1",
-		Description: "{{.Name}} API",
+		Description: "{{.ProjectName}} API",
 		GlobalFlags: []nova.Flag{
 			&nova.BoolFlag{
 				Name:    "verbose",

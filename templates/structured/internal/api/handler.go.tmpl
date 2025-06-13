@@ -10,7 +10,7 @@ import (
 // RegisterRoutes registers all API endpoints to the router.
 func RegisterRoutes(router *nova.Router) {
 	router.GetFunc("/", func(ctx *nova.ResponseContext) error {
-		return ctx.Text(http.StatusOK, "Welcome to {{.Name}} API")
+		return ctx.Text(http.StatusOK, "Welcome to {{.ProjectName}} API")
 	})
 	// Add more route registrations here, or call feature-specific registration functions.
 }

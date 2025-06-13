@@ -407,12 +407,12 @@ It customizes directory names, filenames, and file contents based on user input 
 effectively bootstrapping a new application with a chosen layout.
 
 The core logic resides in the createFromTemplate function, w
-hich is invoked by higher-level functions like CreateMinimal, CreateStructured, or CreateTODO.
+hich is invoked by higher-level functions like CreateMinimal, or CreateStructured.
 It systematically processes template items to build the new project. If any step fails, the scaffolding process is halted, and an error is returned.
 
 ```mermaid
 flowchart TD
-    A_USER_CALL["User calls CreateMinimal, CreateStructured, or CreateTODO"] --> B_INVOKE_CFT["Invoke createFromTemplate(name, templateConfig, dbImport)"]
+    A_USER_CALL["User calls CreateMinimal or CreateStructured"] --> B_INVOKE_CFT["Invoke createFromTemplate(name, templateConfig, dbImport)"]
 
     B_INVOKE_CFT --> C_START_CFT["Start createFromTemplate"]
 

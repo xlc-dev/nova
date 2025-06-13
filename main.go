@@ -109,9 +109,9 @@ func (g *projectGenerator) promptUserForChoices() error {
 	var err error
 
 	// Template selection
-	templateOptions := []string{"minimal", "todo", "structured"}
+	templateOptions := []string{"minimal", "structured"}
 	g.templateChoice, err = g.ask(
-		"Select template (minimal, todo, structured): ",
+		"Select template (minimal, structured): ",
 		templateOptions,
 	)
 	if err != nil {
@@ -161,7 +161,6 @@ func (g *projectGenerator) promptUserForChoices() error {
 func (g *projectGenerator) createFromTemplate() error {
 	createFns := map[string]func(projectDir string, isVerbose bool, dbAdapter string) error{
 		"minimal":    templates.CreateMinimal,
-		"todo":       templates.CreateTODO,
 		"structured": templates.CreateStructured,
 	}
 	createFn, exists := createFns[g.templateChoice]

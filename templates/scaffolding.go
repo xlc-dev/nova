@@ -22,12 +22,12 @@ type templateConfig struct {
 }
 
 // templateData holds the data passed to path and content templates.
-// Name is the project name, DBImport is the database identifier,
+// ProjectName is the project name, DBImport is the database identifier,
 // and DBAdapter is the Go import path for the chosen database adapter.
 type templateData struct {
-	Name      string
-	DBImport  string
-	DBAdapter string
+	ProjectName string
+	DBImport    string
+	DBAdapter   string
 }
 
 // getDBAdapter returns the Go import path for a given database identifier.
@@ -49,7 +49,7 @@ func getDBAdapter(dbImport string) string {
 // createFromTemplate walks the embedded TemplateFS under TemplateDir,
 // processes each path and file as a Go text/template applied to
 // templateData, and writes the results under the new project directory
-// named by 'name'. Returns any error encountered.
+// named by 'ProjectName'. Returns any error encountered.
 func createFromTemplate(
 	projectDir string,
 	projectName string,
@@ -63,9 +63,9 @@ func createFromTemplate(
 
 	// Prepare the data for templating
 	data := templateData{
-		Name:      projectName,
-		DBImport:  dbImport,
-		DBAdapter: getDBAdapter(dbImport),
+		ProjectName: projectName,
+		DBImport:    dbImport,
+		DBAdapter:   getDBAdapter(dbImport),
 	}
 
 	// Walk the embedded filesystem and handle each entry
@@ -107,7 +107,7 @@ func createFromTemplate(
 
 // processPathTemplate applies Go text/template to a file or directory path,
 // stripping any ".tmpl" suffix from the base name. The result is joined under
-// the project root 'name'. Returns the final filesystem path.
+// the project root 'ProjectName'. Returns the final filesystem path.
 func processPathTemplate(
 	path, projectDir string, data templateData,
 ) (string, error) {
@@ -195,9 +195,6 @@ var minimalTemplate embed.FS
 //go:embed structured/*
 var structuredTemplate embed.FS
 
-//go:embed todo/*
-var todoTemplate embed.FS
-
 // CreateMinimal generates a new project using the minimal template layout.
 // name is the project directory, verbose enables logging, and dbImport
 // selects the database adapter ("sqlite", "postgres", "mysql").
@@ -218,18 +215,6 @@ func CreateStructured(projectDir string, verbose bool, dbImport string) error {
 	return createFromTemplate(projectDir, projectName, templateConfig{
 		TemplateFS:  structuredTemplate,
 		TemplateDir: "structured",
-		Verbose:     verbose,
-	}, dbImport)
-}
-
-// CreateTODO generates a new project using the TODO-style template layout.
-// name is the project directory, verbose enables logging, and dbImport
-// selects the database adapter ("sqlite", "postgres", "mysql").
-func CreateTODO(projectDir string, verbose bool, dbImport string) error {
-	projectName := filepath.Base(projectDir)
-	return createFromTemplate(projectDir, projectName, templateConfig{
-		TemplateFS:  todoTemplate,
-		TemplateDir: "todo",
 		Verbose:     verbose,
 	}, dbImport)
 }
