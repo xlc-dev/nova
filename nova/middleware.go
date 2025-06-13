@@ -13,6 +13,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -102,7 +103,7 @@ type responseWriterInterceptor struct {
 
 // NewResponseWriterInterceptor creates a new interceptor.
 func NewResponseWriterInterceptor(w http.ResponseWriter) *responseWriterInterceptor {
-	return &responseWriterInterceptor{ResponseWriter: w, statusCode: http.StatusOK} // Default is 200
+	return &responseWriterInterceptor{ResponseWriter: w, statusCode: http.StatusOK}
 }
 
 // WriteHeader captures the status code.
@@ -119,7 +120,7 @@ func (w *responseWriterInterceptor) WriteHeader(statusCode int) {
 // It also calls WriteHeader implicitly if not already called.
 func (w *responseWriterInterceptor) Write(b []byte) (int, error) {
 	if !w.wroteHeader {
-		w.WriteHeader(http.StatusOK) // Default to 200 if WriteHeader wasn't called
+		w.WriteHeader(http.StatusOK)
 	}
 	size, err := w.ResponseWriter.Write(b)
 	w.size += int64(size)
@@ -147,7 +148,7 @@ type bufferingResponseWriterInterceptor struct {
 func NewBufferingResponseWriterInterceptor(w http.ResponseWriter) *bufferingResponseWriterInterceptor {
 	return &bufferingResponseWriterInterceptor{
 		ResponseWriter: w,
-		statusCode:     http.StatusOK, // Default is 200
+		statusCode:     http.StatusOK,
 		buffer:         new(bytes.Buffer),
 	}
 }
@@ -159,22 +160,20 @@ func (w *bufferingResponseWriterInterceptor) WriteHeader(statusCode int) {
 	}
 	w.statusCode = statusCode
 	w.wroteHeader = true
-	// Don't call underlying WriteHeader yet, allows middleware to change it (e.g., to 304)
 }
 
 // Write captures the number of bytes written and writes to the internal buffer.
 // It also sets the status code implicitly if not already set.
 func (w *bufferingResponseWriterInterceptor) Write(b []byte) (int, error) {
 	if !w.wroteHeader {
-		w.WriteHeader(http.StatusOK) // Default to 200 if WriteHeader wasn't called
+		w.WriteHeader(http.StatusOK)
 	}
-	size, err := w.buffer.Write(b) // Write to buffer
+	size, err := w.buffer.Write(b)
 	w.size += int64(size)
 	return size, err
 }
 
 // Flush implements the http.Flusher interface if the underlying writer supports it.
-// Note: Flushing might be less effective with buffering.
 func (w *bufferingResponseWriterInterceptor) Flush() {
 	if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
 		// We could potentially write the buffer and flush here,
@@ -188,14 +187,7 @@ func (w *bufferingResponseWriterInterceptor) Flush() {
 // WriteCapturedData writes the captured status code, headers, and buffered body
 // to the original ResponseWriter. Returns the number of bytes written from the body.
 func (w *bufferingResponseWriterInterceptor) WriteCapturedData() (int64, error) {
-	// Ensure headers set on the interceptor (like Content-Type) are copied
-	// before writing the header to the underlying writer.
-	// (This happens implicitly as w.ResponseWriter.Header() returns the underlying header map)
-
-	// Write the final status code
 	w.ResponseWriter.WriteHeader(w.statusCode)
-
-	// Write the buffered body
 	written, err := io.Copy(w.ResponseWriter, w.buffer)
 	return written, err
 }
@@ -264,6 +256,7 @@ func CSRFMiddleware(config *CSRFConfig) Middleware {
 	if cfg == nil {
 		cfg = &CSRFConfig{}
 	}
+	// Set defaults for all configuration fields
 	if cfg.Logger == nil {
 		cfg.Logger = log.Default()
 	}
@@ -281,7 +274,11 @@ func CSRFMiddleware(config *CSRFConfig) Middleware {
 	}
 	if cfg.ErrorHandler == nil {
 		cfg.ErrorHandler = func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			http.Error(
+				w,
+				http.StatusText(http.StatusForbidden),
+				http.StatusForbidden,
+			)
 		}
 	}
 	if cfg.CookiePath == "" {
@@ -300,6 +297,7 @@ func CSRFMiddleware(config *CSRFConfig) Middleware {
 		cfg.SkipMethods = []string{"GET", "HEAD", "OPTIONS", "TRACE"}
 	}
 
+	// Create a set for quick lookups of methods to skip
 	skipMethodSet := make(map[string]struct{}, len(cfg.SkipMethods))
 	for _, m := range cfg.SkipMethods {
 		skipMethodSet[strings.ToUpper(m)] = struct{}{}
@@ -314,24 +312,42 @@ func CSRFMiddleware(config *CSRFConfig) Middleware {
 		return base64.StdEncoding.EncodeToString(b), nil
 	}
 
+	// Define the secure comparison function once to avoid recreating it
+	compare := func(a, b string) bool {
+		// Check length first to prevent timing attacks on unequal lengths
+		if len(a) != len(b) {
+			return false
+		}
+		return subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// 1. Generate or retrieve token
+			// Always generate or retrieve the real token
 			var realToken string
 			cookie, err := r.Cookie(cfg.CookieName)
+
+			// If cookie exists and has a value, use it. Otherwise, generate a new one
 			if err == nil && cookie.Value != "" {
 				realToken = cookie.Value
 			} else {
-				// Generate new token if cookie is missing or empty
 				newToken, err := generateToken()
 				if err != nil {
-					cfg.Logger.Printf("[ERROR] CSRF: Failed to generate token: %v", err)
-					cfg.ErrorHandler(w, r) // Use error handler
+					cfg.Logger.Printf(
+						"[ERROR] CSRF: Failed to generate token: %v",
+						err,
+					)
+					// This is a server error, not a client one
+					http.Error(
+						w,
+						"Internal Server Error",
+						http.StatusInternalServerError,
+					)
 					return
 				}
 				realToken = newToken
 
-				// Set the new token in the cookie for the *response*
+				// Set the new token in a cookie on the response
 				http.SetCookie(w, &http.Cookie{
 					Name:     cfg.CookieName,
 					Value:    realToken,
@@ -339,44 +355,45 @@ func CSRFMiddleware(config *CSRFConfig) Middleware {
 					Domain:   cfg.CookieDomain,
 					MaxAge:   int(cfg.CookieMaxAge.Seconds()),
 					Secure:   cfg.CookieSecure,
-					HttpOnly: true, // Crucial: Prevent JS access to this cookie
+					HttpOnly: true,
 					SameSite: cfg.CookieSameSite,
 				})
 			}
 
-			// 2. Store token in context (optional, but can be useful for handlers)
+			// Store the real token in the context. This is useful for HTML
+			// templates to embed the token in forms
 			ctx := context.WithValue(r.Context(), cfg.ContextKey, realToken)
 			r = r.WithContext(ctx)
 
-			// 3. Check token for unsafe methods
-			if _, skip := skipMethodSet[strings.ToUpper(r.Method)]; !skip {
-				// Get token from header or form field
-				sentToken := r.Header.Get(cfg.HeaderName)
-				if sentToken == "" {
-					// Try form field (parse form if necessary)
-					// Note: Parsing form might consume the body, be careful with order
-					if err := r.ParseForm(); err == nil {
-						sentToken = r.PostFormValue(cfg.FieldName)
-					}
-				}
+			// For "safe" methods, we're done. Just call the next handler
+			if _, skip := skipMethodSet[strings.ToUpper(r.Method)]; skip {
+				next.ServeHTTP(w, r)
+				return
+			}
 
-				cfg.ErrorHandler(w, r)
-				compare := func(a, b string) bool {
-					if len(a) != len(b) {
-						return false
-					}
-					return subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
-				}
-
-				// Validate token
-				if sentToken == "" || !compare(sentToken, realToken) {
-					cfg.Logger.Printf("[WARN] CSRF: Invalid token received for %s %s", r.Method, r.URL.Path)
-					cfg.ErrorHandler(w, r)
-					return
+			// For "unsafe" methods, we must validate the token from the request
+			sentToken := r.Header.Get(cfg.HeaderName)
+			if sentToken == "" {
+				// If not in header, try the form field. This requires parsing the form,
+				// which consumes the request body. Be aware of this side effect
+				if err := r.ParseForm(); err == nil {
+					sentToken = r.PostFormValue(cfg.FieldName)
 				}
 			}
 
-			// 4. Call next handler
+			// Perform the secure comparison
+			// If the sent token is empty or doesn't match the real token, fail
+			if !compare(sentToken, realToken) {
+				cfg.Logger.Printf(
+					"[WARN] CSRF: Invalid token for %s %s. Token was empty or mismatched.",
+					r.Method,
+					r.URL.Path,
+				)
+				cfg.ErrorHandler(w, r)
+				return
+			}
+
+			// If validation passes, call the next handler
 			next.ServeHTTP(w, r)
 		})
 	}
@@ -400,14 +417,10 @@ type ETagConfig struct {
 func ETagMiddleware(config *ETagConfig) Middleware {
 	cfg := config
 	if cfg == nil {
-		cfg = &ETagConfig{}
-	}
-	// Default SkipNoContent to true
-	// A helper function `isSet` or checking against a pointer could make this cleaner.
-	// Let's assume if config is provided, the user sets it intentionally.
-	// If config is nil, we default it here.
-	if config == nil {
-		cfg.SkipNoContent = true
+		cfg = &ETagConfig{
+			// Default SkipNoContent to true when config is nil
+			SkipNoContent: true,
+		}
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -428,7 +441,7 @@ func ETagMiddleware(config *ETagConfig) Middleware {
 				return
 			}
 
-			// Only generate ETag for successful responses (2xx)
+			// Only generate ETag for successful responses (2xx) with a body
 			if statusCode >= 200 && statusCode < 300 && len(body) > 0 {
 				// Calculate ETag (SHA1 hash of the body)
 				hasher := sha1.New()
@@ -441,20 +454,30 @@ func ETagMiddleware(config *ETagConfig) Middleware {
 					etag = "W/" + etag
 				}
 
-				// Check If-None-Match request header
+				// Check If-None-Match request header for a match
 				ifNoneMatch := r.Header.Get("If-None-Match")
 				if ifNoneMatch != "" {
-					// Simple comparison (more complex parsing needed for multiple ETags/wildcard)
-					// For simplicity, we only check if the single generated ETag matches.
-					if strings.Contains(ifNoneMatch, etag) { // Basic check
-						// Match found, rewrite to 304 Not Modified
+					match := false
+					if ifNoneMatch == "*" {
+						match = true
+					} else {
+						// Parse comma-separated list of ETags
+						for _, token := range strings.Split(ifNoneMatch, ",") {
+							if strings.TrimSpace(token) == etag {
+								match = true
+								break
+							}
+						}
+					}
+
+					if match {
 						interceptor.Header().Del("Content-Type")
 						interceptor.Header().Del("Content-Length")
 						interceptor.Header().Del("Transfer-Encoding")
 						interceptor.WriteHeader(http.StatusNotModified)
-						interceptor.buffer.Reset() // Clear the buffered body
+						interceptor.buffer.Reset()
 						interceptor.size = 0
-						interceptor.WriteCapturedData() // Write the 304 response
+						interceptor.WriteCapturedData()
 						return
 					}
 				}
@@ -534,7 +557,6 @@ func LoggingMiddleware(config *LoggingConfig) Middleware {
 	if cfg.RequestIDKey == "" {
 		cfg.RequestIDKey = requestIDKey
 	}
-	// Default LogRequestID to true implicitly if not set
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -598,14 +620,17 @@ func RecoveryMiddleware(config *RecoveryConfig) Middleware {
 	if cfg.RequestIDKey == "" {
 		cfg.RequestIDKey = requestIDKey
 	}
-	// Default LogRequestID to true implicitly
 
 	defaultHandler := func(w http.ResponseWriter, r *http.Request, err any) {
 		// Check if headers were already sent (e.g., by a streaming handler before panic)
 		// This is a best-effort check.
 		if _, ok := w.(interface{ Status() int }); !ok { // Simple check if it's our interceptor
 			if w.Header().Get("Content-Type") == "" { // Check if common headers are set
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				http.Error(
+					w,
+					http.StatusText(http.StatusInternalServerError),
+					http.StatusInternalServerError,
+				)
 			}
 		}
 	}
@@ -626,9 +651,13 @@ func RecoveryMiddleware(config *RecoveryConfig) Middleware {
 							requestIDStr = fmt.Sprintf("[%s] ", reqID)
 						}
 					}
-					cfg.Logger.Printf("[ERROR] %sRecovered from panic: %v", requestIDStr, err)
-					// TODO: Add stack trace logging here if desired (using runtime.Stack)
-					handler(w, r, err) // Call the configured (or default) recovery handler
+					cfg.Logger.Printf(
+						"[ERROR] %sRecovered from panic: %v\n%s",
+						requestIDStr,
+						err,
+						debug.Stack(),
+					)
+					handler(w, r, err)
 				}
 			}()
 			next.ServeHTTP(w, r)
@@ -795,8 +824,6 @@ func CORSMiddleware(config CORSConfig) Middleware {
 	}
 }
 
-// --- Security Headers Middleware ---
-
 // SecurityHeadersConfig holds configuration for SecurityHeadersMiddleware.
 type SecurityHeadersConfig struct {
 	// ContentTypeOptions sets the X-Content-Type-Options header.
@@ -805,9 +832,6 @@ type SecurityHeadersConfig struct {
 	// FrameOptions sets the X-Frame-Options header.
 	// Defaults to "DENY". Other common values: "SAMEORIGIN". Set to "" to disable.
 	FrameOptions string
-	// XSSProtection sets the X-XSS-Protection header.
-	// Defaults to "1; mode=block". Set to "" to disable.
-	XSSProtection string
 	// ReferrerPolicy sets the Referrer-Policy header.
 	// Defaults to "strict-origin-when-cross-origin". Set to "" to disable.
 	ReferrerPolicy string
@@ -834,9 +858,6 @@ func SecurityHeadersMiddleware(config SecurityHeadersConfig) Middleware {
 	}
 	if config.FrameOptions == "" {
 		config.FrameOptions = "DENY"
-	}
-	if config.XSSProtection == "" {
-		config.XSSProtection = "1; mode=block"
 	}
 	if config.ReferrerPolicy == "" {
 		config.ReferrerPolicy = "strict-origin-when-cross-origin"
@@ -866,9 +887,6 @@ func SecurityHeadersMiddleware(config SecurityHeadersConfig) Middleware {
 			if config.FrameOptions != "" {
 				hdr.Set("X-Frame-Options", config.FrameOptions)
 			}
-			if config.XSSProtection != "" {
-				hdr.Set("X-XSS-Protection", config.XSSProtection)
-			}
 			if config.ReferrerPolicy != "" {
 				hdr.Set("Referrer-Policy", config.ReferrerPolicy)
 			}
@@ -888,7 +906,34 @@ func SecurityHeadersMiddleware(config SecurityHeadersConfig) Middleware {
 	}
 }
 
-// --- Timeout Middleware ---
+// timeoutResponseWriter wraps http.ResponseWriter to prevent panics from
+// superfluous WriteHeader calls after a timeout.
+type timeoutResponseWriter struct {
+	http.ResponseWriter
+	mu          sync.Mutex
+	wroteHeader bool
+}
+
+func (w *timeoutResponseWriter) WriteHeader(statusCode int) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.wroteHeader {
+		return
+	}
+	w.ResponseWriter.WriteHeader(statusCode)
+	w.wroteHeader = true
+}
+
+func (w *timeoutResponseWriter) Write(b []byte) (int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if !w.wroteHeader {
+		// Implicitly write 200 OK if not already written
+		w.ResponseWriter.WriteHeader(http.StatusOK)
+		w.wroteHeader = true
+	}
+	return w.ResponseWriter.Write(b)
+}
 
 // TimeoutConfig holds configuration for TimeoutMiddleware.
 type TimeoutConfig struct {
@@ -917,10 +962,11 @@ func TimeoutMiddleware(config TimeoutConfig) Middleware {
 			// Use custom timeout handler if provided
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				ctx, cancel := context.WithTimeout(r.Context(), config.Duration)
-				defer cancel() // Important to release resources
+				defer cancel()
 
 				done := make(chan struct{})
-				panicChan := make(chan any, 1) // To capture panics
+				panicChan := make(chan any, 1)
+				tw := &timeoutResponseWriter{ResponseWriter: w}
 
 				go func() {
 					defer func() {
@@ -929,44 +975,38 @@ func TimeoutMiddleware(config TimeoutConfig) Middleware {
 						}
 						close(done)
 					}()
-					next.ServeHTTP(w, r.WithContext(ctx))
+					next.ServeHTTP(tw, r.WithContext(ctx))
 				}()
 
 				select {
 				case <-done:
-					// Handler finished within timeout
-					// Re-panic if the handler panicked
+					// Handler finished within timeout. Re-panic if it panicked
 					select {
 					case p := <-panicChan:
 						panic(p)
 					default:
-						// No panic occurred
+						// No panic.
 					}
 				case <-ctx.Done():
-					// Timeout occurred
-					// Check if the handler panicked just before timeout
-					select {
-					case p := <-panicChan:
-						panic(p) // Prioritize the handler's panic
-					default:
-						// No panic, proceed with timeout handler
-					}
-					// Ensure panicChan is drained if handler finished *after* timeout but *before* this point
-					select {
-					case <-done:
-					default:
+					// Timeout occurred.
+					// Ensure we don't call the timeout handler if the main handler
+					// already wrote the headers
+					tw.mu.Lock()
+					if tw.wroteHeader {
+						tw.mu.Unlock()
+						return
 					}
 					config.TimeoutHandler.ServeHTTP(w, r)
+					tw.wroteHeader = true
+					tw.mu.Unlock()
 				}
 			})
 		} else {
-			// Use standard http.TimeoutHandler
+			// Use standard http.TimeoutHandler for the simple case
 			return http.TimeoutHandler(next, config.Duration, config.TimeoutMessage)
 		}
 	}
 }
-
-// --- Basic Auth Middleware ---
 
 // AuthValidator is a function type that validates the provided username and password.
 // It returns true if the credentials are valid.
@@ -1017,8 +1057,6 @@ func BasicAuthMiddleware(config BasicAuthConfig) Middleware {
 	}
 }
 
-// --- Method Override Middleware ---
-
 // MethodOverrideConfig holds configuration for MethodOverrideMiddleware.
 type MethodOverrideConfig struct {
 	// HeaderName is the name of the header checked for the method override value.
@@ -1048,6 +1086,13 @@ func MethodOverrideMiddleware(config *MethodOverrideConfig) Middleware {
 		}
 	}
 
+	// A set of methods that are safe to allow for overriding.
+	allowedOverrideMethods := map[string]struct{}{
+		http.MethodPut:    {},
+		http.MethodPatch:  {},
+		http.MethodDelete: {},
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			overrideMethod := ""
@@ -1056,21 +1101,20 @@ func MethodOverrideMiddleware(config *MethodOverrideConfig) Middleware {
 				overrideMethod = headerVal
 			} else if cfg.FormFieldName != "" && r.Method == http.MethodPost {
 				// Check form field only for POST requests
-				// ParseForm parses the request body, call it only if needed.
-				// Consider potential side effects if the body is needed later.
-				// A MaxBytesReader might have already limited the body size.
 				if err := r.ParseForm(); err == nil {
 					if formVal := r.PostFormValue(cfg.FormFieldName); formVal != "" {
 						overrideMethod = formVal
 					}
-				} else {
-					// Log parsing error? Or ignore? Ignoring for now.
 				}
 			}
 
 			if overrideMethod != "" {
-				// TODO: Validate overrideMethod against a list of allowed methods?
-				r.Method = strings.ToUpper(overrideMethod)
+				// Validate that the override method is one we allow.
+				// This prevents clients from setting arbitrary methods.
+				method := strings.ToUpper(overrideMethod)
+				if _, ok := allowedOverrideMethods[method]; ok {
+					r.Method = method
+				}
 			}
 			next.ServeHTTP(w, r)
 		})
@@ -1192,9 +1236,8 @@ func (w *gzipResponseWriter) Header() http.Header {
 }
 
 // WriteHeader sends the HTTP status code using the underlying ResponseWriter.
-// It ensures Content-Length is removed as gzip modifies the size.
 func (w *gzipResponseWriter) WriteHeader(statusCode int) {
-	w.Header().Del("Content-Length") // Size is unknown/modified by compression
+	w.Header().Del("Content-Length")
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
@@ -1204,30 +1247,13 @@ func (w *gzipResponseWriter) Write(b []byte) (int, error) {
 }
 
 // Flush implements http.Flusher if the underlying ResponseWriter supports it.
-// It flushes the gzip writer and then the underlying writer.
 func (w *gzipResponseWriter) Flush() {
-	// Flush the gzip writer to ensure all buffered data is written.
 	if err := w.Writer.Flush(); err != nil {
-		// Log the error, but flushing might fail if connection is closed etc.
-		// Consider logging level (e.g., debug) as it might not be critical.
 		log.Printf("[DEBUG] GzipMiddleware: Error flushing gzip writer: %v", err)
 	}
-
-	// Flush the underlying response writer if it supports flushing.
 	if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
 		flusher.Flush()
 	}
-}
-
-// CloseNotify implements http.CloseNotifier if the underlying ResponseWriter supports it.
-// Deprecated: Use Request.Context().Done() instead in handlers.
-// Included for potential compatibility if underlying writer implements it.
-func (w *gzipResponseWriter) CloseNotify() <-chan bool {
-	if cn, ok := w.ResponseWriter.(http.CloseNotifier); ok {
-		return cn.CloseNotify()
-	}
-	// Return a dummy channel if not supported
-	return make(chan bool)
 }
 
 // GzipConfig holds configuration options for the GzipMiddleware.
@@ -1236,16 +1262,13 @@ type GzipConfig struct {
 	// Accepts values from gzip.BestSpeed (1) to gzip.BestCompression (9).
 	// Defaults to gzip.DefaultCompression (-1).
 	CompressionLevel int
-
 	// AddVaryHeader indicates whether to add the "Vary: Accept-Encoding" header.
 	// A nil value defaults to true. Set explicitly to false to disable.
 	// Disabling is only recommended if caching behavior is fully understood.
 	AddVaryHeader *bool
-
 	// Logger specifies an optional logger for errors.
 	// Defaults to log.Default().
 	Logger *log.Logger
-
 	// Pool specifies an optional sync.Pool for gzip.Writer reuse.
 	// Can improve performance by reducing allocations.
 	Pool *sync.Pool // Optional: Pool for gzip.Writers
@@ -1280,9 +1303,6 @@ func GzipMiddleware(config *GzipConfig) Middleware {
 	if pool == nil {
 		pool = &sync.Pool{
 			New: func() any {
-				// Error handling for NewWriterLevel is minimal here as level is validated.
-				// If NewWriterLevel could fail significantly, more robust error handling
-				// might be needed within the pool's New function or middleware itself.
 				gw, _ := gzip.NewWriterLevel(io.Discard, level)
 				return gw
 			},
@@ -1353,7 +1373,6 @@ func RealIPMiddleware(config RealIPConfig) Middleware {
 	if config.ContextKey == "" {
 		config.ContextKey = realIPKey
 	}
-	// Default StoreInContext to true implicitly
 
 	var trustedNets []*net.IPNet
 	for _, cidr := range config.TrustedProxyCIDRs {
@@ -1469,8 +1488,6 @@ func MaxRequestBodySizeMiddleware(config MaxRequestBodySizeConfig) Middleware {
 	}
 }
 
-// --- Trailing Slash Redirect Middleware ---
-
 // TrailingSlashRedirectConfig holds configuration for TrailingSlashRedirectMiddleware.
 type TrailingSlashRedirectConfig struct {
 	// AddSlash enforces trailing slashes (redirects /path to /path/). Defaults to false (removes slash).
@@ -1501,9 +1518,9 @@ func TrailingSlashRedirectMiddleware(config TrailingSlashRedirectConfig) Middlew
 				if hasSlash != shouldHaveSlash {
 					newPath := path
 					if shouldHaveSlash {
-						newPath += "/" // Add slash
+						newPath += "/"
 					} else {
-						newPath = strings.TrimSuffix(path, "/") // Remove slash
+						newPath = strings.TrimSuffix(path, "/")
 					}
 					// Preserve query string
 					r.URL.Path = newPath
@@ -1544,7 +1561,7 @@ func ForceHTTPSMiddleware(config ForceHTTPSConfig) Middleware {
 	if config.ForwardedProtoHeader == "" {
 		config.ForwardedProtoHeader = "X-Forwarded-Proto"
 	}
-	trustHeader := true // Default to true
+	trustHeader := true
 	if config.TrustForwardedHeader != nil {
 		trustHeader = *config.TrustForwardedHeader
 	}
@@ -1774,7 +1791,10 @@ func IPFilterMiddleware(config IPFilterConfig) Middleware {
 				if err == nil {
 					nets = append(nets, ipNet)
 				} else {
-					config.Logger.Printf("[WARN] IPFilterMiddleware: Invalid IP/CIDR in filter list: %s", entry)
+					config.Logger.Printf(
+						"[WARN] IPFilterMiddleware: Invalid IP/CIDR in filter list: %s",
+						entry,
+					)
 				}
 			}
 		}
@@ -1799,12 +1819,15 @@ func IPFilterMiddleware(config IPFilterConfig) Middleware {
 			}
 			clientIP := net.ParseIP(clientIPStr)
 			if clientIP == nil {
-				config.Logger.Printf("[WARN] IPFilterMiddleware: Could not parse client IP: %s", clientIPStr)
+				config.Logger.Printf(
+					"[WARN] IPFilterMiddleware: Could not parse client IP: %s",
+					clientIPStr,
+				)
 				onForbidden(w, r)
 				return
 			}
 
-			// Check blocked list first (takes precedence)
+			// Check if the IP is in a blocked network.
 			for _, network := range blockedNets {
 				if network.Contains(clientIP) {
 					onForbidden(w, r)
@@ -1812,38 +1835,25 @@ func IPFilterMiddleware(config IPFilterConfig) Middleware {
 				}
 			}
 
-			// Check allowed list
+			// Check if the IP is in an allowed network.
 			isAllowed := false
-			if len(allowedNets) > 0 {
-				for _, network := range allowedNets {
-					if network.Contains(clientIP) {
-						isAllowed = true
-						break
-					}
+			for _, network := range allowedNets {
+				if network.Contains(clientIP) {
+					isAllowed = true
+					break
 				}
-			} else if !config.BlockByDefault {
-				// If allowed list is empty and not blocking by default, allow implicitly
-				isAllowed = true
 			}
 
-			// Apply block-by-default logic
+			// Decide based on the BlockByDefault setting.
+			// If we block by default, the IP must be explicitly allowed.
+			// If we don't block by default, the IP is allowed as long as it wasn't blocked.
 			if config.BlockByDefault && !isAllowed {
 				onForbidden(w, r)
 				return
 			}
 
-			// If not blocked and ( (not block-by-default) OR (is explicitly allowed) )
-			if isAllowed {
-				next.ServeHTTP(w, r)
-			} else if !config.BlockByDefault {
-				// This case should only be hit if BlockedByDefault is false AND AllowedIPs is empty
-				// AND the IP wasn't blocked. In this scenario, allow.
-				next.ServeHTTP(w, r)
-			} else {
-				// Should technically be unreachable due to the BlockByDefault check above,
-				// but include for safety.
-				onForbidden(w, r)
-			}
+			// If we reach here, the request is permitted.
+			next.ServeHTTP(w, r)
 		})
 	}
 }
@@ -1873,11 +1883,9 @@ type RateLimiterConfig struct {
 
 // visitor tracks request counts and timestamps for rate limiting.
 type visitor struct {
-	count    int       // Requests within the current window/burst phase
-	lastSeen time.Time // Timestamp of the last request seen
-	// Using a simple leaky bucket / token bucket concept:
 	tokens    float64   // Current number of available tokens
 	lastToken time.Time // Time when tokens were last refilled
+	lastSeen  time.Time // Timestamp of the last request seen (for cleanup)
 }
 
 // RateLimitMiddleware provides basic in-memory rate limiting.
@@ -1890,7 +1898,7 @@ func RateLimitMiddleware(config RateLimiterConfig) Middleware {
 		panic("RateLimitMiddleware: Requests and Duration must be positive")
 	}
 	if config.Burst <= 0 {
-		config.Burst = config.Requests // Default burst to the rate limit
+		config.Burst = config.Requests
 	}
 	if config.Logger == nil {
 		config.Logger = log.Default()
@@ -1901,7 +1909,6 @@ func RateLimitMiddleware(config RateLimiterConfig) Middleware {
 		keyFunc = func(r *http.Request) string {
 			ip, _, err := net.SplitHostPort(r.RemoteAddr)
 			if err != nil {
-				// Log error? For now, use RemoteAddr directly if split fails
 				return r.RemoteAddr
 			}
 			return ip
@@ -1914,15 +1921,19 @@ func RateLimitMiddleware(config RateLimiterConfig) Middleware {
 			// Suggest retrying after the window duration passes
 			retryAfter := strconv.Itoa(int(config.Duration.Seconds()))
 			w.Header().Set("Retry-After", retryAfter)
-			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+			http.Error(
+				w,
+				http.StatusText(http.StatusTooManyRequests),
+				http.StatusTooManyRequests,
+			)
 		}
 	}
 
 	visitors := make(map[string]*visitor)
-	var mu sync.Mutex // Protects the visitors map
+	var mu sync.Mutex
 
 	// Token bucket parameters
-	rate := float64(config.Requests) / config.Duration.Seconds() // tokens per second
+	rate := float64(config.Requests) / config.Duration.Seconds()
 	burst := float64(config.Burst)
 
 	// Start cleanup goroutine if interval is set
@@ -1935,7 +1946,6 @@ func RateLimitMiddleware(config RateLimiterConfig) Middleware {
 				now := time.Now()
 				for key, v := range visitors {
 					// Remove entries idle for more than ~2x the duration (heuristic)
-					// Or entries whose tokens would have fully refilled long ago
 					if now.Sub(v.lastSeen) > config.Duration*2 {
 						delete(visitors, key)
 					}
@@ -1949,8 +1959,11 @@ func RateLimitMiddleware(config RateLimiterConfig) Middleware {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			key := keyFunc(r)
 			if key == "" {
-				// If key cannot be determined, maybe allow or block? Allowing for now.
-				config.Logger.Printf("[WARN] RateLimitMiddleware: Could not determine rate limit key for request %s %s", r.Method, r.URL.Path)
+				config.Logger.Printf(
+					"[WARN] RateLimitMiddleware: Could not determine rate limit key for request %s %s",
+					r.Method,
+					r.URL.Path,
+				)
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -1960,31 +1973,27 @@ func RateLimitMiddleware(config RateLimiterConfig) Middleware {
 			now := time.Now()
 
 			if !exists {
-				// New visitor, start with full burst capacity
 				v = &visitor{tokens: burst, lastToken: now}
 				visitors[key] = v
 			}
 
-			// Refill tokens based on elapsed time
 			elapsed := now.Sub(v.lastToken)
 			tokensToAdd := elapsed.Seconds() * rate
 			v.tokens += tokensToAdd
-			v.lastToken = now // Update last refill time
+			v.lastToken = now
 
-			// Cap tokens at the burst limit
 			if v.tokens > burst {
 				v.tokens = burst
 			}
 
-			// Check if enough tokens are available
 			allowed := false
 			if v.tokens >= 1 {
-				v.tokens-- // Consume one token
+				v.tokens--
 				allowed = true
-				v.lastSeen = now // Update last seen time for cleanup
+				v.lastSeen = now
 			}
 
-			mu.Unlock() // Unlock before calling next handler or error response
+			mu.Unlock()
 
 			if !allowed {
 				onLimitExceeded(w, r)
