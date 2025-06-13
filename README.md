@@ -7,7 +7,7 @@
 <h1 align="center">Nova</h1>
 
 <p align="center" style="font-size: 1.2em; color: #586069;">
-  Build Powerful Web Applications in Go.
+  Build Powerful Web Applications in Go, Faster.
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@ Nova consists of two main components:
 - 🏗️ **Project Scaffolding:** Quickly generate new projects with a sensible default structure using `nova new`.
 - 🗃️ **Database Migrations:** Manage database migrations effortlessly with the `nova` binary.
 - 🛠️ **Streamlined REST APIs:** Simplified routing, request handling, and response generation.
-- 🚧 **Automatic Validation & OpenAPI:** Built-in support for request validation and OpenAPI (Swagger) spec generation.
+- 🚧 **Validation & OpenAPI:** Built-in support for request validation and OpenAPI (Swagger) spec generation.
 - 🧩 **Middleware Support:** Easily add and manage middleware for enhanced functionality.
 - 📄 **Templating Engine:** Built-in support for building HTML templates within Go files.
 
@@ -44,7 +44,7 @@ Nova consists of two main components:
 ### Prerequisites
 
 - Go 1.23 or later
-- Make (optional, does _make_ life easy ;) – pun intended, as it simplifies build tasks)
+- Make (optional, does _make_ life easy ;) – pun intended)
 
 ### Installation
 
