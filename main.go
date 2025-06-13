@@ -15,6 +15,8 @@ import (
 	_ "github.com/lib/pq"
 	_ "modernc.org/sqlite"
 
+	"slices"
+
 	"github.com/xlc-dev/nova/nova"
 	"github.com/xlc-dev/nova/templates"
 )
@@ -25,6 +27,300 @@ var logo = " _   _\n" +
 	"| . ` | / _ \\\\ \\ / // _` |\n" +
 	"| |\\  || (_) |\\ V /| (_| |\n" +
 	"|_| \\_| \\___/  \\_/  \\____|\n"
+
+// projectGenerator holds the state and logic for creating a new project.
+type projectGenerator struct {
+	projectName string
+	projectDir  string
+	isVerbose   bool
+	reader      *bufio.Reader
+
+	// User choices
+	templateChoice string
+	dbAdapter      string
+	useGit         bool
+	useMakefile    bool
+}
+
+// newProjectGenerator is the constructor for our generator.
+func newProjectGenerator(
+	projectName string,
+	isVerbose bool,
+) (*projectGenerator, error) {
+	projectDir, err := filepath.Abs(projectName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get absolute path: %w", err)
+	}
+
+	if _, err := os.Stat(projectDir); err == nil {
+		return nil, fmt.Errorf("directory '%s' already exists", projectName)
+	}
+
+	return &projectGenerator{
+		projectName: projectName,
+		projectDir:  projectDir,
+		isVerbose:   isVerbose,
+		reader:      bufio.NewReader(os.Stdin),
+	}, nil
+}
+
+// run executes the full project generation workflow.
+func (g *projectGenerator) run() error {
+	if err := os.MkdirAll(g.projectDir, 0755); err != nil {
+		return fmt.Errorf("failed to create project directory: %w", err)
+	}
+	fmt.Printf("Created directory: %s\n", g.projectDir)
+
+	if err := g.promptUserForChoices(); err != nil {
+		return err
+	}
+
+	if err := g.createFromTemplate(); err != nil {
+		return err
+	}
+
+	if err := g.initializeGoModule(); err != nil {
+		return err
+	}
+
+	if g.dbAdapter != "" {
+		if err := g.setupDatabase(); err != nil {
+			return err
+		}
+	}
+
+	if g.useGit {
+		if err := g.initializeGit(); err != nil {
+			return err
+		}
+	}
+
+	if g.useMakefile {
+		if err := g.createMakefile(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// promptUserForChoices handles all interactive questions.
+func (g *projectGenerator) promptUserForChoices() error {
+	var err error
+
+	// Template selection
+	templateOptions := []string{"minimal", "todo", "structured"}
+	g.templateChoice, err = g.ask(
+		"Select template (minimal, todo, structured): ",
+		templateOptions,
+	)
+	if err != nil {
+		return err
+	}
+
+	dbAnswer, err := g.ask(
+		"Would you like to add a database? (y/n): ",
+		[]string{"y", "n"},
+	)
+	if err != nil {
+		return err
+	}
+	if dbAnswer == "y" {
+		adapterOptions := []string{"sqlite", "postgres", "mysql"}
+		g.dbAdapter, err = g.ask(
+			"Select database adapter (sqlite, postgres, mysql): ",
+			adapterOptions,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	gitAnswer, err := g.ask(
+		"Initialize a git repository? (y/n): ",
+		[]string{"y", "n"},
+	)
+	if err != nil {
+		return err
+	}
+	g.useGit = (gitAnswer == "y")
+
+	makefileAnswer, err := g.ask(
+		"Would you like to add a Makefile? (y/n): ",
+		[]string{"y", "n"},
+	)
+	if err != nil {
+		return err
+	}
+	g.useMakefile = (makefileAnswer == "y")
+
+	return nil
+}
+
+// createFromTemplate executes the chosen template creation function.
+func (g *projectGenerator) createFromTemplate() error {
+	createFns := map[string]func(projectDir string, isVerbose bool, dbAdapter string) error{
+		"minimal":    templates.CreateMinimal,
+		"todo":       templates.CreateTODO,
+		"structured": templates.CreateStructured,
+	}
+	createFn, exists := createFns[g.templateChoice]
+	if !exists {
+		return fmt.Errorf("internal error: unknown template '%s'", g.templateChoice)
+	}
+
+	fmt.Println("Creating project from template...")
+	err := createFn(g.projectDir, g.isVerbose, g.dbAdapter)
+	if err != nil {
+		return fmt.Errorf("failed to create from template: %w", err)
+	}
+	return nil
+}
+
+// initializeGoModule runs `go mod init`, `go mod tidy`, and `go fmt`.
+func (g *projectGenerator) initializeGoModule() error {
+	fmt.Println("Initializing Go module...")
+	if err := g.runCommand("go", "mod", "init", g.projectName); err != nil {
+		return fmt.Errorf("failed to run 'go mod init': %w", err)
+	}
+	if err := g.runCommand("go", "mod", "tidy"); err != nil {
+		return fmt.Errorf("failed to run 'go mod tidy': %w", err)
+	}
+	if err := g.runCommand("go", "fmt", "./..."); err != nil {
+		return fmt.Errorf("failed to run 'go fmt': %w", err)
+	}
+	return nil
+}
+
+// setupDatabase creates the .env file with the correct DATABASE_URL.
+func (g *projectGenerator) setupDatabase() error {
+	dbConfig := map[string]string{
+		"sqlite":   "DATABASE_URL=file:database.db?cache=shared&mode=rwc\n",
+		"postgres": "DATABASE_URL=postgres://user:password@localhost/dbname?sslmode=disable\n",
+		"mysql":    "DATABASE_URL=mysql://user:password@tcp(127.0.0.1:3306)/dbname\n",
+	}
+	envURL, exists := dbConfig[g.dbAdapter]
+	if !exists {
+		return fmt.Errorf("internal error: unknown db adapter '%s'", g.dbAdapter)
+	}
+
+	fmt.Println("Creating .env file...")
+	envPath := filepath.Join(g.projectDir, ".env")
+	if err := os.WriteFile(envPath, []byte(envURL), 0644); err != nil {
+		return fmt.Errorf("failed to create .env file: %w", err)
+	}
+	return nil
+}
+
+// initializeGit creates a .gitignore file and runs `git init`.
+func (g *projectGenerator) initializeGit() error {
+	fmt.Println("Initializing git repository...")
+	gitignore := fmt.Sprintf(`.DS_Store
+Thumbs.db
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+.idea/
+.vscode/
+*~
+*.swp
+.env
+*.db
+%s
+`, g.projectName)
+	gitignorePath := filepath.Join(g.projectDir, ".gitignore")
+	if err := os.WriteFile(gitignorePath, []byte(gitignore), 0644); err != nil {
+		return fmt.Errorf("failed to create .gitignore: %w", err)
+	}
+
+	if err := g.runCommand("git", "init"); err != nil {
+		return fmt.Errorf("failed to initialize git: %w", err)
+	}
+	fmt.Println("Git repository and .gitignore initialized successfully.")
+	return nil
+}
+
+// createMakefile generates and writes the Makefile.
+func (g *projectGenerator) createMakefile() error {
+	fmt.Println("Creating Makefile...")
+	var buildTarget string
+	if g.templateChoice == "structured" {
+		buildTarget = fmt.Sprintf("./cmd/%s", g.projectName)
+	} else {
+		buildTarget = "."
+	}
+	makefileContent := fmt.Sprintf(`BINARY_NAME=%s
+
+.PHONY: build clean fmt test help
+default: build
+
+build:
+	@go build -o $(BINARY_NAME) %s
+
+clean:
+	@rm -f $(BINARY_NAME)
+
+fmt:
+	@goimports -w .
+	@go fmt ./...
+
+test:
+	@go test ./... -v
+
+help:
+	@echo "Available Make targets:"
+	@echo "  build : Build the Go application (default)"
+	@echo "  clean : Remove the built binary ($(BINARY_NAME))"
+	@echo "  fmt   : Format Go source code (using goimports)"
+	@echo "  test  : Run Go tests"
+	@echo "  help  : Show this help message"
+`, g.projectName, buildTarget)
+	makefile_path := filepath.Join(g.projectDir, "Makefile")
+	if err := os.WriteFile(makefile_path, []byte(makefileContent), 0644); err != nil {
+		return fmt.Errorf("failed to create Makefile: %w", err)
+	}
+	fmt.Println("Makefile created successfully.")
+	return nil
+}
+
+// runCommand is a helper to execute external commands in the project directory.
+func (g *projectGenerator) runCommand(name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Dir = g.projectDir
+	if g.isVerbose {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("command '%s %s' failed: %w", name, strings.Join(args, " "), err)
+	}
+	return nil
+}
+
+// ask is a generic helper for prompting the user and validating input.
+func (g *projectGenerator) ask(
+	prompt string,
+	validOptions []string,
+) (string, error) {
+	for {
+		fmt.Print(prompt)
+		input, err := g.reader.ReadString('\n')
+		if err != nil {
+			return "", fmt.Errorf("failed to read user input: %w", err)
+		}
+		input = strings.TrimSpace(strings.ToLower(input))
+
+		if slices.Contains(validOptions, input) {
+			return input, nil
+		}
+		fmt.Printf(
+			"Invalid input. Please choose one of: %v\n",
+			validOptions,
+		)
+	}
+}
 
 func main() {
 	config := &nova.CLI{
@@ -144,201 +440,29 @@ func main() {
 				Usage:       "Creates a new project",
 				Description: "Creates a new project directory with the basic structure.",
 				ArgsUsage:   "<project-name>",
-				Action: func(ctx *nova.Context) error {
-					// Ensure exactly one argument for the project name
+				Action: func(ctx *nova.Context) (err error) {
 					if len(ctx.Args()) != 1 {
 						return fmt.Errorf("expected exactly one argument: <project-name>")
 					}
 					projectName := ctx.Args()[0]
 
-					// Get the absolute path for the project directory
-					projectDir, err := filepath.Abs(projectName)
-					if err != nil {
-						return fmt.Errorf("failed to get absolute path: %w", err)
-					}
-					if _, err := os.Stat(projectDir); err == nil {
-						return fmt.Errorf("directory '%s' already exists", projectName)
-					}
-
-					reader := bufio.NewReader(os.Stdin)
-
-					// Helper function for getting validated input.
-					// If validOptions is nil or empty, valid responses are expected to be "y" or "n".
-					getInput := func(prompt string, validOptions []string) (string, error) {
-						for {
-							fmt.Print(prompt)
-							input, err := reader.ReadString('\n')
-							if err != nil {
-								return "", err
-							}
-							input = strings.TrimSpace(strings.ToLower(input))
-							if len(validOptions) == 0 {
-								if input == "y" || input == "n" {
-									return input, nil
-								}
-							} else {
-								for _, option := range validOptions {
-									if input == option {
-										return input, nil
-									}
-								}
-							}
-							fmt.Printf("Invalid input. Valid options: %v\n", validOptions)
-						}
-					}
-
-					// Template selection
-					templateOptions := []string{"minimal", "todo", "structured"}
-					templateChoice, err := getInput(
-						"Select template (minimal, todo, structured): ",
-						templateOptions,
-					)
+					g, err := newProjectGenerator(projectName, ctx.Bool("verbose"))
 					if err != nil {
 						return err
 					}
 
-					// Map the chosen template to the corresponding creation function
-					createFns := map[string]func(string, bool, string) error{
-						"minimal":    templates.CreateMinimal,
-						"todo":       templates.CreateTODO,
-						"structured": templates.CreateStructured,
-					}
-					createFn, exists := createFns[templateChoice]
-					if !exists {
-						return fmt.Errorf("unknown template: %s", templateChoice)
-					}
-
-					// Database setup
-					chosenAdapter := ""
-					dbAnswer, err := getInput("Would you like to add a database to your project? (y/n): ", nil)
-					if err != nil {
-						return err
-					}
-
-					// dbConfig contains your adapter configuration
-					dbConfig := map[string]struct {
-						pkg    string
-						envURL string
-					}{
-						"sqlite":   {"modernc.org/sqlite", "DATABASE_URL=file:database.db?cache=shared&mode=rwc\n"},
-						"postgres": {"github.com/lib/pq", "DATABASE_URL=postgres://user:password@localhost/dbname?sslmode=disable\n"},
-						"mysql":    {"github.com/go-sql-driver/mysql", "DATABASE_URL=mysql://user:password@tcp(127.0.0.1:3306)/dbname\n"},
-					}
-
-					if dbAnswer == "y" {
-						adapterOptions := []string{"sqlite", "postgres", "mysql"}
-						chosenAdapter, err = getInput(
-							"Select your database adapter (sqlite, postgres, mysql): ",
-							adapterOptions,
-						)
+					defer func() {
 						if err != nil {
-							return err
+							// g.cleanupOnFailure()
 						}
-					}
+					}()
 
-					// Create project from template
-					if err := createFn(projectName, ctx.Bool("verbose"), chosenAdapter); err != nil {
+					err = g.run()
+					if err != nil {
 						return fmt.Errorf("failed to create project: %w", err)
 					}
 
-					// Initialize module and add replace directive
-					initCmd := exec.Command("go", "mod", "init", projectName)
-					initCmd.Dir = projectDir
-					if err := initCmd.Run(); err != nil {
-						return fmt.Errorf("failed to initialize go module: %w", err)
-					}
-
-					// Setup database (if chosen)
-					if config, exists := dbConfig[chosenAdapter]; exists {
-						if err := os.WriteFile(filepath.Join(projectDir, ".env"), []byte(config.envURL), 0644); err != nil {
-							return fmt.Errorf("failed to create .env file: %w", err)
-						}
-					}
-
-					// Run remaining commands
-					for _, cmd := range [][]string{
-						{"go", "mod", "tidy"},
-						{"go", "fmt", "./..."},
-					} {
-						command := exec.Command(cmd[0], cmd[1:]...)
-						command.Dir = projectDir
-						if err := command.Run(); err != nil {
-							return fmt.Errorf("failed to run %s: %w", strings.Join(cmd, " "), err)
-						}
-					}
-
-					// Initialize git if requested
-					gitAnswer, err := getInput("Initialize a git repository? (y/n): ", nil)
-					if err != nil {
-						return err
-					}
-					if gitAnswer == "y" {
-						gitCmd := exec.Command("git", "init")
-						gitCmd.Dir = projectDir
-						if err := gitCmd.Run(); err != nil {
-							return fmt.Errorf("failed to initialize git: %w", err)
-						}
-
-						gitignore := fmt.Sprintf(`.DS_Store
-Thumbs.db
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-.idea/
-.vscode/
-*~
-*.swp
-*.env
-*.db
-%s
-`, projectName)
-						if err := os.WriteFile(filepath.Join(projectDir, ".gitignore"), []byte(gitignore), 0644); err != nil {
-							return fmt.Errorf("failed to create .gitignore: %w", err)
-						}
-						fmt.Println("Git repository and .gitignore initialized successfully.")
-					}
-
-					// Ask about adding a Makefile
-					makefileAnswer, err := getInput("Would you like to add a Makefile? (y/n): ", nil)
-					if err != nil {
-						return err
-					}
-					if makefileAnswer == "y" {
-						makefile := fmt.Sprintf(`BINARY_NAME=%s
-
-.PHONY: build clean fmt test help
-default: build
-
-build:
-	@go build -o $(BINARY_NAME)
-
-clean:
-	@rm -f $(BINARY_NAME)
-
-fmt:
-	@goimports -w .
-	@go fmt ./...
-
-test:
-	@go test ./... -v
-
-help:
-	@echo "Available Make targets:"
-	@echo "  build : Build the Go application (default)"
-	@echo "  clean : Remove the built binary ($(BINARY_NAME))"
-	@echo "  fmt   : Format Go source code (using goimports)"
-	@echo "  test  : Run Go tests"
-	@echo "  help  : Show this help message"
-`, projectName)
-						if err := os.WriteFile(filepath.Join(projectDir, "Makefile"), []byte(makefile), 0644); err != nil {
-							return fmt.Errorf("failed to create Makefile: %w", err)
-						}
-						fmt.Println("Makefile created successfully.")
-					}
-
-					fmt.Printf("Project '%s' created successfully.\n", projectName)
+					fmt.Printf("\nProject '%s' created successfully.\n", projectName)
 					return nil
 				},
 			},
