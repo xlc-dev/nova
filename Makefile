@@ -1,4 +1,4 @@
-BINARY_NAME=rnova
+BINARY_NAME=novarun
 
 .PHONY: build clean fmt test docs help
 default: build
