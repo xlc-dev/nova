@@ -1794,16 +1794,13 @@ steps - The maximum number of migrations to apply (0 means apply all).
 	// Accepts values from gzip.BestSpeed (1) to gzip.BestCompression (9).
 	// Defaults to gzip.DefaultCompression (-1).
 	CompressionLevel int
-
 	// AddVaryHeader indicates whether to add the "Vary: Accept-Encoding" header.
 	// A nil value defaults to true. Set explicitly to false to disable.
 	// Disabling is only recommended if caching behavior is fully understood.
 	AddVaryHeader *bool
-
 	// Logger specifies an optional logger for errors.
 	// Defaults to log.Default().
 	Logger *log.Logger
-
 	// Pool specifies an optional sync.Pool for gzip.Writer reuse.
 	// Can improve performance by reducing allocations.
 	Pool *sync.Pool // Optional: Pool for gzip.Writers
@@ -2146,9 +2143,9 @@ steps - The maximum number of migrations to apply (0 means apply all).
 <hr />
 <h3 id="openapiconfig"><a class="header" href="#openapiconfig"><code>OpenAPIConfig</code></a></h3>
 <pre><code class="language-go">type OpenAPIConfig struct {
-	Title       string // Title of the API
-	Version     string // Version of the API
-	Description string // Description of the API
+	Title       string
+	Version     string
+	Description string
 }
 </code></pre>
 <p>OpenAPIConfig holds metadata for generating an OpenAPI specification.</p>
@@ -2318,7 +2315,7 @@ steps - The maximum number of migrations to apply (0 means apply all).
 <h3 id="bindvalidated"><a class="header" href="#bindvalidated"><code>BindValidated</code></a></h3>
 <pre><code class="language-go">func (rc *ResponseContext) BindValidated(v any) error
 </code></pre>
-<p>BindValidated binds and validates request data (JSON or form) with comprehensive validation</p>
+<p>BindValidated binds and validates request data (JSON or form) with comprehensive validation.</p>
 <hr />
 <h3 id="html"><a class="header" href="#html"><code>HTML</code></a></h3>
 <pre><code class="language-go">func (rc *ResponseContext) HTML(statusCode int, content HTMLElement) error
@@ -2545,9 +2542,6 @@ steps - The maximum number of migrations to apply (0 means apply all).
 	// FrameOptions sets the X-Frame-Options header.
 	// Defaults to "DENY". Other common values: "SAMEORIGIN". Set to "" to disable.
 	FrameOptions string
-	// XSSProtection sets the X-XSS-Protection header.
-	// Defaults to "1; mode=block". Set to "" to disable.
-	XSSProtection string
 	// ReferrerPolicy sets the Referrer-Policy header.
 	// Defaults to "strict-origin-when-cross-origin". Set to "" to disable.
 	ReferrerPolicy string
@@ -2724,6 +2718,22 @@ steps - The maximum number of migrations to apply (0 means apply all).
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function () {
+                socket.close();
+            }
+        </script>
 
 
 

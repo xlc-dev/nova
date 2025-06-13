@@ -30,4 +30,4 @@ heading-split-level = 2
 [preprocessor]
 
 [preprocessor.mermaid]
-command = "./mdbook-mermaid"
+command = "mdbook-mermaid"
