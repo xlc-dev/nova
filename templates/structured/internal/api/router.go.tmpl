@@ -1,0 +1,21 @@
+package api
+
+import (
+	"github.com/xlc-dev/nova/nova"
+
+	"{{.Name}}/internal/middleware"
+)
+
+func NewRouter() *nova.Router {
+	router := nova.NewRouter()
+
+	// Register global middleware here
+	// router.Use(middleware.Logging())
+
+	// Register all API routes
+	RegisterRoutes(router)
+	// Optionally: RegisterUserRoutes(router)
+	// Optionally: RegisterOtherFeatureRoutes(router)
+
+	return router
+}

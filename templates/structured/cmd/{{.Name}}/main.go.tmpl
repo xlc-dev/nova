@@ -1,0 +1,57 @@
+package main
+
+import (
+	"log"
+	"os"
+
+	"github.com/xlc-dev/nova/nova"
+
+	"{{.Name}}/internal/api"
+	"{{.Name}}/internal/config"
+)
+
+func main() {
+	{{if .DBAdapter}}
+	if err := nova.LoadDotenv(); err != nil {
+		log.Fatal(err)
+	}
+	{{end}}
+
+	cli, err := nova.NewCLI(&nova.CLI{
+		Name:        "Nova",
+		Version:     "0.0.1",
+		Description: "{{.Name}} API",
+		GlobalFlags: []nova.Flag{
+			&nova.BoolFlag{
+				Name:    "verbose",
+				Aliases: []string{"V"},
+				Usage:   "Enable verbose output",
+			},
+		},
+		Commands: []*nova.Command{
+			{
+				Name:  "api",
+				Usage: "Start the API server",
+				Flags: config.ServerFlags(),
+				Action: func(ctx *nova.Context) error {
+					{{if .DBAdapter}}
+					db, err := config.OpenDB()
+					if err != nil {
+						log.Fatal(err)
+					}
+					defer db.Close()
+					{{end}}
+
+					router := api.NewRouter()
+					return nova.Serve(ctx, router)
+				},
+			},
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := cli.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}

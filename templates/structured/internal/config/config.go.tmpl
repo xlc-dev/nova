@@ -1,0 +1,64 @@
+package config
+
+import (
+	"os"
+
+	"github.com/xlc-dev/nova/nova"
+
+	{{if .DBAdapter}}"database/sql"{{end}}
+	{{if .DBAdapter}}_ "{{.DBAdapter}}"{{end}}
+)
+
+func ServerFlags() []nova.Flag {
+	return []nova.Flag{
+		&nova.IntFlag{
+			Name:    "port",
+			Aliases: []string{"p"},
+			Usage:   "Port for the server to listen on",
+			Default: 8080,
+		},
+		&nova.StringFlag{
+			Name:    "host",
+			Aliases: []string{"H"},
+			Usage:   "Hostname or IP address to bind the server",
+			Default: "127.0.0.1",
+		},
+		&nova.BoolFlag{
+			Name:    "watch",
+			Aliases: []string{"w"},
+			Usage:   "Enable recompiling on changes",
+		},
+		&nova.StringFlag{
+			Name:    "extensions",
+			Aliases: []string{"e"},
+			Usage:   "Comma-separated list of file extensions to watch for changes",
+			Default: ".go",
+		},
+		&nova.StringFlag{
+			Name:    "log_format",
+			Aliases: []string{"lf"},
+			Usage:   "Log format: json or text",
+			Default: "text",
+		},
+		&nova.StringFlag{
+			Name:    "log_level",
+			Aliases: []string{"ll"},
+			Usage:   "Log level: debug, info, warn, error",
+			Default: "info",
+		},
+	}
+}
+
+{{if .DBAdapter}}
+// OpenDB opens a database connection using DATABASE_URL from the environment.
+func OpenDB() (*sql.DB, error) {
+	db, err := sql.Open("{{.DBImport}}", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+{{end}}
