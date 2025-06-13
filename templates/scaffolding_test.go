@@ -34,7 +34,7 @@ func TestProcessPathTemplate(t *testing.T) {
 		DBImport:    "sqlite",
 		DBAdapter:   getDBAdapter("sqlite"),
 	}
-	in := "dir/{{.Name}}.tmpl"
+	in := "dir/{{.ProjectName}}.tmpl"
 	out, err := processPathTemplate(in, "my-project", data)
 	if err != nil {
 		t.Fatalf("processPathTemplate error: %v", err)
@@ -48,7 +48,7 @@ func TestProcessPathTemplate(t *testing.T) {
 // TestProcessContentTemplate remains the same, no file I/O.
 func TestProcessContentTemplate(t *testing.T) {
 	name := "file.tmpl"
-	content := `package {{.Name}}
+	content := `package {{.ProjectName}}
 
 import "{{.DBAdapter}}"
 `
