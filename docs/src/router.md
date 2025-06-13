@@ -83,7 +83,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/xlc-dev/nova/nova" // Adjust import path as necessary
+	"github.com/xlc-dev/nova/nova"
 )
 
 func main() {
@@ -192,12 +192,10 @@ These use the standard Go `http.HandlerFunc` signature: `func(w http.ResponseWri
 
 ```go
 func listItemsHandler(w http.ResponseWriter, r *http.Request) {
-    // Your logic here...
     fmt.Fprintln(w, "List of items")
 }
 
 func createItemHandler(w http.ResponseWriter, r *http.Request) {
-    // Your logic here...
     w.WriteHeader(http.StatusCreated)
     fmt.Fprintln(w, "Item created")
 }
@@ -233,20 +231,20 @@ All route registration methods (`Handle`, `HandleFunc`, `Get`, `GetFunc`, etc.) 
 
 ```go
 // Example: User-defined RouteOptions for OpenAPI
-// type MyRouteOptions struct {
-//     Summary     string
-//     Description string
-//     Tags        []string
-//     Deprecated  bool
-// }
-//
-// func getUserProfile(ctx *nova.ResponseContext) error { /* ... */ }
-//
-// routeOpts := &MyRouteOptions{
-//     Summary: "Get user profile",
-//     Tags:    []string{"users", "profile"},
-// }
-// router.GetFunc("/users/{id}/profile", getUserProfile, routeOpts) // Pass your custom options
+type MyRouteOptions struct {
+    Summary     string
+    Description string
+    Tags        []string
+    Deprecated  bool
+}
+
+func getUserProfile(ctx *nova.ResponseContext) error { /* ... */ }
+
+routeOpts := &MyRouteOptions{
+    Summary: "Get user profile",
+    Tags:    []string{"users", "profile"},
+}
+router.GetFunc("/users/{id}/profile", getUserProfile, routeOpts) // Pass your custom options
 ```
 
 Nova's router will store this pointer, but it's up to other parts of your application or third-party tools to interpret these options.
@@ -500,11 +498,11 @@ import (
     "log"
     "net/http"
 
-    "github.com/xlc-dev/nova/nova" // Adjust path
+    "github.com/xlc-dev/nova/nova"
 )
 
 //go:embed assets/*
-var embeddedAssets embed.FS // Embeds the 'assets' directory and its contents
+var embeddedAssets embed.FS
 
 func main() {
     router := nova.NewRouter()
@@ -529,17 +527,17 @@ func main() {
             nova.DocumentConfig{
                 Title: "Static Files Example",
                 HeadExtras: []nova.HTMLElement{
-                    nova.StyleSheet("/static/css/main.css"), // Link to a static CSS file
+                    nova.StyleSheet("/static/css/main.css"),
                 },
             },
             nova.H1().Text("Page with Static Assets"),
-            nova.Img("/static/images/banner.jpg", "Banner Image"), // Link to a static image
-            nova.Script("/static/js/app.js").Attr("defer","true"), // Link to a static JS file
+            nova.Img("/static/images/banner.jpg", "Banner Image"),
+            nova.Script("/static/js/app.js").Attr("defer","true"),
         )
         return ctx.HTML(http.StatusOK, page)
     })
 
-    // ... rest of your server setup (CLI, nova.Serve) ...
+    // rest of your server setup (CLI, nova.Serve)
 }
 ```
 
@@ -982,22 +980,22 @@ package main
 
 import (
 	"context"
-	"embed" // For embedding static files
+	"embed"
 	"fmt"
 	"io/fs"
-	"log"      // Standard log, though slog will be configured by nova.Serve
-	"log/slog" // For application-level structured logging
+	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/xlc-dev/nova/nova" // Adjust import path as necessary
+	"github.com/xlc-dev/nova/nova"
 )
 
 //go:embed static/*
-var embeddedStaticFiles embed.FS // Embeds the 'static' directory
+var embeddedStaticFiles embed.FS
 
-// --- Middleware ---
+// Middleware
 func requestLoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -1021,7 +1019,7 @@ func simpleAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// --- HTML Page Components (Example) ---
+// HTML Page Components (Example)
 func pageLayout(config nova.DocumentConfig, bodyContent ...nova.HTMLElement) nova.HTMLElement {
 	defaultConfig := nova.DocumentConfig{
 		Lang:     "en",
@@ -1056,7 +1054,7 @@ func pageLayout(config nova.DocumentConfig, bodyContent ...nova.HTMLElement) nov
 	return nova.Document(defaultConfig, allBodyContent...)
 }
 
-// --- Handlers ---
+// Handlers
 func handleHomepage(ctx *nova.ResponseContext) error {
 	slog.Info("Handling homepage request")
 	content := nova.Main(
@@ -1106,7 +1104,6 @@ func handleContactSubmit(ctx *nova.ResponseContext) error {
 	}
 
 	slog.Info("Contact form submitted", "name", input.Name, "email", input.Email)
-	// Process the form data (e.g., send an email)
 
 	thankYouMessage := nova.Main(
 		nova.H1().Text("Thank You!"),
@@ -1128,18 +1125,19 @@ func handleApiGetData(ctx *nova.ResponseContext) error {
 }
 
 func main() {
-	// --- Router Setup ---
+	// Router Setup
 	router := nova.NewRouter()
 
 	// Global Middleware
 	router.Use(requestLoggingMiddleware)
 
-	// Serve static files from embedded 'static' directory under '/assets' URL path
+	// Serve static files from embedded 'static' directory under '/assets' URL path,
+    // e.g., /assets/css/style.css
 	staticFilesRoot, err := fs.Sub(embeddedStaticFiles, "static")
 	if err != nil {
 		log.Fatalf("Failed to create sub FS for static files: %v", err)
 	}
-	router.Static("/assets", staticFilesRoot) // e.g., /assets/css/style.css
+	router.Static("/assets", staticFilesRoot)
 
 	// Public Routes
 	router.GetFunc("/", handleHomepage)
@@ -1151,7 +1149,7 @@ func main() {
 	apiGroup.Use(simpleAuthMiddleware)
 	apiGroup.GetFunc("/data", handleApiGetData)
 
-	// --- CLI Setup ---
+	// CLI Setup
 	cliApp, err := nova.NewCLI(&nova.CLI{
 		Name:        "NovaFullApp",
 		Version:     "1.0.0",
