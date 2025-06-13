@@ -50,20 +50,25 @@ func getDBAdapter(dbImport string) string {
 // processes each path and file as a Go text/template applied to
 // templateData, and writes the results under the new project directory
 // named by 'name'. Returns any error encountered.
-func createFromTemplate(name string, config templateConfig, dbImport string) error {
-	// Create the project root directory.
-	if err := os.Mkdir(name, 0755); err != nil {
-		return fmt.Errorf("failed to create directory: %w", err)
+func createFromTemplate(
+	projectDir string,
+	projectName string,
+	config templateConfig,
+	dbImport string,
+) error {
+	// Ensure the root project directory exists before we start
+	if err := os.MkdirAll(projectDir, 0755); err != nil {
+		return fmt.Errorf("failed to create project directory: %w", err)
 	}
 
-	// Prepare the data for templating.
+	// Prepare the data for templating
 	data := templateData{
-		Name:      name,
+		Name:      projectName,
 		DBImport:  dbImport,
 		DBAdapter: getDBAdapter(dbImport),
 	}
 
-	// Walk the embedded filesystem and handle each entry.
+	// Walk the embedded filesystem and handle each entry
 	return fs.WalkDir(config.TemplateFS, config.TemplateDir, func(
 		path string, d fs.DirEntry, err error,
 	) error {
@@ -71,23 +76,32 @@ func createFromTemplate(name string, config templateConfig, dbImport string) err
 			return fmt.Errorf("filesystem walk error: %w", err)
 		}
 
-		// Compute the path relative to the template root.
+		// Compute the path relative to the template root
 		relPath, err := filepath.Rel(config.TemplateDir, path)
 		if err != nil {
 			return fmt.Errorf("failed to get relative path: %w", err)
 		}
 
-		// Process the path as a template, stripping .tmpl extension.
-		targetPath, err := processPathTemplate(relPath, name, data)
+		// Process the path as a template, stripping .tmpl extension
+		targetPath, err := processPathTemplate(relPath, projectDir, data)
 		if err != nil {
 			return fmt.Errorf("failed to process path template: %w", err)
 		}
 
-		// If it's a directory, create it; otherwise process a file.
+		// If it's a directory, create it; otherwise process a file
 		if d.IsDir() {
+			if path == config.TemplateDir {
+				return nil // Skip the root template dir itself
+			}
 			return handleDirectory(targetPath, config.Verbose)
 		}
-		return handleFile(config.TemplateFS, path, targetPath, data, config.Verbose)
+		return handleFile(
+			config.TemplateFS,
+			path,
+			targetPath,
+			data,
+			config.Verbose,
+		)
 	})
 }
 
@@ -95,7 +109,7 @@ func createFromTemplate(name string, config templateConfig, dbImport string) err
 // stripping any ".tmpl" suffix from the base name. The result is joined under
 // the project root 'name'. Returns the final filesystem path.
 func processPathTemplate(
-	path, name string, data templateData,
+	path, projectDir string, data templateData,
 ) (string, error) {
 	dir := filepath.Dir(path)
 	base := filepath.Base(path)
@@ -118,7 +132,7 @@ func processPathTemplate(
 	}
 
 	// Prepend the project root directory
-	return filepath.Join(name, processed.String()), nil
+	return filepath.Join(projectDir, processed.String()), nil
 }
 
 // handleDirectory creates the directory (and parents) at path.
@@ -187,8 +201,9 @@ var todoTemplate embed.FS
 // CreateMinimal generates a new project using the minimal template layout.
 // name is the project directory, verbose enables logging, and dbImport
 // selects the database adapter ("sqlite", "postgres", "mysql").
-func CreateMinimal(name string, verbose bool, dbImport string) error {
-	return createFromTemplate(name, templateConfig{
+func CreateMinimal(projectDir string, verbose bool, dbImport string) error {
+	projectName := filepath.Base(projectDir)
+	return createFromTemplate(projectDir, projectName, templateConfig{
 		TemplateFS:  minimalTemplate,
 		TemplateDir: "minimal",
 		Verbose:     verbose,
@@ -198,8 +213,9 @@ func CreateMinimal(name string, verbose bool, dbImport string) error {
 // CreateStructured generates a new project using the structured template layout.
 // name is the project directory, verbose enables logging, and dbImport
 // selects the database adapter ("sqlite", "postgres", "mysql").
-func CreateStructured(name string, verbose bool, dbImport string) error {
-	return createFromTemplate(name, templateConfig{
+func CreateStructured(projectDir string, verbose bool, dbImport string) error {
+	projectName := filepath.Base(projectDir)
+	return createFromTemplate(projectDir, projectName, templateConfig{
 		TemplateFS:  structuredTemplate,
 		TemplateDir: "structured",
 		Verbose:     verbose,
@@ -209,8 +225,9 @@ func CreateStructured(name string, verbose bool, dbImport string) error {
 // CreateTODO generates a new project using the TODO-style template layout.
 // name is the project directory, verbose enables logging, and dbImport
 // selects the database adapter ("sqlite", "postgres", "mysql").
-func CreateTODO(name string, verbose bool, dbImport string) error {
-	return createFromTemplate(name, templateConfig{
+func CreateTODO(projectDir string, verbose bool, dbImport string) error {
+	projectName := filepath.Base(projectDir)
+	return createFromTemplate(projectDir, projectName, templateConfig{
 		TemplateFS:  todoTemplate,
 		TemplateDir: "todo",
 		Verbose:     verbose,

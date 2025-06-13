@@ -7,8 +7,7 @@ import (
 	"testing"
 )
 
-// TestGetDBAdapter verifies that getDBAdapter returns the correct import
-// path for known databases and empty string for unknown.
+// TestGetDBAdapter remains the same, no file I/O.
 func TestGetDBAdapter(t *testing.T) {
 	cases := []struct {
 		dbImport string
@@ -28,28 +27,25 @@ func TestGetDBAdapter(t *testing.T) {
 	}
 }
 
-// TestProcessPathTemplate ensures that processPathTemplate strips the
-// .tmpl extension and applies data to path templates.
+// TestProcessPathTemplate remains the same, no file I/O.
 func TestProcessPathTemplate(t *testing.T) {
 	data := templateData{
 		Name:      "proj",
 		DBImport:  "sqlite",
 		DBAdapter: getDBAdapter("sqlite"),
 	}
-	// path template uses Name in directory and filename
 	in := "dir/{{.Name}}.tmpl"
-	out, err := processPathTemplate(in, "proj", data)
+	out, err := processPathTemplate(in, "my-project", data)
 	if err != nil {
 		t.Fatalf("processPathTemplate error: %v", err)
 	}
-	want := filepath.Join("proj", "dir", "proj")
+	want := filepath.Join("my-project", "dir", "proj")
 	if out != want {
 		t.Errorf("got path %q; want %q", out, want)
 	}
 }
 
-// TestProcessContentTemplate verifies that templates in file content
-// are executed correctly.
+// TestProcessContentTemplate remains the same, no file I/O.
 func TestProcessContentTemplate(t *testing.T) {
 	name := "file.tmpl"
 	content := `package {{.Name}}
@@ -73,12 +69,11 @@ import "{{.DBAdapter}}"
 	}
 }
 
-// TestHandleDirectory checks that handleDirectory creates nested dirs
-// and prints verbose messages when requested.
+// TestHandleDirectory now uses t.TempDir() for safety.
 func TestHandleDirectory(t *testing.T) {
 	base := t.TempDir()
 	target := filepath.Join(base, "a", "b", "c")
-	// verbose = false: should create without error
+
 	if err := handleDirectory(target, false); err != nil {
 		t.Fatalf("handleDirectory failed: %v", err)
 	}
@@ -91,27 +86,22 @@ func TestHandleDirectory(t *testing.T) {
 	}
 }
 
-// TestCreateMinimalIntegration runs CreateMinimal on the embedded
-// minimalTemplate and checks that expected files are generated.
+// TestCreateMinimalIntegration now uses t.TempDir() to prevent deleting source.
 func TestCreateMinimalIntegration(t *testing.T) {
-	name := "testminimal"
-	defer os.RemoveAll(name)
+	projectDir := t.TempDir()
 
-	if err := CreateMinimal(name, false, "sqlite"); err != nil {
+	if err := CreateMinimal(projectDir, false, "sqlite"); err != nil {
 		t.Fatalf("CreateMinimal failed: %v", err)
 	}
-	// root dir exists
-	info, err := os.Stat(name)
+	info, err := os.Stat(projectDir)
 	if err != nil || !info.IsDir() {
-		t.Fatalf("project dir %q not created", name)
+		t.Fatalf("project dir %q not created", projectDir)
 	}
 
-	// check that main.go exists
-	mainPath := filepath.Join(name, "main.go")
+	mainPath := filepath.Join(projectDir, "main.go")
 	if _, err := os.Stat(mainPath); err != nil {
 		t.Fatalf("generated file %q missing: %v", mainPath, err)
 	}
-	// read and verify it contains the sqlite adapter import
 	out, err := os.ReadFile(mainPath)
 	if err != nil {
 		t.Fatalf("reading %q: %v", mainPath, err)
@@ -122,8 +112,7 @@ func TestCreateMinimalIntegration(t *testing.T) {
 	}
 }
 
-// TestCreateStructuredAndTODO ensures CreateStructured and CreateTODO
-// create their project roots without error.
+// TestCreateStructuredAndTODO is updated to use t.TempDir() for best practice.
 func TestCreateStructuredAndTODO(t *testing.T) {
 	cases := []struct {
 		name string
@@ -133,16 +122,14 @@ func TestCreateStructuredAndTODO(t *testing.T) {
 		{"todo", CreateTODO},
 	}
 	for _, tc := range cases {
-		dir := "proj_" + tc.name
-		os.RemoveAll(dir)
-		if err := tc.call(dir, false, "postgres"); err != nil {
+		projectDir := t.TempDir()
+
+		if err := tc.call(projectDir, false, "postgres"); err != nil {
 			t.Errorf("Create%s failed: %v", strings.Title(tc.name), err)
 			continue
 		}
-		// root dir exists
-		if info, err := os.Stat(dir); err != nil || !info.IsDir() {
+		if info, err := os.Stat(projectDir); err != nil || !info.IsDir() {
 			t.Errorf("%s project dir not created", tc.name)
 		}
-		os.RemoveAll(dir)
 	}
 }
