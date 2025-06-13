@@ -30,9 +30,9 @@ func TestGetDBAdapter(t *testing.T) {
 // TestProcessPathTemplate remains the same, no file I/O.
 func TestProcessPathTemplate(t *testing.T) {
 	data := templateData{
-		Name:      "proj",
-		DBImport:  "sqlite",
-		DBAdapter: getDBAdapter("sqlite"),
+		ProjectName: "proj",
+		DBImport:    "sqlite",
+		DBAdapter:   getDBAdapter("sqlite"),
 	}
 	in := "dir/{{.Name}}.tmpl"
 	out, err := processPathTemplate(in, "my-project", data)
@@ -53,9 +53,9 @@ func TestProcessContentTemplate(t *testing.T) {
 import "{{.DBAdapter}}"
 `
 	data := templateData{
-		Name:      "mypkg",
-		DBImport:  "sqlite",
-		DBAdapter: getDBAdapter("sqlite"),
+		ProjectName: "mypkg",
+		DBImport:    "sqlite",
+		DBAdapter:   getDBAdapter("sqlite"),
 	}
 	got, err := processContentTemplate(name, content, data)
 	if err != nil {
@@ -112,14 +112,13 @@ func TestCreateMinimalIntegration(t *testing.T) {
 	}
 }
 
-// TestCreateStructuredAndTODO is updated to use t.TempDir() for best practice.
-func TestCreateStructuredAndTODO(t *testing.T) {
+// TestCreateStructured is updated to use t.TempDir() for best practice.
+func TestCreateStructured(t *testing.T) {
 	cases := []struct {
 		name string
 		call func(string, bool, string) error
 	}{
 		{"structured", CreateStructured},
-		{"todo", CreateTODO},
 	}
 	for _, tc := range cases {
 		projectDir := t.TempDir()

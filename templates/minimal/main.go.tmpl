@@ -21,7 +21,7 @@ func main() {
 	cli, err := nova.NewCLI(&nova.CLI{
 		Name: "Nova",
 		Version: "0.0.1",
-		Description: "{{.Name}} API",
+		Description: "{{.ProjectName}} API",
 		GlobalFlags: []nova.Flag{
 			&nova.BoolFlag{
 				Name:        "verbose",
@@ -86,7 +86,7 @@ func main() {
 
 					// Register Hello route.
 					router.Get("/hello/{name}", func(w http.ResponseWriter, r *http.Request) {
-						w.Write([]byte("Hello, {{.Name}}!"))
+						w.Write([]byte("Hello, {{.ProjectName}}!"))
 					})
 
 					// Start the Nova server.

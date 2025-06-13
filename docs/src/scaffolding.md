@@ -2,7 +2,7 @@
 
 **scaffolding** in Nova automates project bootstrapping. It provides:
 
-- **Multiple Layouts:** Choose between Minimal, Structured, or TODO-style starter kits.
+- **Multiple Layouts:** Choose between Minimal or Structured template.
 - **Name-Aware Paths:** Template filenames and directories can include `{{.Name}}` to personalize paths.
 - **Content Templating:** File contents are processed as Go `text/template`, with access to project metadata.
 - **Database Adapter Injection:** Select between `sqlite`, `postgres`, or `mysql`; the correct Go import path is injected.
@@ -32,7 +32,6 @@ When you run `nova new`, Nova creates a new project directory based on a templat
 
 - **Minimal:** A bare-bones project with a single `main.go` file.
 - **Structured:** A more complete project with a `main.go` file, a `cmd` directory, and a `db` directory.
-- **TODO:** A full TODO CRUD API making use of all Nova's powers to show off Nova's capabilities.
 
 When you select a template, you get the following options:
 

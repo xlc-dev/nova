@@ -522,10 +522,10 @@ This helper compares the parts of an incoming URL path against a route’s pre-c
 It customizes directory names, filenames, and file contents based on user input (like project name and database choice),
 effectively bootstrapping a new application with a chosen layout.</p>
 <p>The core logic resides in the createFromTemplate function, w
-hich is invoked by higher-level functions like CreateMinimal, CreateStructured, or CreateTODO.
+hich is invoked by higher-level functions like CreateMinimal, or CreateStructured.
 It systematically processes template items to build the new project. If any step fails, the scaffolding process is halted, and an error is returned.</p>
 <pre class="mermaid">flowchart TD
-    A_USER_CALL[&quot;User calls CreateMinimal, CreateStructured, or CreateTODO&quot;] --&gt; B_INVOKE_CFT[&quot;Invoke createFromTemplate(name, templateConfig, dbImport)&quot;]
+    A_USER_CALL[&quot;User calls CreateMinimal or CreateStructured&quot;] --&gt; B_INVOKE_CFT[&quot;Invoke createFromTemplate(name, templateConfig, dbImport)&quot;]
 
     B_INVOKE_CFT --&gt; C_START_CFT[&quot;Start createFromTemplate&quot;]
 
