@@ -926,7 +926,7 @@ func (rc *ResponseContext) BindForm(v any) error {
 	return bindFormToStruct(rc.r.Form, v)
 }
 
-// BindValidated binds and validates request data (JSON or form) with comprehensive validation
+// BindValidated binds and validates request data (JSON or form) with comprehensive validation.
 func (rc *ResponseContext) BindValidated(v any) error {
 	// Detect language from Accept-Language header
 	lang := detectLanguage(rc.r.Header.Get("Accept-Language"))
