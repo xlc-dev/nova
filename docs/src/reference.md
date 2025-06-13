@@ -2620,16 +2620,13 @@ type GzipConfig struct {
 	// Accepts values from gzip.BestSpeed (1) to gzip.BestCompression (9).
 	// Defaults to gzip.DefaultCompression (-1).
 	CompressionLevel int
-
 	// AddVaryHeader indicates whether to add the "Vary: Accept-Encoding" header.
 	// A nil value defaults to true. Set explicitly to false to disable.
 	// Disabling is only recommended if caching behavior is fully understood.
 	AddVaryHeader *bool
-
 	// Logger specifies an optional logger for errors.
 	// Defaults to log.Default().
 	Logger *log.Logger
-
 	// Pool specifies an optional sync.Pool for gzip.Writer reuse.
 	// Can improve performance by reducing allocations.
 	Pool *sync.Pool // Optional: Pool for gzip.Writers
@@ -3217,9 +3214,9 @@ GenerateOpenAPISpec constructs an OpenAPI 3.0 specification from the given route
 
 ```go
 type OpenAPIConfig struct {
-	Title       string // Title of the API
-	Version     string // Version of the API
-	Description string // Description of the API
+	Title       string
+	Version     string
+	Description string
 }
 ```
 
@@ -3461,7 +3458,7 @@ BindJSON unmarshals JSON request body into the provided struct. The struct shoul
 func (rc *ResponseContext) BindValidated(v any) error
 ```
 
-BindValidated binds and validates request data (JSON or form) with comprehensive validation
+BindValidated binds and validates request data (JSON or form) with comprehensive validation.
 
 ---
 
@@ -3879,9 +3876,6 @@ type SecurityHeadersConfig struct {
 	// FrameOptions sets the X-Frame-Options header.
 	// Defaults to "DENY". Other common values: "SAMEORIGIN". Set to "" to disable.
 	FrameOptions string
-	// XSSProtection sets the X-XSS-Protection header.
-	// Defaults to "1; mode=block". Set to "" to disable.
-	XSSProtection string
 	// ReferrerPolicy sets the Referrer-Policy header.
 	// Defaults to "strict-origin-when-cross-origin". Set to "" to disable.
 	ReferrerPolicy string
