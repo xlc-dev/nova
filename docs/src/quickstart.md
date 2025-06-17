@@ -5,7 +5,7 @@ To get started with Nova, follow these steps:
 1. Install Nova:
 
 ```sh
-go install github.com/xlc-dev/nova/nova@latest
+go install github.com/xlc-dev/nova@latest
 ```
 
 2. Create a new project and follow the prompts:

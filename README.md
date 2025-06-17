@@ -51,7 +51,7 @@ Nova consists of two main components:
 Install the Nova binary globally to get started with a Nova project quickly:
 
 ```sh
-go install github.com/xlc-dev/nova/nova@latest
+go install github.com/xlc-dev/nova@latest
 ```
 
 ### Quick Start
