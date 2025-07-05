@@ -1,0 +1,1130 @@
+#!/bin/sh
+
+# -----------------------------------------------------------------------------
+# fssg - Fast, Simple Static Site Generator
+#
+# A minimal, fast static site generator built with POSIX shell scripting.
+# It transforms Markdown and HTML files into a complete website by applying
+# templates, processing includes, conditionals, pagination, and events.
+# Static assets are copied automatically, producing a ready-to-deploy `dist`
+# directory.
+#
+# Usage: ./fssg [options]
+#
+# Options:
+#   -h, --help     Display this help message
+#   -q, --quiet    Suppress all output except errors
+#   -v, --verbose  Show detailed build information
+#   -V, --version  Show version information of this version of fssg
+#   -n, --nocolor  Disable colored output
+#   -w, --watch    Watch for changes and rebuild automatically
+#   -o, --open     Open the browser automatically (requires -s)
+#   -s, --serve    Start a local Mongoose server for serving the dist dir
+#   -j, --jobs     Number of background jobs to run (default: 4)
+#
+# License: MIT License (see below)
+#
+# Copyright (c) xlc-dev 2025
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# -----------------------------------------------------------------------------
+
+# Logging utilities
+log_info()    { [ "$QUIET" -eq 0 ] && printf '%s[INFO]%s %s\n'  "$GREEN" "$NC" "$1"; }
+log_verbose() { [ "$VERBOSE" -eq 1 ] && printf '%s[DEBUG]%s %s\n' "$BLUE" "$NC" "$1"; }
+log_warn()    { [ "$QUIET" -eq 0 ] && printf '%s[WARN]%s %s\n'  "$YELLOW" "$NC" "$1" >&2; }
+log_error()   { printf '%s[ERROR]%s %s\n' "$RED" "$NC" "$1" >&2; }
+
+# Convert Markdown to HTML
+parse_markdown() {
+  awk '
+    BEGIN {
+      list_depth  = 0
+      in_code     = 0
+      in_table    = 0
+      in_thead    = 0
+      in_tbody    = 0
+      in_bq       = 0
+      in_template = 0
+      in_para     = 0
+    }
+
+    # Close a paragraph if open
+    function close_para() {
+      if (in_para) {
+        print "</p>"
+        in_para = 0
+      }
+    }
+
+    # Open a list tag (ul or ol)
+    function open_list(type, indent) {
+      list_depth++
+      list_type[list_depth]   = type
+      list_indent[list_depth] = indent
+      print "<" type ">"
+    }
+
+    # Close one list level
+    function close_list() {
+      t = list_type[list_depth]
+      print "</" t ">"
+      delete list_type[list_depth]
+      delete list_indent[list_depth]
+      list_depth--
+    }
+
+    # Close lists until indent < target
+    function close_lists_to(indent) {
+      while (list_depth > 0 && list_indent[list_depth] >= indent)
+        close_list()
+    }
+
+    # Handle nesting, de-denting, or same-level list items.
+    # This rewritten function is simpler and more robust.
+    function handle_list(type, indent) {
+      # First, close any lists that are more deeply indented than the
+      # current item, or lists of a different type at the same level.
+      while (list_depth > 0 &&
+             (list_indent[list_depth] > indent ||
+              (list_indent[list_depth] == indent &&
+               list_type[list_depth] != type))) {
+        close_list()
+      }
+
+      # Now, open a new list if we are not in one, or if the current
+      # item is more indented than the current list level.
+      if (list_depth == 0 || list_indent[list_depth] < indent) {
+        open_list(type, indent)
+      }
+    }
+
+    # Close code blocks and/or tables if open
+    function close_code_and_table() {
+      if (in_code) {
+        print "</code></pre>"
+        in_code = 0
+      }
+      if (in_table) {
+        if      (in_tbody) print "</tbody>"
+        else if (in_thead) print "</thead>"
+        print "</table>"
+        in_table = in_thead = in_tbody = 0
+      }
+    }
+    function close_blocks() { close_code_and_table() }
+
+    # Inline replacements: images, links, bold, italic, etc.
+    function process_inline(text, pre, post, m, a, b, c, rep) {
+      # images
+      while (match(text, /!\[[^]]*\]\([^)]+\)/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        a    = index(m, "](")
+        b    = substr(m, 3, a-3)
+        c    = substr(m, a+2, length(m)-a-2)
+        rep  = sprintf("<img src=\"%s\" alt=\"%s\">", c, b)
+        text = pre rep post
+      }
+      # links
+      while (match(text, /\[[^]]+\]\([^)]+\)/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        a    = index(m, "](")
+        b    = substr(m, 2, a-2)
+        c    = substr(m, a+2, length(m)-a-2)
+        rep  = sprintf("<a href=\"%s\">%s</a>", c, b)
+        text = pre rep post
+      }
+      # bold+italic
+      while (match(text, /\*\*\*[^*]+\*\*\*/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,4,length(m)-6)
+        rep  = "<strong><em>" b "</em></strong>"
+        text = pre rep post
+      }
+      while (match(text, /___[^_]+___/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,4,length(m)-6)
+        rep  = "<strong><em>" b "</em></strong>"
+        text = pre rep post
+      }
+      # bold
+      while (match(text, /\*\*[^*]+\*\*/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,3,length(m)-4)
+        rep  = "<strong>" b "</strong>"
+        text = pre rep post
+      }
+      while (match(text, /__[^_]+__/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,3,length(m)-4)
+        rep  = "<strong>" b "</strong>"
+        text = pre rep post
+      }
+      # italic
+      while (match(text, /\*[^*]+\*/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,2,length(m)-2)
+        rep  = "<em>" b "</em>"
+        text = pre rep post
+      }
+      while (match(text, /_([^_]+)_/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,2,length(m)-2)
+        rep  = "<em>" b "</em>"
+        text = pre rep post
+      }
+      # strikethrough
+      while (match(text, /~~[^~]+~~/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,3,length(m)-4)
+        rep  = "<del>" b "</del>"
+        text = pre rep post
+      }
+      # inline code
+      while (match(text, /`[^`]+`/)) {
+        pre  = substr(text,1,RSTART-1)
+        m    = substr(text,RSTART,RLENGTH)
+        post = substr(text,RSTART+RLENGTH)
+        b    = substr(m,2,length(m)-2)
+        rep  = "<code>" b "</code>"
+        text = pre rep post
+      }
+      return text
+    }
+
+    # Fenced code blocks
+    /^[[:space:]]*```/ {
+      if (in_code) {
+        print "</code></pre>"
+        in_code = 0
+      } else {
+        close_para()
+        close_blocks()
+        close_lists_to(0)
+        line = $0
+        sub(/^[[:space:]]*```[[:space:]]*/, "", line)
+        lang = line; sub(/[[:space:]]*$/, "", lang)
+        if (lang != "")
+          print "<pre><code class=\"language-" lang "\">"
+        else
+          print "<pre><code>"
+        in_code = 1
+      }
+      next
+    }
+    in_code {
+      gsub(/&/, "&amp;"); gsub(/</, "&lt;"); gsub(/>/, "&gt;")
+      print
+      next
+    }
+
+    # Template passthrough
+    /^\{\{[[:space:]]*include-block:/ {
+      close_para()
+      in_template = 1
+      print
+      next
+    }
+    # If we are in a template and see the end tag, print the line,
+    # turn off template mode, and move to the next line.
+    # This MUST come before the general "in_template" rule.
+    in_template && /\{\{[[:space:]]*endinclude[[:space:]]*\}\}/ {
+      print
+      in_template = 0
+      next
+    }
+    # For any other line while in a template, just print it.
+    in_template {
+      print
+      next
+    }
+
+    # Raw HTML passthrough.
+    /^[[:space:]]*<\/?([a-zA-Z])/ {
+      close_para()
+      close_list()
+      print
+      next
+    }
+
+    # Blank lines do NOT close lists under CommonMark
+    /^[[:space:]]*$/ {
+      close_para()
+      close_code_and_table()
+      if (in_bq) { print "</blockquote>"; in_bq = 0 }
+      next
+    }
+
+    # Headings (1–6)
+    /^#{1,6}[[:space:]]/ {
+      close_para(); close_blocks(); close_lists_to(0)
+      n = 0
+      while (substr($0,1,1) == "#") {
+        n++; $0 = substr($0,2)
+      }
+      sub(/^[[:space:]]*/, "", $0)
+      printf "<h%d>%s</h%d>\n", n, process_inline($0), n
+      next
+    }
+
+    # Horizontal rule
+    /^[[:space:]]*([-*_][[:space:]]*){3,}$/ {
+      close_para(); close_blocks(); close_lists_to(0)
+      print "<hr>"; next
+    }
+
+    # Blockquote
+    /^[[:space:]]*>/ {
+      close_para()
+      if (!in_bq) {
+        close_blocks(); close_lists_to(0)
+        print "<blockquote>"; in_bq = 1
+      }
+      line = $0; sub(/^[[:space:]]*>[[:space:]]*/, "", line)
+      print "<p>" process_inline(line) "</p>"
+      next
+    }
+
+    # Unordered list
+    /^[[:space:]]*[-*+][[:space:]]+/ {
+      match($0,/^[ \t]*/); indent = RLENGTH
+      close_para(); close_code_and_table()
+      handle_list("ul", indent)
+      sub(/^[[:space:]]*[-*+][[:space:]]*/, "", $0)
+      print "<li>" process_inline($0) "</li>"
+      next
+    }
+
+    # Ordered list
+    /^[[:space:]]*[0-9]+\.[[:space:]]+/ {
+      match($0,/^[ \t]*/); indent = RLENGTH
+      close_para(); close_code_and_table()
+      handle_list("ol", indent)
+      sub(/^[[:space:]]*[0-9]+\.[[:space:]]*/, "", $0)
+      print "<li>" process_inline($0) "</li>"
+      next
+    }
+
+    # GFM tables
+    /^[[:space:]]*\|/ {
+      close_para()
+      line = $0; sub(/^[[:space:]]*\|/,"",line); sub(/\|\s*$/,"",line)
+      n = split(line,cols,/\|/)
+      sep    = "^[[:space:]]*:?-+:?[[:space:]]*$"
+      is_sep = 1
+      for (i=1; i<=n; i++) if (cols[i]!~sep) is_sep=0
+
+      if (!in_table) {
+        close_blocks(); close_lists_to(0)
+        print "<table>"; in_table=1; in_thead=1; delete align
+      }
+      if (is_sep) {
+        for (i=1; i<=n; i++) {
+          cell = cols[i]; gsub(/^[[:space:]]+|[[:space:]]+$/,"",cell)
+          if      (cell~/^:[^-]*-+[^-]*:$/) align[i]="center"
+          else if (cell~/^:[^-]*-+$/)     align[i]="left"
+          else if (cell~/^-+[^-]*:$/)     align[i]="right"
+          else                            align[i]=""
+        }
+        print "</thead>\n<tbody>"
+        in_thead=0; in_tbody=1
+        next
+      }
+      printf "<tr>"
+      for (i=1; i<=n; i++) {
+        cell = process_inline(cols[i])
+        tag  = in_thead ? "th" : "td"
+        if (align[i]!="")
+          printf "<%s align=\"%s\">%s</%s>",tag,align[i],cell,tag
+        else
+          printf "<%s>%s</%s>",tag,cell,tag
+      }
+      print "</tr>"; next
+    }
+
+    # Paragraphs
+    {
+      if (in_bq && $0 !~ /^[[:space:]]*>/) {
+        print "</blockquote>"; in_bq = 0
+      }
+      close_code_and_table()
+      # Note: we do not close lists here (blank lines only do that)
+      if (!in_para) {
+        printf "<p>%s", process_inline($0)
+        in_para = 1
+      } else {
+        printf " %s\n", process_inline($0)
+      }
+    }
+
+    END {
+      close_code_and_table()
+      close_lists_to(0)
+      close_para()
+      if (in_bq) print "</blockquote>"
+    }
+  '
+}
+
+# Inject {{ title }} and {{ content }} into template
+apply_template() {
+  template_path="$1"
+  title_val="$2"
+  awk -v template_title_value="$title_val" '
+    BEGIN {
+      # collect page content in array
+      c=0
+    }
+    FILENAME=="-" {
+      content[++c] = $0
+      next
+    }
+    {
+      line = $0
+      # replace title placeholder
+      gsub(/\{\{[[:space:]]*title[[:space:]]*\}\}/, template_title_value, line)
+      # expand content placeholder
+      while (match(line, /\{\{[[:space:]]*content[[:space:]]*\}\}/)) {
+        printf "%s", substr(line,1,RSTART-1)
+        for (i=1;i<=c;i++) print content[i]
+        line = substr(line, RSTART+RLENGTH)
+      }
+      print line
+    }
+  ' - "$template_path"
+}
+
+# Handle IF_/ELIF_/ELSE_/ENDIF_ blocks
+process_conditionals() {
+  page_id="$1"; ext="$2"
+  awk -v current_page="$page_id" -v current_ext="$ext" '
+    # trim whitespace
+    function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
+    # normalize multiline tag to single line
+    function normalize(tag) { gsub(/\n|[[:space:]]+/, " ", tag); return trim(tag) }
+    BEGIN {
+      depth=0; print_ok[0]=1; branch_taken[0]=0; state=0; tag_accumulator=""
+    }
+    {
+      line = $0
+      # detect start of a conditional tag
+      if (state==0 && match(line, /\{\{[[:space:]]*(IF_|ELIF_|ELSE_|ENDIF_)/)) {
+        state=1; tag_accumulator=""
+      }
+      if (state==1) {
+        tag_accumulator = tag_accumulator (tag_accumulator? "\n":"") line
+        # wait until closing }}
+        if (tag_accumulator ~ /\}\}/) {
+          tag_norm = normalize(tag_accumulator)
+          # handle IF_EXT
+          if (tag_norm ~ /^\{\{[[:space:]]*IF_EXT:/) {
+            depth++; sub(/^\{\{[[:space:]]*IF_EXT:/,"",tag_norm); sub(/\}\}.*/,"",tag_norm)
+            target=trim(tag_norm)
+            is_met = (target==current_ext)
+            print_ok[depth] = print_ok[depth-1] && is_met
+            branch_taken[depth] = print_ok[depth]?1:0
+          }
+          # handle ELIF_EXT
+          else if (tag_norm ~ /^\{\{[[:space:]]*ELIF_EXT:/) {
+            sub(/^\{\{[[:space:]]*ELIF_EXT:/,"",tag_norm); sub(/\}\}.*/,"",tag_norm)
+            target=trim(tag_norm)
+            can_take = print_ok[depth-1] && !branch_taken[depth]
+            is_met = (target==current_ext)
+            print_ok[depth] = can_take && is_met
+            if (print_ok[depth]) branch_taken[depth]=1
+          }
+          # handle ELSE_EXT
+          else if (tag_norm ~ /^\{\{[[:space:]]*ELSE_EXT/) {
+            can_take = print_ok[depth-1] && !branch_taken[depth]
+            print_ok[depth] = can_take
+            if (can_take) branch_taken[depth]=1
+          }
+          # handle ENDIF_EXT
+          else if (tag_norm ~ /^\{\{[[:space:]]*ENDIF_EXT/) {
+            depth--
+          }
+          # page-based variants IF_PAGE, ELIF_PAGE, etc. (same logic)
+          else if (tag_norm ~ /^\{\{[[:space:]]*IF_PAGE:/) {
+            depth++; sub(/^\{\{[[:space:]]*IF_PAGE:/,"",tag_norm); sub(/\}\}.*/,"",tag_norm)
+            target=trim(tag_norm)
+            is_met = (target==current_page)
+            print_ok[depth] = print_ok[depth-1] && is_met
+            branch_taken[depth] = print_ok[depth]?1:0
+          }
+          else if (tag_norm ~ /^\{\{[[:space:]]*ELIF_PAGE:/) {
+            sub(/^\{\{[[:space:]]*ELIF_PAGE:/,"",tag_norm); sub(/\}\}.*/,"",tag_norm)
+            target=trim(tag_norm)
+            can_take = print_ok[depth-1] && !branch_taken[depth]
+            is_met = (target==current_page)
+            print_ok[depth] = can_take && is_met
+            if (print_ok[depth]) branch_taken[depth]=1
+          }
+          else if (tag_norm ~ /^\{\{[[:space:]]*ELSE_PAGE/) {
+            can_take = print_ok[depth-1] && !branch_taken[depth]
+            print_ok[depth] = can_take
+            if (can_take) branch_taken[depth]=1
+          }
+          else if (tag_norm ~ /^\{\{[[:space:]]*ENDIF_PAGE/) {
+            depth--
+          }
+          else {
+            # unrecognized tag, print as-is
+            print tag_accumulator
+          }
+          state=0; next
+        }
+        next
+      }
+      # print line only if all enclosing IFs allow
+      if (print_ok[depth]) print line
+    }
+  '
+}
+
+# Handle include and include-block tags
+process_includes() {
+  awk -v INC_DIR="src/includes" '
+    # trim whitespace
+    function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
+    # load a template file into array
+    function load_template(fp, arr, n, line) {
+      n=0
+      while ((getline line < fp)>0) arr[++n]=line
+      close(fp)
+      return n
+    }
+    # render template arr[1..n] replacing params and {{content}}
+    function render(arr,n,params,block,i,key,line,out,rest,p) {
+      for(i=1;i<=n;i++){
+        line=arr[i]
+        for(key in params) gsub("{{"key"}}",params[key],line)
+        rest=line; out=""
+        while ((p=index(rest,"{{content}}"))>0) {
+          out = out substr(rest,1,p-1) block
+          rest = substr(rest,p+length("{{content}}"))
+        }
+        print out rest
+      }
+    }
+    # parse include-block tag into filename and params
+    function parse_tag(full,s,ps,key,val,eq,vs,qc,off){
+      s=trim(full); gsub(/\n/," ",s)
+      sub(/^.*include-block[[:space:]]*:/,"",s); sub(/\}\}.*/,"",s); s=trim(s)
+      if (match(s,/^[^[:space:]]+/)) {
+        filename=substr(s,RSTART,RLENGTH)
+        ps=trim(substr(s,RSTART+RLENGTH))
+      } else { filename=""; ps="" }
+      delete params
+      while(ps){
+        eq=index(ps,"="); if(eq<=1) break
+        key=trim(substr(ps,1,eq-1))
+        qc=substr(ps,eq+1,1)
+        if(qc!="\""&&qc!="\047"){
+          if(match(substr(ps,eq+1),/[[:space:]]+/)){
+            val=substr(ps,eq+1,RSTART-1)
+            ps=trim(substr(ps,eq+1+RLENGTH))
+          } else { val=substr(ps,eq+1); ps="" }
+        } else {
+          vs=eq+2
+          off=index(substr(ps,vs),qc)
+          if(!off) break
+          val=substr(ps,vs,off-1)
+          ps=trim(substr(ps,vs+off))
+        }
+        params[key]=val
+      }
+    }
+
+    BEGIN { state=0; tag_acc=""; block="" }
+    {
+      line=$0
+      if(state==0 && match(line,/\{\{[[:space:]]*(include(-block)?)/)){
+        state=1; tag_acc=""; block=""
+      }
+      if(state==1){
+        tag_acc = tag_acc (tag_acc? "\n":"") line
+        if(tag_acc ~ /\}\}/){
+          norm=tag_acc; gsub(/\n|[[:space:]]+/," ",norm)
+          # self-contained include-block?
+          if(norm ~ /\{\{[[:space:]]*include-block:.*\{\{[[:space:]]*endinclude/){
+            match(tag_acc,/\{\{[[:space:]]*include-block:[^}]+\}\}/)
+            st=substr(tag_acc,RSTART,RLENGTH)
+            cntend=substr(tag_acc,RSTART+RLENGTH)
+            sub(/\{\{[[:space:]]*endinclude.*$/,"",cntend)
+            parse_tag(st)
+            p=INC_DIR"/"filename
+            if(system("test -f \""p"\"")==0){
+              tn=load_template(p,tpl)
+              render(tpl,tn,params,cntend)
+            } else print tag_acc
+            state=0; next
+          }
+          # simple include
+          if(norm~/\{\{[[:space:]]*include:[^}]+\}\}/){
+            match(norm,/\{\{[[:space:]]*include:[^}]+\}\}/)
+            inc=substr(norm,RSTART,RLENGTH)
+            f=inc; sub(/^.*include[[:space:]]*:/,"",f); sub(/\}\}.*/,"",f)
+            fname=trim(f); p2=INC_DIR"/"fname
+            if(system("test -f \""p2"\"")==0){
+              while((getline il<p2)>0) print il
+              close(p2)
+            } else print inc
+            state=0; next
+          }
+          # start include-block (no end on same line)
+          if(norm~/\{\{[[:space:]]*include-block:[^}]+\}\}/){
+            parse_tag(norm); state=2; next
+          }
+          # fallback
+          print tag_acc; state=0; next
+        }
+        next
+      }
+      if(state==2){
+        if(line~/\{\{[[:space:]]*endinclude/) {
+          p3=INC_DIR"/"filename
+          if(system("test -f \""p3"\"")==0){
+            tn=load_template(p3,tpl); render(tpl,tn,params,block)
+          }
+          state=0; tag_acc=""; block=""; next
+        } else {
+          block = block (block? "\n":"") line; next
+        }
+      }
+      if(state==0) print line
+    }
+  '
+}
+
+# Dedupe <style> and <script> blocks
+process_styles_and_scripts() {
+  awk '
+    # State machine: 0=normal, 1=in style, 2=in script
+    BEGIN { state=0; buffer="" }
+
+    # Handle single-line tags first, add to collection and skip
+    /<[sS][tT][yY][lL][eE][^>]*>.*<\/[sS][tT][yY][lL][eE]>/ {
+      styles[$0]=1; next
+    }
+    /<[sS][cC][rR][iI][pP][tT][^>]*>.*<\/[sS][cC][rR][iI][pP][tT]>/ {
+      scripts[$0]=1; next
+    }
+
+    # Handle multi-line <style> blocks
+    /<[sS][tT][yY][lL][eE][^>]*>/ { state=1; buffer=$0; next }
+    /<\/[sS][tT][yY][lL][eE]>/ && state==1 {
+      buffer=buffer"\n"$0; styles[buffer]=1; state=0; buffer=""; next
+    }
+    state==1 { buffer=buffer"\n"$0; next }
+
+    # Handle multi-line <script> blocks
+    /<[sS][cC][rR][iI][pP][tT][^>]*>/ { state=2; buffer=$0; next }
+    /<\/[sS][cC][rR][iI][pP][tT]>/ && state==2 {
+      buffer=buffer"\n"$0; scripts[buffer]=1; state=0; buffer=""; next
+    }
+    state==2 { buffer=buffer"\n"$0; next }
+
+    # For normal lines that are not part of any tag, buffer them
+    { content[NR]=$0 }
+
+    END {
+      # Print the buffered content, injecting hoisted blocks at the right place
+      for (i=1; i<=NR; i++) {
+        if (i in content) {
+          line = content[i]
+          if (line ~ /<\/[hH][eE][aA][dD]>/) {
+            for (s in styles) print s
+          }
+          if (line ~ /<\/[bB][oO][dD][yY]>/) {
+            for (s in scripts) print s
+          }
+          print line
+        }
+      }
+    }
+  '
+}
+
+# Resolve "." and ".." in paths
+normalize_path() {
+  path="$1"; is_absolute=0; prefix=""
+  case "$path" in /*) is_absolute=1; path="${path#?}"; prefix="/";; esac
+  old_ifs="$IFS"; IFS='/'; set -- $path; IFS="$old_ifs"
+  out=""
+  for comp in "$@"; do
+    if [ "$comp" = "." ] || [ -z "$comp" ]; then continue; fi
+    if [ "$comp" = ".." ]; then
+      if [ -n "$out" ]; then out="${out%/*}"
+      elif [ "$is_absolute" -eq 0 ]; then
+        out="${out:+$out/}.."
+      fi
+    else
+      out="${out:+$out/}$comp"
+    fi
+  done
+  if [ "$is_absolute" -eq 1 ]; then
+    printf '/%s\n' "${out#/}"
+  else
+    printf '%s\n' "${out:-.}"
+  fi
+}
+
+# Find dated files, extract metadata, sort newest-first
+collect_posts() {
+  find src -type f ! -path 'src/includes/*' ! -path 'src/static/*' \
+    \( -name '*.md' -o -name '*.html' \) |
+  while IFS= read -r file; do
+    filename=${file##*/}
+    case "$filename" in
+      ????-??-??-*) date=${filename%%-*}; rest=${filename#*-}
+                    slug=${rest%.*}; sort_key=${date//-/} ;;
+      ??_??_????-*) date=${filename%%-*}; rest=${filename#*-}
+                    slug=${rest%.*}; old=$IFS; IFS='_'; set -- $date
+                    sort_key=$3$2$1; IFS="$old" ;;
+      ??-??-????-*) date=${filename%%-*}; rest=${filename#*-}
+                    slug=${rest%.*}; old=$IFS; IFS='-'; set -- $date
+                    sort_key=$3$1$2; IFS="$old" ;;
+      *) continue ;;
+    esac
+    out="dist/${file#src/}"; out="${out%.*}.html"
+    # find first <img src="...">
+    img=$(sed -n 's/.*<[iI][mM][gG][^>]*src=["'"'"']\([^"'"'"']*\).*/\1/p' "$file" | head -1)
+    image=""
+    if [ -n "$img" ]; then
+      case "$img" in http://*|https://*|//*) image="$img";;
+                      /*) image="${img#/}";;
+                  *) np=$(normalize_path "$(dirname "$file")/$img")
+                     image=${np#src/};;
+      esac
+    fi
+    # fallback image lookup
+    if [ -z "$image" ]; then
+      for ext in jpg jpeg png gif webp svg; do
+        p="static/posts/${slug}.${ext}"
+        [ -f "src/$p" ] && { image="$p"; break; }
+      done
+    fi
+    printf '%s|%s|%s|%s|%s\n' "$sort_key" "$date" "$slug" "$out" "$image"
+  done | sort -r
+}
+
+# Output <ul> list of posts (recent or paginated)
+render_posts() {
+  mode=$1; cnt=$2; page=${3:-1}; pag=${4:-false}
+  ucls=$5; lcls=$6; tcls=$7; xcls=$8; icls=$9; show=${10}
+
+  all=$(collect_posts)
+  total=$(printf '%s\n' "$all" | wc -l)
+  total=${total##* }
+
+  printf '<ul class="%s">\n' "$ucls"
+  if [ "$mode" = "recent" ]; then
+    to_show=$(printf '%s\n' "$all" | head -n "$cnt")
+  else
+    start=$(( (page-1)*cnt+1 )); end=$(( page*cnt ))
+    to_show=$(printf '%s\n' "$all" | awk "NR>= $start && NR<= $end")
+  fi
+  printf '%s\n' "$to_show" | while IFS='|' read -r key date slug url img; do
+    title=$(echo "$slug" | tr '-' ' ')
+    printf '  <li class="%s">\n' "$lcls"
+    if [ "$show" = "true" ] && [ -n "$img" ]; then
+      case "$img" in http://*|https://*|//*) src="$img";;
+                      *) src="/static/${img#*/}";;
+      esac
+      printf '    <img class="%s" src="%s" alt="%s">\n' "$icls" "$src" "$title"
+    fi
+    printf '    <time class="%s" datetime="%s">%s</time>\n' "$tcls" "$key" "$date"
+    printf '    <a class="%s" href="/%s">%s</a>\n' "$xcls" "${url#dist/}" "$title"
+    printf '  </li>\n'
+  done
+  printf '</ul>\n'
+
+  # pagination links
+  if [ "$mode" = "all" ] && [ "$pag" = "true" ] && [ "$cnt" -gt 0 ]; then
+    pages=$(( (total+cnt-1)/cnt ))
+    if [ "$pages" -gt 1 ]; then
+      printf '<nav class="pagination">\n'
+      for p in $(seq 1 $pages); do
+        if [ "$p" -eq "$page" ]; then
+          printf ' <span class="current">%d</span>' "$p"
+        else
+          printf ' <a class="page" href="?page=%d">%d</a>' "$p" "$p"
+        fi
+      done
+      printf '\n</nav>\n'
+    fi
+  fi
+}
+
+# Inline {{ recent-posts }} / {{ all-posts }}
+process_post_directives() {
+  awk '
+    # mark directive start
+    /\{\{[[:space:]]*(recent-posts|all-posts)/ {
+      buf=$0
+      while(buf!~/\}\}/ && getline) buf=buf" "$0
+      gsub(/\{\{/, "{{ ", buf); gsub(/\}\}/, " }}", buf)
+      gsub(/[[:space:]]+/, " ", buf); gsub(/^ | $/, "", buf)
+      print "FSSG_DIRECTIVE::" buf; next
+    }
+    { print }
+  ' | while IFS= read -r line; do
+    case "$line" in
+      FSSG_DIRECTIVE::*)
+        tag=${line#FSSG_DIRECTIVE::}
+        dir=$(echo "$tag" | sed 's/^{{ \([^ ]*\).*/\1/')
+        case "$dir" in
+          recent-posts)
+            cnt=$(echo "$tag" | sed -n 's/.*count="\([^"]*\)".*/\1/p')
+            u=$(echo "$tag" | sed -n 's/.*ul_class="\([^"]*\)".*/\1/p')
+            l=$(echo "$tag" | sed -n 's/.*li_class="\([^"]*\)".*/\1/p')
+            t=$(echo "$tag" | sed -n 's/.*time_class="\([^"]*\)".*/\1/p')
+            x=$(echo "$tag" | sed -n 's/.*link_class="\([^"]*\)".*/\1/p')
+            i=$(echo "$tag" | sed -n 's/.*img_class="\([^"]*\)".*/\1/p')
+            s=$(echo "$tag" | sed -n 's/.*show_images="\([^"]*\)".*/\1/p')
+            render_posts "recent" "${cnt:-10}" 1 "false" \
+                         "${u:-posts}" "${l:-post}" \
+                         "${t:-date}" "${x:-title}" \
+                         "${i:-thumb}" "${s:-false}"
+            ;;
+          all-posts)
+            ps=$(echo "$tag" | sed -n 's/.*page_size="\([^"]*\)".*/\1/p')
+            pg=$(echo "$tag" | sed -n 's/.*page="\([^"]*\)".*/\1/p')
+            pa=$(echo "$tag" | sed -n 's/.*pagination="\([^"]*\)".*/\1/p')
+            u=$(echo "$tag" | sed -n 's/.*ul_class="\([^"]*\)".*/\1/p')
+            l=$(echo "$tag" | sed -n 's/.*li_class="\([^"]*\)".*/\1/p')
+            t=$(echo "$tag" | sed -n 's/.*time_class="\([^"]*\)".*/\1/p')
+            x=$(echo "$tag" | sed -n 's/.*link_class="\([^"]*\)".*/\1/p')
+            i=$(echo "$tag" | sed -n 's/.*img_class="\([^"]*\)".*/\1/p')
+            s=$(echo "$tag" | sed -n 's/.*show_images="\([^"]*\)".*/\1/p')
+            render_posts "all" "${ps:-10}" "${pg:-1}" "${pa:-false}" \
+                         "${u:-posts}" "${l:-post}" \
+                         "${t:-date}" "${x:-title}" \
+                         "${i:-thumb}" "${s:-false}"
+            ;;
+          *) printf '%s\n' "$tag" ;;
+        esac
+        ;;
+      *) printf '%s\n' "$line" ;;
+    esac
+  done
+}
+
+# Full pipeline for each source file
+process_file() {
+  file="$1"
+  ext="${file##*.}"
+  rel="${file#src/}"
+  out="dist/${rel%.*}.html"
+  mkdir -p "$(dirname "$out")"
+  log_verbose "Processing $file -> $out"
+
+  # generate or override title
+  base=$(basename "$file" ."$ext")
+  dyn=$(printf '%s\n' "$base"|tr '-' ' '|awk '{for(i=1;i<=NF;i++)$i=toupper(substr($i,1,1))tolower(substr($i,2));print}')
+  pid="${rel%.*}.html"
+
+  if [ "$ext" = "md" ]; then
+    raw=$(parse_markdown<"$file")
+  else
+    raw=$(cat "$file")
+  fi
+  override=$(printf '%s\n' "$raw"|awk '/\{\{ *[Tt][Ii][Tt][Ll][Ee]:/ {sub(/.*\{\{.*:/,"");sub(/\}\}.*/,"");print;exit}')
+  title="${override:-$dyn}"
+
+  tpl="src/template.html"; [ ! -f "$tpl" ] && tpl="/dev/null"
+
+  printf '%s\n' "$raw" \
+    | sed 's/{{ *[Tt][Ii][Tt][Ll][Ee]:[^}]*}}//g' \
+    | apply_template "$tpl" "$title" \
+    | process_conditionals "$pid" "$ext" \
+    | process_includes \
+    | process_post_directives \
+    | process_styles_and_scripts >"$out"
+
+  log_info "Created $out"
+}
+
+
+# Orchestrate full build and asset copy
+build_site() {
+  log_verbose "Starting build..."
+
+  # Clean output and copy static assets
+  rm -rf dist
+  mkdir -p dist/static
+  if [ -d src/static ]; then
+    log_info "Copying src/static -> dist/static/"
+    # Try POSIX-cp -R, fallback to -r
+    if cp -R src/static/. dist/static/ >/dev/null 2>&1; then
+      :
+    else
+      cp -r src/static/. dist/static/
+    fi
+  fi
+
+  # Gather the list of files (split on newline only)
+  OLD_IFS=$IFS
+  IFS='
+'
+  files=$(find src \
+    \( -path src/includes -o -name template.html -o -path src/static \) -prune \
+    -o -type f \( -name '*.md' -o -name '*.html' \) -print)
+  IFS=$OLD_IFS
+
+  pids=""
+  count=0
+
+  for f in $files; do
+    process_file "$f" &
+    pid=$!
+    # accumulate PIDs in a space-separated string
+    if [ -z "$pids" ]; then
+      pids="$pid"
+    else
+      pids="$pids $pid"
+    fi
+    count=$((count + 1))
+
+    # throttle if we've launched $MAX_JOBS
+    if [ "$count" -ge "$MAX_JOBS" ]; then
+      for wp in $pids; do
+        wait "$wp"
+      done
+      pids=""
+      count=0
+    fi
+  done
+
+  # wait for any remaining workers
+  if [ -n "$pids" ]; then
+    for wp in $pids; do
+      wait "$wp"
+    done
+  fi
+
+  log_info "${GREEN}Build complete!${NC}"
+}
+
+# Choose the correct Mongoose binary for the current OS and launch it,
+# serving the dist/ directory at http://localhost:8000.
+start_server() {
+  case "$(uname -s)" in
+    CYGWIN*|MINGW*|MSYS*) MONGOOSE_BIN="./mongoose/mongoose_windows.exe" ;;
+    Linux*)               MONGOOSE_BIN="./mongoose/mongoose_linux"      ;;
+    Darwin*)              MONGOOSE_BIN="./mongoose/mongoose_mac"        ;;
+    *)                    MONGOOSE_BIN="./mongoose/mongoose_linux"      ;;
+  esac
+
+  if [ ! -x "$MONGOOSE_BIN" ]; then
+    log_error "Mongoose binary not found or not executable."
+    exit 1
+  fi
+
+  "$MONGOOSE_BIN" -d dist/ -v 0 &
+  SERVER_PID=$!
+  log_info "Server started at http://localhost:8000 (press Ctrl+C to stop)"
+}
+
+# Open the default web browser to http://localhost:8000, depending on OS.
+open_browser() {
+   url="http://localhost:8000"
+   case "$(uname -s)" in
+     Darwin*)
+       open "$url" >/dev/null 2>&1 &
+       ;;
+     Linux*)
+       xdg-open "$url" >/dev/null 2>&1 &
+       ;;
+     CYGWIN*|MINGW*|MSYS*)
+       start "$url" >/dev/null 2>&1 &
+       ;;
+     *)
+       log_info "Please open $url in your browser."
+       ;;
+   esac
+ }
+
+# Show help info... Duh
+display_help() {
+  cat <<EOF
+  fssg - Fast, Simple Static Site Generator
+  -----------------------------------------
+
+  Usage:
+    $0 [options]
+
+  Options:
+    -h, --help          Display this help message
+    -q, --quiet         Suppress all output except errors
+    -v, --verbose       Show detailed build information
+    -V, --version       Show version information of this version of fssg
+    -n, --no-color      Disable colored output
+    -w, --watch         Watch for changes and rebuild automatically
+    -s, --serve         Start a local server for the dist/ directory
+    -o, --open          Open the browser automatically (requires -s)
+    -j, --jobs <num>    Number of parallel jobs (default: 4)
+EOF
+}
+
+# -----------------------------------------------------------------------------------------
+# Entrypoint and main control flow
+# -----------------------------------------------------------------------------------------
+
+VERSION="1.0"
+QUIET=0
+VERBOSE=0
+MAX_JOBS=4
+WATCH=0
+SERVE=0
+OPEN_BROWSER=0
+NO_COLOR=0
+SERVER_PID=""
+
+# Parse command-line options
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h|--help)
+      display_help
+      exit 0
+      ;;
+    -q|--quiet)
+      QUIET=1; VERBOSE=0
+      shift
+      ;;
+    -v|--verbose)
+      VERBOSE=1; QUIET=0
+      shift
+      ;;
+    -V|--version)
+      echo "fssg version $VERSION"
+      exit 0
+      ;;
+    -n|--nocolor)
+      NO_COLOR=1
+      shift
+      ;;
+    -w|--watch)
+      WATCH=1
+      shift
+      ;;
+    -s|--serve)
+      SERVE=1
+      shift
+      ;;
+    -o|--open)
+      OPEN_BROWSER=1
+      shift
+      ;;
+    --jobs=*)
+      MAX_JOBS="${1#*=}"
+      shift
+      ;;
+    -j|--jobs)
+      shift
+      if [ -n "$1" ] && [ "${1%%[0-9]*}" != "$1" ]; then
+        MAX_JOBS="$1"
+        shift
+      else
+        echo "Error: --jobs requires a numeric argument" >&2
+        exit 1
+      fi
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      display_help
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [ "$NO_COLOR" -eq 1 ] || ! [ -t 1 ]; then
+	GREEN="" RED="" YELLOW="" BLUE="" NC=""
+else
+	GREEN=$(printf '\033[0;32m')
+	RED=$(printf '\033[0;31m')
+	YELLOW=$(printf '\033[0;33m')
+	BLUE=$(printf '\033[0;34m')
+	NC=$(printf '\033[0m')
+fi
+
+# Ensure the Mongoose server (if started) is killed when the script exits.
+trap 'if [ -n "$SERVER_PID" ]; then kill "$SERVER_PID"; fi' EXIT
+
+get_src_hash() {
+ find src -type f -exec md5sum {} + 2>/dev/null | md5sum | awk '{print $1}'
+}
+
+if [ "$WATCH" -eq 1 ]; then
+  build_site
+  last_hash=$(get_src_hash)
+
+  if [ "$SERVE" -eq 1 ]; then
+    start_server
+    if [ "$OPEN_BROWSER" -eq 1 ]; then
+      open_browser
+    fi
+  fi
+
+  log_verbose "Watching for file changes in src/..."
+  while true; do
+    sleep 0.2
+    current_hash=$(get_src_hash)
+    if [ "$current_hash" != "$last_hash" ]; then
+      log_verbose "Change detected, rebuilding..."
+      build_site
+      last_hash=$(get_src_hash)
+      log_verbose "Watching for file changes in src/..."
+    fi
+  done
+else
+  build_site
+  if [ "$SERVE" -eq 1 ]; then
+    start_server
+    [ "$OPEN_BROWSER" -eq 1 ] && open_browser
+    wait "$SERVER_PID"
+  fi
+fi
+
+exit 0
