@@ -1,0 +1,216 @@
+{{ title: Nova - Build Powerful Web Applications in Go }}
+
+<header class="main-header" id="mainHeader">
+  <div class="container">
+    <a href="#" class="logo">Nova</a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#example">Example</a></li>
+        <li><a href="#get-started">Get Started</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1>Build powerful web applications in Go <span>Faster</span></h1>
+      <p class="subtitle">
+        Nova is a flexible framework that simplifies creating both RESTful APIs
+        and web UIs. It extends Go's standard library with sensible defaults and
+        helper utilities for components like routing, middleware, OpenAPI, and
+        HTML templating, minimizing decision fatique. Making it easier than ever
+        to build powerful web applications in Go.
+      </p>
+      <div class="hero-cta">
+        <a href="https://xlc-dev.github.io/nova/docs/" class="btn btn-primary"
+          >Get Started</a
+        >
+        <a
+          href="https://github.com/xlc-dev/nova"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-secondary"
+          >View on GitHub</a
+        >
+      </div>
+    </div>
+    <div class="hero-image-container">
+      <img
+        src="/static/img/nova.png"
+        alt="Nova Web Framework Logo"
+        class="hero-image"
+      />
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="container">
+    <h2>Why Choose Nova?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>Built around Go's Standard Library</h3>
+        <p>
+          Nova leverages Go's robust standard library while abstracting away
+          repetitive boilerplate.
+        </p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🏗</span>
+        <h3>Built-in Project Scaffolding</h3>
+        <p>
+          Generate project structure and starter code instantly for a seamless
+          development experience.
+        </p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🛠️</span>
+        <h3>Streamlined REST API Development</h3>
+        <p>
+          Simplify routing, middleware, and request handling to jumpstart your
+          API.
+        </p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💻</span>
+        <h3>CLI Tooling Included</h3>
+        <p>
+          Manage your application with an intuitive CLI that complements your
+          REST API.
+        </p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🗃</span>
+        <h3>Database Management</h3>
+        <p>
+          Integrated support for database connections and migrations to simplify
+          database management.
+        </p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🚧</span>
+        <h3>Validation & OpenAPI</h3>
+        <p>
+          Validate incoming requests to ensure data integrity together with
+          OpenAPI integration.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="code-highlight" id="example">
+  <div class="container">
+    <h2>Get Started Quickly</h2>
+    <pre>
+<code class="language-go"><span class="keyword">func</span> <span class="func">main</span>() {
+    cli, err := <span class="package">nova</span>.<span class="func">NewCLI</span>(&<span class="package">nova</span>.<span class="type">CLI</span>{
+        Name:        <span class="string">"api"</span>,
+        Version:     <span class="string">"0.0.1"</span>,
+        Description: <span class="string">"Hello Nova"</span>,
+        Action: <span class="keyword">func</span>(ctx *<span class="package">nova</span>.<span class="type">Context</span>) <span class="keyword">error</span> {
+            router := <span class="package">nova</span>.<span class="func">NewRouter</span>()
+
+            router.<span class="func">Get</span>(<span class="string">"/"</span>, <span class="keyword">func</span>(w <span class="package">http</span>.<span class="type">ResponseWriter</span>, r *<span class="package">http</span>.<span class="type">Request</span>) {
+                w.<span class="func">Write</span>([]<span class="keyword">byte</span>(<span class="string">"Hello, Nova!"</span>))
+            })
+
+            <span class="keyword">if</span> err := <span class="package">nova</span>.<span class="func">Serve</span>(ctx, router); err != <span class="keyword">nil</span> {
+                <span class="keyword">return</span> <span class="package">fmt</span>.<span class="func">Errorf</span>(<span class="string">"failed to start server: %s"</span>, err)
+            }
+
+            <span class="keyword">return</span> <span class="keyword">nil</span>
+        },
+    })
+
+    <span class="keyword">if</span> err != <span class="keyword">nil</span> {
+        <span class="package">log</span>.<span class="func">Fatalf</span>(<span class="string">"Error initializing CLI: %v"</span>, err)
+    }
+
+    <span class="keyword">if</span> err := cli.<span class="func">Run</span>(<span class="package">os</span>.Args); err != <span class="keyword">nil</span> {
+        <span class="package">log</span>.<span class="func">Fatalf</span>(<span class="string">"Error running CLI: %v"</span>, err)
+    }
+}
+</code></pre>
+  </div>
+</section>
+
+<section class="cta-section" id="get-started">
+  <div class="container">
+    <h2>Ready to Build Better Go WebApps?</h2>
+    <p>
+      Explore the repository or dive into the documentation to get started with
+      Nova.
+    </p>
+    <div class="hero-cta">
+      <a
+        href="https://github.com/xlc-dev/nova"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn btn-secondary"
+        >View on GitHub</a
+      >
+      <a href="https://xlc-dev.github.io/nova/docs/" class="btn btn-primary"
+        >Read the Docs</a
+      >
+    </div>
+  </div>
+</section>
+
+<footer class="main-footer">
+  <div class="container">
+    <p>&copy; 2025 Nova Web Framework. Built with simplicity in mind.</p>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const header = document.getElementById("mainHeader");
+    const navLinks = document.querySelectorAll(".main-nav a");
+    const sections = [];
+
+    navLinks.forEach((link) => {
+      const sectionId = link.getAttribute("href").substring(1);
+      const section = document.getElementById(sectionId);
+      if (section) {
+        sections.push({ link: link, element: section });
+      }
+    });
+
+    const updateActiveLink = () => {
+      const headerHeight = header ? header.offsetHeight : 0;
+      const scrollPosition = window.scrollY + headerHeight + 50;
+      let currentActiveSection = null;
+
+      sections.forEach((sectionData) => {
+        const sectionTop = sectionData.element.offsetTop;
+        const sectionBottom = sectionTop + sectionData.element.offsetHeight;
+
+        if (sectionTop <= scrollPosition) {
+          currentActiveSection = sectionData;
+        }
+      });
+
+      navLinks.forEach((link) => link.classList.remove("active"));
+
+      if (currentActiveSection) {
+        currentActiveSection.link.classList.add("active");
+      }
+    };
+
+    window.addEventListener("scroll", updateActiveLink);
+    updateActiveLink();
+
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) {
+        header.classList.add("scrolled");
+      } else {
+        header.classList.remove("scrolled");
+      }
+    });
+  });
+</script>

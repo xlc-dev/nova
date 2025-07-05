@@ -1,0 +1,73 @@
+<header class="main-header" id="mainHeader">
+  <div class="container">
+    <a href="/docs" class="logo">Nova<span>Docs</span></a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/">Homepage</a></li>
+        <li><a href="https://github.com/xlc-dev/nova">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="docs-layout">
+  <div class="container">
+    <aside class="docs-sidebar">
+      <nav class="sidebar-nav">
+        <h5>Getting Started</h5>
+        <ul>
+          <li><a href="/docs/introduction.html">Introduction</a></li>
+          <li>
+            <a href="/docs/installation.html" class="active">Installation</a>
+          </li>
+          <li><a href="/docs/scaffolding.html">Project Scaffolding</a></li>
+        </ul>
+        <h5>Core Concepts</h5>
+        <ul>
+          <li><a href="/docs/routing.html">Routing</a></li>
+          <li><a href="/docs/middleware.html">Middleware</a></li>
+          <li><a href="/docs/context.html">Context</a></li>
+          <li><a href="/docs/validation.html">Validation</a></li>
+        </ul>
+        <h5>Advanced</h5>
+        <ul>
+          <li><a href="/docs/openapi.html">OpenAPI</a></li>
+          <li><a href="/docs/database.html">Database</a></li>
+          <li><a href="/docs/cli.html">CLI Tooling</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="docs-content">{{content}}</article>
+  </div>
+</main>
+
+<footer class="main-footer">
+  <div class="container">
+    <p>&copy; 2025 Nova Web Framework. Built with simplicity in mind.</p>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const header = document.getElementById("mainHeader");
+    if (header) {
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 20) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      });
+    }
+
+    const currentPath = window.location.pathname;
+    const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
+    sidebarLinks.forEach((link) => {
+      link.classList.remove("active");
+      if (link.getAttribute("href") === currentPath) {
+        link.classList.add("active");
+      }
+    });
+  });
+</script>
