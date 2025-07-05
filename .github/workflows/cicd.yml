@@ -1,4 +1,4 @@
-name: Go CI & Docs Deployment
+name: Go CI & Site Deployment
 
 on:
   push:
@@ -40,8 +40,8 @@ jobs:
       - name: Run Go Tests
         run: go test -v ./...
 
-  deploy-docs:
-    name: Build and Deploy Documentation
+  deploy-site:
+    name: Build and Deploy Site
     runs-on: ubuntu-latest
     needs: lint-test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -66,44 +66,10 @@ jobs:
           go install github.com/xlc-dev/nova@latest
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-      - name: Setup Rust and mdBook
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Cache mdBook and mdbook-mermaid
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/mdbook
-            ~/.cargo/bin/mdbook-mermaid
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-mdbook-mermaid
-      - name: Install mdBook
+      - name: Run fssg
         run: |
-          if ! command -v mdbook &> /dev/null
-          then
-            cargo install mdbook --locked
-          fi
-      - name: Install mdbook-mermaid
-        run: |
-          if ! command -v mdbook-mermaid &> /dev/null
-          then
-            cargo install mdbook-mermaid --locked
-          fi
-
-      - name: Generate Nova Documentation
-        run: |
-          echo "Running nova gendoc..."
-          nova gendoc
-          echo "Nova docs generated."
-
-      - name: Build mdBook
-        run: |
-          echo "Building mdBook..."
-          cd docs
-          mdbook build
-          cd ..
-          echo "mdBook build complete."
+          cd ./www
+          ./fssg -n -j 50
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -111,7 +77,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./docs/"
+          path: "./www/dist/"
 
       - name: Deploy to GitHub Pages
         id: deployment
