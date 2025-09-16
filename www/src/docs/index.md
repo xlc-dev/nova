@@ -4,8 +4,6 @@
 
 # Nova
 
-Welcome to Nova.
-
 Nova is a flexible framework that simplifies creating both RESTful APIs and web UIs.
 It extends Go's standard library with sensible defaults and helper utilities for components like routing, middleware, OpenAPI, and HTML templating, minimizing decision fatique.
 Making it easier than ever to build powerful web applications in Go.
