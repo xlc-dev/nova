@@ -68,6 +68,13 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 	}
 	defer out.Close()
 
+	// Add header
+	header := "{{ title: Nova - Reference }}\n\n{{ include-block: doc.html markdown=\"true\" }}\n\n"
+	_, err = out.WriteString(header)
+	if err != nil {
+		return fmt.Errorf("failed to write header to output file: %w", err)
+	}
+
 	var tocBuf bytes.Buffer
 	var contentBuf bytes.Buffer
 
@@ -95,7 +102,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 			itemTitle := fmt.Sprintf("`%s`", displayNames)
 			itemAnchor := generateAnchor(itemTitle)
 			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", itemTitle, itemAnchor))
-			writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl)
+			writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl, 3)
 		}
 	}
 
@@ -110,7 +117,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 			itemTitle := fmt.Sprintf("`%s`", displayNames)
 			itemAnchor := generateAnchor(itemTitle)
 			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", itemTitle, itemAnchor))
-			writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl)
+			writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl, 3)
 		}
 	}
 
@@ -124,7 +131,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 			itemTitle := fmt.Sprintf("`%s`", f.Name)
 			itemAnchor := generateAnchor(itemTitle)
 			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", itemTitle, itemAnchor))
-			writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl)
+			writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl, 3)
 		}
 	}
 
@@ -139,7 +146,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 			typeAnchor := generateAnchor(typeTitle)
 			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", typeTitle, typeAnchor))
 			// Document the type itself
-			writeDocItem(&contentBuf, fset, t.Doc, []string{t.Name}, t.Decl)
+			writeDocItem(&contentBuf, fset, t.Doc, []string{t.Name}, t.Decl, 3)
 
 			if len(t.Consts) > 0 {
 				subSectionTitle := "Associated Constants"
@@ -149,7 +156,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 					itemTitle := fmt.Sprintf("`%s`", displayNames)
 					itemAnchor := generateAnchor(itemTitle)
 					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl)
+					writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl, 4)
 				}
 			}
 			if len(t.Vars) > 0 {
@@ -160,7 +167,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 					itemTitle := fmt.Sprintf("`%s`", displayNames)
 					itemAnchor := generateAnchor(itemTitle)
 					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl)
+					writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl, 4)
 				}
 			}
 			if len(t.Funcs) > 0 {
@@ -170,7 +177,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 					itemTitle := fmt.Sprintf("`%s`", f.Name)
 					itemAnchor := generateAnchor(itemTitle)
 					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl)
+					writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl, 4)
 				}
 			}
 			if len(t.Methods) > 0 {
@@ -180,7 +187,7 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 					itemTitle := fmt.Sprintf("`%s.%s`", t.Name, m.Name)
 					itemAnchor := generateAnchor(itemTitle)
 					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, m.Doc, []string{m.Name}, m.Decl)
+					writeDocItem(&contentBuf, fset, m.Doc, []string{m.Name}, m.Decl, 4)
 				}
 			}
 		}
@@ -210,13 +217,20 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 		return fmt.Errorf("failed to write content buffer to output file: %w", err)
 	}
 
+	// Add footer
+	footer := "{{ endinclude }}"
+	_, err = out.WriteString(footer)
+	if err != nil {
+		return fmt.Errorf("failed to write footer to output file: %w", err)
+	}
+
 	log.Printf("Successfully generated reference docs with TOC to %s", outputFile)
 	return nil
 }
 
 // writeDocItem formats a single documentation item (const, var, func, type, method)
 // and writes it to the content buffer.
-func writeDocItem(contentBuf *bytes.Buffer, fset *token.FileSet, docComment string, names []string, decl ast.Node) {
+func writeDocItem(contentBuf *bytes.Buffer, fset *token.FileSet, docComment string, names []string, decl ast.Node, level int) {
 	// Use the first name for the header, join for display if multiple (const/var blocks)
 	// For methods, names only contains the method name, not the receiver type.
 	// The anchor generation in the main function handles creating unique anchors like Type.Method.
@@ -230,7 +244,9 @@ func writeDocItem(contentBuf *bytes.Buffer, fset *token.FileSet, docComment stri
 	// but the header ID generated by Markdown processors will likely match this simpler anchor.
 	itemAnchor := generateAnchor(itemTitle)
 
-	contentBuf.WriteString(fmt.Sprintf("### %s {#%s}\n\n", itemTitle, itemAnchor)) // Header for the item with explicit anchor
+	// Create a clean anchor tag that is compatible with most Markdown renderers
+	contentBuf.WriteString(fmt.Sprintf("<a id=\"%s\"></a>\n", itemAnchor))
+	contentBuf.WriteString(fmt.Sprintf("%s %s\n\n", strings.Repeat("#", level), itemTitle)) // Header for the item
 
 	// Print the declaration (signature) using go/printer
 	var declBuf bytes.Buffer
@@ -250,7 +266,6 @@ func writeDocItem(contentBuf *bytes.Buffer, fset *token.FileSet, docComment stri
 		contentBuf.WriteString(formatDocText(docComment))
 		contentBuf.WriteString("\n\n")
 	}
-	contentBuf.WriteString("---\n\n") // Separator
 }
 
 // formatDocText performs basic formatting on Go doc strings for Markdown.
