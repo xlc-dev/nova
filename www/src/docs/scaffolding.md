@@ -1,3 +1,7 @@
+{{ title: Nova - Scaffolding }}
+
+{{ include-block: doc.html markdown="true" }}
+
 # Scaffolding
 
 **scaffolding** in Nova automates project bootstrapping. It provides:
@@ -12,8 +16,6 @@
 
 1. [Getting Started](#getting-started)
 2. [Core Concepts](#core-concepts)
-
----
 
 ## Getting Started
 
@@ -36,16 +38,15 @@ When you run `nova new`, Nova creates a new project directory based on a templat
 When you select a template, you get the following options:
 
 - Add a database, with the following options:
-
   - **sqlite:** Use the `modernc.org/sqlite` package.
   - **postgres:** Use the `github.com/lib/pq` package.
   - **mysql:** Use the `github.com/go-sql-driver/mysql` package.
-
     - Add a `.env` file with the following environment variables when you select a database:
       - `DATABASE_URL`: The database connection string.
 
 - Initialize a git repository.
-
   - Add a `.gitignore` if you said yes to git
 
 - Add a Make file for making it easier to develop.
+
+{{ endinclude }}

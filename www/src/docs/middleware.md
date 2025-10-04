@@ -1,3 +1,7 @@
+{{ title: Nova - Middleware }}
+
+{{ include-block: doc.html markdown="true" }}
+
 # Middleware
 
 Nova has ready-to-use middleware for `net/http`. In this document, you will find the list of built-in middleware and how to use them.
@@ -99,8 +103,6 @@ router.Use(CustomHeaderMiddleware("X-App-Version", "1.2.3"))
 
 Nova provides a collection of standard `net/http` middleware. Each middleware is typically configured using a specific `Config` struct and applied using `router.Use(...)` for global application or `group.Use(...)` for group-specific application.
 
----
-
 ### LoggingMiddleware
 
 - **Description:** Logs incoming requests (start) and outgoing responses (completion), including method, path, remote address, status code, response size, and duration.
@@ -125,8 +127,6 @@ func main() {
 	router.Use(nova.RequestIDMiddleware(nil)) // Use defaults
 }
 ```
-
----
 
 ### RecoveryMiddleware
 
@@ -171,8 +171,6 @@ func main() {
 }
 ```
 
----
-
 ### RequestIDMiddleware
 
 - **Description:** Assigns a unique ID to each request (from header or generated), sets it in the response header, and adds it to the request context.
@@ -202,8 +200,6 @@ func main() {
 	})
 }
 ```
-
----
 
 ### CORSMiddleware
 
@@ -240,8 +236,6 @@ func main() {
 	})
 }
 ```
-
----
 
 ### SecurityHeadersMiddleware
 
@@ -282,8 +276,6 @@ func main() {
 	})
 }
 ```
-
----
 
 ### TimeoutMiddleware
 
@@ -326,8 +318,6 @@ func main() {
 	})
 }
 ```
-
----
 
 ### BasicAuthMiddleware
 
@@ -374,8 +364,6 @@ func main() {
 }
 ```
 
----
-
 ### MethodOverrideMiddleware
 
 - **Description:** Allows overriding the HTTP method via a header (`X-HTTP-Method-Override`) or form field (`_method` for POST requests).
@@ -409,6 +397,7 @@ func main() {
 	log.Println("Starting server on :8080")
 	http.ListenAndServe(":8080", router)
 }
+
 // Example client request using header:
 // curl -X POST -H "X-HTTP-Method-Override: DELETE" http://localhost:8080/resource
 
@@ -418,8 +407,6 @@ func main() {
 //   <button type="submit">Update Resource</button>
 // </form>
 ```
-
----
 
 ### EnforceContentTypeMiddleware
 
@@ -451,6 +438,7 @@ func main() {
 		w.Write([]byte("Data fetched."))
 	})
 }
+
 // Example failing request:
 // curl -X POST -d 'data' http://localhost:8080/submit
 // -> 400 Bad Request (Missing Content-Type)
@@ -463,8 +451,6 @@ func main() {
 // curl -X POST -H "Content-Type: application/json" -d '{"key":"value"}' http://localhost:8080/submit
 // -> 200 OK
 ```
-
----
 
 ### CacheControlMiddleware
 
@@ -488,8 +474,6 @@ func main() {
 	})
 }
 ```
-
----
 
 ### GzipMiddleware
 
@@ -534,8 +518,6 @@ func main() {
 // Example request:
 // curl -H "Accept-Encoding: gzip" http://localhost:8080/large-data --output - | gunzip
 ```
-
----
 
 ### CSRFMiddleware
 
@@ -609,8 +591,6 @@ func main() {
 // Response: Forbidden
 ```
 
----
-
 ### ETagMiddleware
 
 - **Description:** Adds an `ETag` header to successful responses based on a hash of the response body. Handles `If-None-Match` conditional requests, potentially returning a `304 Not Modified` status without the response body if the client's cached ETag matches. **Note:** This middleware buffers the entire response body in memory to calculate the hash, which may be unsuitable for very large responses.
@@ -658,8 +638,6 @@ func main() {
 //    curl -v -H 'If-None-Match: "HASH_VALUE"' http://localhost:8080/content
 //    (Response should be 200 OK with the new content and a *new* ETag)
 ```
-
----
 
 ### HealthCheckMiddleware
 
@@ -712,8 +690,6 @@ func main() {
 // Response: Main application page (Logs will show this request, but not the /status request if logging is after health check)
 ```
 
----
-
 ### RealIPMiddleware
 
 - **Description:** Extracts the client's real IP address from trusted proxy headers (e.g., `X-Forwarded-For`, `X-Real-IP`). **Warning:** Only use behind a trusted proxy.
@@ -723,7 +699,8 @@ func main() {
   - `StoreInContext bool`: Store the real IP in context (defaults to true).
   - `ContextKey contextKey`: Context key for IP (defaults to internal key).
 - **Context Helper:** `nova.GetRealIP(ctx context.Context)` retrieves the IP.
-- **Usage:**
+
+#### Example
 
 ```go
 func main() {
@@ -750,8 +727,6 @@ func main() {
 // Example request (simulating proxy):
 // curl -H "X-Forwarded-For: 1.2.3.4" http://localhost:8080/ip
 ```
-
----
 
 ### MaxRequestBodySizeMiddleware
 
@@ -803,12 +778,11 @@ func main() {
 	log.Println("Starting server on :8080")
 	http.ListenAndServe(":8080", router)
 }
+
 // Example request exceeding limit:
 // curl -X POST --data-binary @large_file.dat http://localhost:8080/upload
 // -> 413 Request Entity Too Large
 ```
-
----
 
 ### TrailingSlashRedirectMiddleware
 
@@ -840,13 +814,12 @@ func main() {
 		w.Write([]byte("List of products"))
 	})
 }
+
 // Example request:
 // curl -L http://localhost:8080/users/
 // -> Redirects (301) to http://localhost:8080/users
 // -> Responds with "List of users"
 ```
-
----
 
 ### ForceHTTPSMiddleware
 
@@ -881,12 +854,11 @@ func main() {
 		w.Write([]byte("Welcome to the secure site!"))
 	})
 }
+
 // Example request:
 // curl http://localhost:8080
 // -> Redirects (301) to https://localhost:8080 (or https://localhost if port 443)
 ```
-
----
 
 ### ConcurrencyLimiterMiddleware
 
@@ -918,12 +890,11 @@ func main() {
 		w.Write([]byte("Processing complete."))
 	})
 }
+
 // Example: Run 15 concurrent requests:
 // for i in {1..15}; do curl http://localhost:8080/process & done
 // -> First 10 start immediately, next ~5 wait up to 2s. Some might get 503.
 ```
-
----
 
 ### MaintenanceModeMiddleware
 
@@ -971,6 +942,7 @@ func main() {
 		w.Write([]byte("Application is running normally."))
 	})
 }
+
 // Example:
 // curl http://localhost:8080/ -> Shows normal page
 // curl http://localhost:8080/admin/maintenance/on -> Enables maintenance
@@ -978,8 +950,6 @@ func main() {
 // curl http://localhost:8080/ -> Still shows normal page (due to AllowedIPs)
 // curl http://localhost:8080/admin/maintenance/off -> Disables maintenance
 ```
-
----
 
 ### IPFilterMiddleware
 
@@ -1017,8 +987,6 @@ func main() {
 	})
 }
 ```
-
----
 
 ### RateLimitMiddleware
 
@@ -1059,7 +1027,10 @@ func main() {
 		w.Write([]byte("Resource data"))
 	})
 }
+
 // Example: Hit the endpoint repeatedly
 // for i in {1..15}; do curl -I http://localhost:8080/api/resource; sleep 0.1; done
 // -> First ~10 requests get 200 OK, subsequent ones get 429 Too Many Requests
 ```
+
+{{ endinclude }}

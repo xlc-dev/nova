@@ -1,10 +1,10 @@
-<header class="main-header" id="mainHeader">
+<header class="main-header" id="mainheader">
   <div class="container">
-    <a href="/docs" class="logo">Nova<span>Docs</span></a>
+    <a href="/docs" class="logo">nova<span>docs</span></a>
     <nav class="main-nav">
       <ul>
-        <li><a href="/">Homepage</a></li>
-        <li><a href="https://github.com/xlc-dev/nova">GitHub</a></li>
+        <li><a href="/">homepage</a></li>
+        <li><a href="https://github.com/xlc-dev/nova">github</a></li>
       </ul>
     </nav>
   </div>
@@ -16,24 +16,24 @@
       <nav class="sidebar-nav">
         <h5>Getting Started</h5>
         <ul>
-          <li><a href="/docs/introduction.html">Introduction</a></li>
-          <li>
-            <a href="/docs/installation.html" class="active">Installation</a>
-          </li>
-          <li><a href="/docs/scaffolding.html">Project Scaffolding</a></li>
+          <li><a href="/docs">Introduction</a></li>
+          <li><a href="/docs/quickstart.html">Quickstart</a></li>
+          <li><a href="/docs/scaffolding.html">Scaffolding</a></li>
         </ul>
         <h5>Core Concepts</h5>
         <ul>
-          <li><a href="/docs/routing.html">Routing</a></li>
+          <li><a href="/docs/cli.html">CLI</a></li>
+          <li><a href="/docs/router.html">Router</a></li>
+          <li>
+            <a href="/docs/database_migrations.html">Database Migrations</a>
+          </li>
           <li><a href="/docs/middleware.html">Middleware</a></li>
-          <li><a href="/docs/context.html">Context</a></li>
-          <li><a href="/docs/validation.html">Validation</a></li>
-        </ul>
-        <h5>Advanced</h5>
-        <ul>
           <li><a href="/docs/openapi.html">OpenAPI</a></li>
-          <li><a href="/docs/database.html">Database</a></li>
-          <li><a href="/docs/cli.html">CLI Tooling</a></li>
+        </ul>
+        <h5>Extras</h5>
+        <ul>
+          <li><a href="/docs/faq.html">FAQ</a></li>
+          <li><a href="/docs/reference.html">Reference</a></li>
         </ul>
       </nav>
     </aside>
@@ -42,15 +42,9 @@
   </div>
 </main>
 
-<footer class="main-footer">
-  <div class="container">
-    <p>&copy; 2025 Nova Web Framework. Built with simplicity in mind.</p>
-  </div>
-</footer>
-
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const header = document.getElementById("mainHeader");
+    const header = document.getElementById("mainheader");
     if (header) {
       window.addEventListener("scroll", () => {
         if (window.scrollY > 20) {
@@ -61,11 +55,24 @@
       });
     }
 
-    const currentPath = window.location.pathname;
+    // Function to normalize paths by removing trailing slashes
+    const normalizePath = (path) => {
+      return path.replace(/\/$/, "") || "/";
+    };
+
+    const currentPath = normalizePath(window.location.pathname);
     const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
+
     sidebarLinks.forEach((link) => {
       link.classList.remove("active");
-      if (link.getAttribute("href") === currentPath) {
+      const linkPath = normalizePath(link.getAttribute("href"));
+
+      if (linkPath === currentPath) {
+        link.classList.add("active");
+        return;
+      }
+
+      if (currentPath === "/docs" && linkPath === "/docs") {
         link.classList.add("active");
       }
     });

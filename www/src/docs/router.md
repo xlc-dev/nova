@@ -1,4 +1,8 @@
-# Nova Framework Router & HTML Engine
+{{ title: Nova - Router }}
+
+{{ include-block: doc.html markdown="true" }}
+
+# Router
 
 Nova provides a minimal, zero-dependency HTTP router and a programmatic HTML generation engine, built upon Go's standard `net/http` package. It simplifies web development in Go by offering:
 
@@ -69,8 +73,6 @@ Nova provides a minimal, zero-dependency HTTP router and a programmatic HTML gen
 13. [Server Management (`nova.Serve`)](#server-management-novaserve)
 14. [Full Example](#full-example)
 
----
-
 ## 1. Getting Started
 
 Here's a minimal example to create a router, serve a simple HTML page, and start an HTTP server using Nova's integrated server utilities:
@@ -134,9 +136,7 @@ curl http://localhost:8080/
 # Output will be the rendered HTML page.
 ```
 
----
-
-## 2. Core Concepts
+## Core Concepts
 
 ### The `Router` Struct
 
@@ -180,9 +180,7 @@ Nova matches routes based on the request path segments:
     - If the HTTP method _doesn't_ match, a 405 Method Not Allowed response is sent (using the custom handler if set).
 8.  If no route pattern matches the path, a 404 Not Found response is sent (using the custom handler if set).
 
----
-
-## 3. Defining Routes
+## Defining Routes
 
 Nova supports two primary handler signatures for defining routes.
 
@@ -249,9 +247,7 @@ router.GetFunc("/users/{id}/profile", getUserProfile, routeOpts) // Pass your cu
 
 Nova's router will store this pointer, but it's up to other parts of your application or third-party tools to interpret these options.
 
----
-
-## 4. Route Parameters
+## Route Parameters
 
 Parameters allow parts of the URL path to be dynamic and captured for use in your handlers.
 
@@ -288,19 +284,21 @@ router.GetFunc("/files/{filename:[a-zA-Z0-9_]+\\.(jpg|png|gif)}", func(ctx *nova
 ### Accessing Parameters (`URLParam`)
 
 - **Inside an enhanced handler (`HandlerFunc`):** Use `ctx.URLParam("key")` to retrieve the value of a captured parameter.
-  ```go
-  name := ctx.URLParam("name")
-  ```
+
+```go
+name := ctx.URLParam("name")
+```
+
 - **Inside a standard handler (`http.HandlerFunc`):** You can use `router.URLParam(req, "key")`. This requires having access to the `router` instance within the handler.
-  ```go
-  // Assuming 'router' is accessible, e.g., via a global variable or closure
-  // userID := router.URLParam(r, "id")
-  ```
-  Using the `ResponseContext` method within an enhanced handler is generally preferred for cleaner code.
 
----
+```go
+// Assuming 'router' is accessible, e.g., via a global variable or closure
+// userID := router.URLParam(r, "id")
+```
 
-## 5. Middleware
+Using the `ResponseContext` method within an enhanced handler is generally preferred for cleaner code.
+
+## Middleware
 
 Middleware provides a way to add cross-cutting concerns (like logging, authentication, compression, CORS) to your request handling pipeline.
 
@@ -358,9 +356,7 @@ Middleware execution follows a standard "onion" model:
 4.  The route's specific handler executes.
 5.  The response travels back out through the middleware in the reverse order of execution on the way in (FIFO relative to addition).
 
----
-
-## 6. Route Groups
+## Route Groups
 
 Groups simplify managing routes that share a common URL prefix and/or a common set of middleware. Create a group using `router.Group(prefix, optionalMiddleware...)`.
 
@@ -385,9 +381,7 @@ web.GetFunc("/about", aboutPageHandler) // Path: /about
 
 Routes defined within a group automatically have the group's prefix prepended to their pattern.
 
----
-
-## 7. Subrouters
+## Subrouters
 
 Subrouters allow you to mount a completely separate `nova.Router` instance at a specific URL prefix. This is useful for modularizing large applications where different sections might have entirely different routing logic, middleware stacks, or even error handlers (though error handlers are inherited by default).
 
@@ -430,9 +424,7 @@ publicApiRouter.GetFunc("/version", func(ctx *nova.ResponseContext) error {
 
 When a request comes in, the main router first checks if the request path matches the `basePath` of any of its subrouters. If a match is found, the request is delegated to that subrouter's `ServeHTTP` method.
 
----
-
-## 8. Custom Error Handlers
+## Custom Error Handlers
 
 You can customize the responses for 404 (Not Found) and 405 (Method Not Allowed) errors by providing your own `http.Handler`.
 
@@ -483,9 +475,7 @@ router := nova.NewRouter()
 router.SetMethodNotAllowedHandler(http.HandlerFunc(customMethodNotAllowedHandler))
 ```
 
----
-
-## 9. Serving Static Files
+## Serving Static Files
 
 Nova allows you to serve static files (like CSS, JavaScript, images) from an `fs.FS` (such as one created from `embed.FS` or `os.DirFS`) under a specified URL prefix.
 
@@ -543,9 +533,7 @@ func main() {
 
 This setup uses `http.FileServer` and `http.StripPrefix` internally to serve the files efficiently.
 
----
-
-## 10. Programmatic HTML Generation
+## Programmatic HTML Generation
 
 Nova includes a powerful and fluent API for generating HTML programmatically within your Go code. This allows for type-safe construction of HTML structures without relying on traditional template files.
 
@@ -570,7 +558,7 @@ Any type that implements this interface can be rendered as part of an HTML struc
 Nova provides helper functions for most standard HTML tags. These functions return an `*nova.Element`, allowing for method chaining.
 
 ```go
-import "github.com/xlc-dev/nova/nova" // Or your specific import path
+import "github.com/xlc-dev/nova/nova"
 
 myDiv := nova.Div()
 myParagraph := nova.P()
@@ -586,23 +574,24 @@ Elements can have direct text content or child `HTMLElement`s.
 
 - **Direct Text Content:** Use the `.Text(string) *Element` method. This content is HTML-escaped during rendering (except for `<script>` and `<style>` tags).
 
-  ```go
-  titleHeader := nova.H1().Text("Page Title")
-  // Renders: <h1>Page Title</h1>
-  ```
+```go
+titleHeader := nova.H1().Text("Page Title")
+// Renders: <h1>Page Title</h1>
+```
 
 - **Child Elements:** Pass `HTMLElement`s as variadic arguments to the element creation function (e.g., `nova.Div(child1, child2)`) or use the `.Add(children ...HTMLElement) *Element` method.
-  ```go
-  container := nova.Div(
-      nova.H2().Text("Subtitle"),
-      nova.P().Text("Some paragraph text."),
-  )
-  // Or using .Add():
-  anotherContainer := nova.Div().Add(
-      nova.Span().Text("Part 1"),
-      nova.Span().Text("Part 2"),
-  )
-  ```
+
+```go
+container := nova.Div(
+  nova.H2().Text("Subtitle"),
+  nova.P().Text("Some paragraph text."),
+)
+// Or using .Add():
+anotherContainer := nova.Div().Add(
+  nova.Span().Text("Part 1"),
+  nova.Span().Text("Part 2"),
+)
+```
 
 ### Setting Attributes (`.Attr()`, `.Class()`, `.ID()`)
 
@@ -711,9 +700,7 @@ inlineCSS := nova.StyleTag("body > p { font-weight: bold; color: #333; }")
 
 Be cautious when embedding user-provided data into inline scripts or styles.
 
----
-
-## 11. Response Helpers (`ResponseContext`)
+## Response Helpers (`ResponseContext`)
 
 These methods are available on `*nova.ResponseContext` within `HandlerFunc` (enhanced handlers).
 
@@ -834,9 +821,7 @@ func versatileDataHandler(ctx *nova.ResponseContext) error {
 }
 ```
 
----
-
-## 12. Data Binding and Validation
+## Data Binding and Validation
 
 Nova simplifies handling incoming request data (JSON, forms) and validating it using struct tags.
 
@@ -933,9 +918,7 @@ Validation error messages are automatically localized based on the `Accept-Langu
 - English (`en`) serves as the fallback if a requested language or a specific message key within a language is not found.
 - The `detectLanguage` internal function parses the `Accept-Language` header (simplified parsing) to pick the best available match from the supported languages.
 
----
-
-## 13. Server Management (`nova.Serve`)
+## Server Management (`nova.Serve`)
 
 Nova provides a `Serve(ctx *nova.Context, router http.Handler) error` function to simplify server startup, management, and add features like live reloading and configurable logging. It's typically used as the action for a `nova.CLI` command.
 
@@ -969,9 +952,7 @@ cli.Action = func(cliCtx *nova.Context) error {
 }
 ```
 
----
-
-## 14. Full Example
+## Full Example
 
 This example demonstrates routing, middleware, programmatic HTML generation, static file serving, data binding with validation, and server management via `nova.Serve` and `nova.CLI`.
 
@@ -1174,3 +1155,5 @@ func main() {
 	}
 }
 ```
+
+{{ endinclude }}
