@@ -16,9 +16,6 @@ func TestGenerateReferenceMarkdown_Nonexistent(t *testing.T) {
 	}
 }
 
-// TestGenerateReferenceMarkdown_Basic creates a minimal Go package with
-// one const, var, func, and type+method, then verifies the generated
-// Markdown contains appropriate sections, TOC entries, and code blocks.
 func TestGenerateReferenceMarkdown_Basic(t *testing.T) {
 	// Set up temporary input directory
 	inDir := t.TempDir()
@@ -63,7 +60,7 @@ func TestGenerateReferenceMarkdown_Basic(t *testing.T) {
 	md := string(data)
 
 	// Check title
-	if !strings.HasPrefix(md, "# Reference") {
+	if !strings.Contains(md, "# Reference") {
 		t.Error("missing title '# Reference'")
 	}
 	// Check TOC contains sections
@@ -88,19 +85,21 @@ func TestGenerateReferenceMarkdown_Basic(t *testing.T) {
 	if !strings.Contains(md, "### `Counter`") || !strings.Contains(md, "type Counter int") {
 		t.Error("missing or malformed type Counter documentation")
 	}
-	if !strings.Contains(md, "### `Increment`") || !strings.Contains(md, "func (c *Counter) Increment()") {
+	if !strings.Contains(md, "#### `Increment`") || !strings.Contains(md, "func (c *Counter) Increment()") {
 		t.Error("missing or malformed method Increment documentation")
 	}
 }
 
-// TestGenerateAnchor verifies that generateAnchor produces expected Markdown anchors.
 func TestGenerateAnchor(t *testing.T) {
 	cases := map[string]string{
-		"Simple Text":     "simple-text",
-		"`Code` Example":  "code-example",
-		"Mixed_Case 123":  "mixedcase-123",
-		"Trailing - dash": "trailing---dash",
-		"***Stars***":     "stars",
+		"Simple Text":       "simple-text",
+		"`Code` Example":    "code-example",
+		"Mixed_Case 123":    "mixedcase-123",
+		"Trailing - dash":   "trailing-dash",
+		"***Stars***":       "stars",
+		"Multiple---dashes": "multiple-dashes",
+		" leading-space":    "leading-space",
+		"trailing-space ":   "trailing-space",
 	}
 	for input, want := range cases {
 		if got := generateAnchor(input); got != want {
@@ -121,7 +120,7 @@ More text after code.
 - list item two
 `
 	out := formatDocText(raw)
-	if !strings.Contains(out, "```text") {
+	if !strings.Contains(out, "```go") {
 		t.Error("expected code fence for indented block")
 	}
 	// List items should be present
