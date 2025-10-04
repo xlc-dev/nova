@@ -1,40 +1,44 @@
+{{ title: Nova - CLI }}
+
+{{ include-block: doc.html markdown="true" }}
+
 # CLI
 
 Nova has a built in CLI feature. It simplifies common CLI tasks by providing:
 
--   **Structured Application:** Define your application commands clearly.
--   **Type-Safe Flag Parsing:** Supports `string`, `int`, `bool`, `float64`, and `[]string` flags.
--   **Automatic Help Generation:** Generates help text for the application and individual commands, including usage, descriptions, flags, and aliases. Features a built-in `help` command.
--   **Built-in Version Flag:** Automatically handles `--version` and `-v` global flags.
--   **Global and Command-Specific Flags:** Define flags that apply to the entire application or only to specific commands.
--   **Required Flag Validation:** Mark flags as mandatory, and Nova will enforce their presence.
--   **Default Values:** Specify default values for flags.
--   **Aliases:** Define short or alternative names for commands and flags.
--   **Context-Aware Actions:** Command actions receive a `Context` object providing access to parsed flags, arguments, and application metadata.
--   **Initialization Validation:** `NewCLI` validates your configuration for conflicts (e.g., reserved names) before running.
+- **Structured Application:** Define your application commands clearly.
+- **Type-Safe Flag Parsing:** Supports `string`, `int`, `bool`, `float64`, and `[]string` flags.
+- **Automatic Help Generation:** Generates help text for the application and individual commands, including usage, descriptions, flags, and aliases. Features a built-in `help` command.
+- **Built-in Version Flag:** Automatically handles `--version` and `-v` global flags.
+- **Global and Command-Specific Flags:** Define flags that apply to the entire application or only to specific commands.
+- **Required Flag Validation:** Mark flags as mandatory, and Nova will enforce their presence.
+- **Default Values:** Specify default values for flags.
+- **Aliases:** Define short or alternative names for commands and flags.
+- **Context-Aware Actions:** Command actions receive a `Context` object providing access to parsed flags, arguments, and application metadata.
+- **Initialization Validation:** `NewCLI` validates your configuration for conflicts (e.g., reserved names) before running.
 
 ## Table of Contents
 
 1.  [Getting Started](#getting-started)
 2.  [Core Concepts](#core-concepts)
-    -   [The `CLI` Struct](#the-cli-struct)
-    -   [The `Command` Struct](#the-command-struct)
-    -   [The `Flag` Interface](#the-flag-interface)
-    -   [The `Context` Object](#the-context-object)
-    -   [Execution Flow (`Run`)](#execution-flow-run)
+    - [The `CLI` Struct](#the-cli-struct)
+    - [The `Command` Struct](#the-command-struct)
+    - [The `Flag` Interface](#the-flag-interface)
+    - [The `Context` Object](#the-context-object)
+    - [Execution Flow (`Run`)](#execution-flow-run)
 3.  [Defining Commands](#defining-commands)
 4.  [Working with Flags](#working-with-flags)
-    -   [Flag Types](#flag-types)
-    -   [Flag Definition](#flag-definition)
-    -   [Global vs. Command Flags](#global-vs-command-flags)
-    -   [Required Flags](#required-flags)
-    -   [Default Values](#default-values)
-    -   [Aliases](#aliases)
-    -   [String Slice Flags](#string-slice-flags)
+    - [Flag Types](#flag-types)
+    - [Flag Definition](#flag-definition)
+    - [Global vs. Command Flags](#global-vs-command-flags)
+    - [Required Flags](#required-flags)
+    - [Default Values](#default-values)
+    - [Aliases](#aliases)
+    - [String Slice Flags](#string-slice-flags)
 5.  [Context API](#context-api)
-    -   [Accessing Arguments](#accessing-arguments)
-    -   [Accessing Flag Values](#accessing-flag-values)
-    -   [Accessing Metadata](#accessing-metadata)
+    - [Accessing Arguments](#accessing-arguments)
+    - [Accessing Flag Values](#accessing-flag-values)
+    - [Accessing Metadata](#accessing-metadata)
 6.  [Help and Version](#help-and-version)
 7.  [Error Handling](#error-handling)
 8.  [Full Example Application](#full-example-application)
@@ -125,13 +129,13 @@ go build -o myapp
 
 The `nova.CLI` struct is the root of your application. It holds metadata and configuration:
 
--   `Name` (string, **Required**): The name of your application, used in help messages.
--   `Version` (string, **Required**): The application version, displayed by the `--version` flag.
--   `Description` (string): A short description of the application, shown in the main help.
--   `Commands` ([]*`Command`): A slice of commands the application supports.
--   `Action` (`ActionFunc`): A function to run if no command is specified on the command line. If `nil` and no command is given, the main help is shown.
--   `GlobalFlags` ([]`Flag`): Flags that apply to the application globally, regardless of the command being run. Parsed before command flags.
--   `Authors` (string): Optional author information, displayed in the main help.
+- `Name` (string, **Required**): The name of your application, used in help messages.
+- `Version` (string, **Required**): The application version, displayed by the `--version` flag.
+- `Description` (string): A short description of the application, shown in the main help.
+- `Commands` ([]\*`Command`): A slice of commands the application supports.
+- `Action` (`ActionFunc`): A function to run if no command is specified on the command line. If `nil` and no command is given, the main help is shown.
+- `GlobalFlags` ([]`Flag`): Flags that apply to the application globally, regardless of the command being run. Parsed before command flags.
+- `Authors` (string): Optional author information, displayed in the main help.
 
 **Important:** Always initialize your application using `nova.NewCLI(app)`. This function validates your configuration (checking for required fields, reserved names like `help` for commands or `version` for global flags) and sets up internal flags before you call `Run`.
 
@@ -139,23 +143,23 @@ The `nova.CLI` struct is the root of your application. It holds metadata and con
 
 The `nova.Command` struct defines a specific action your application can perform.
 
--   `Name` (string, **Required**): The primary name used to invoke the command. Cannot be `help`.
--   `Aliases` ([]string): Alternative names for the command. Cannot include `h`.
--   `Usage` (string): A short, one-line description shown in the main command list.
--   `Description` (string): A more detailed description shown in the command's specific help (`myapp help <command>`).
--   `ArgsUsage` (string): Describes the expected arguments (e.g., `<input> [output]`), shown in the command's help.
--   `Action` (`ActionFunc`, **Required**): The function to execute when the command is invoked. It receives a `*nova.Context`.
--   `Flags` ([]`Flag`): Flags specific to this command. Cannot be named `help` or have an alias `h`.
+- `Name` (string, **Required**): The primary name used to invoke the command. Cannot be `help`.
+- `Aliases` ([]string): Alternative names for the command. Cannot include `h`.
+- `Usage` (string): A short, one-line description shown in the main command list.
+- `Description` (string): A more detailed description shown in the command's specific help (`myapp help <command>`).
+- `ArgsUsage` (string): Describes the expected arguments (e.g., `<input> [output]`), shown in the command's help.
+- `Action` (`ActionFunc`, **Required**): The function to execute when the command is invoked. It receives a `*nova.Context`.
+- `Flags` ([]`Flag`): Flags specific to this command. Cannot be named `help` or have an alias `h`.
 
 ### The `Flag` Interface
 
 `nova.Flag` is an interface implemented by concrete flag types. You don't use the interface directly but rather the specific types:
 
--   `nova.StringFlag`
--   `nova.IntFlag`
--   `nova.BoolFlag`
--   `nova.Float64Flag`
--   `nova.StringSliceFlag`
+- `nova.StringFlag`
+- `nova.IntFlag`
+- `nova.BoolFlag`
+- `nova.Float64Flag`
+- `nova.StringSliceFlag`
 
 Each flag type defines how a command-line option is parsed and stored. Key properties include `Name`, `Aliases`, `Usage`, `Default`, and `Required`.
 
@@ -163,9 +167,9 @@ Each flag type defines how a command-line option is parsed and stored. Key prope
 
 An instance of `nova.Context` is passed to every `ActionFunc`. It provides access to runtime information:
 
--   Parsed flag values (both command-specific and global).
--   Positional arguments remaining after flag parsing.
--   Metadata about the `CLI` and the currently executing `Command`.
+- Parsed flag values (both command-specific and global).
+- Positional arguments remaining after flag parsing.
+- Metadata about the `CLI` and the currently executing `Command`.
 
 ### Execution Flow (`Run`)
 
@@ -175,9 +179,9 @@ When you call `cli.Run(os.Args)`:
 2.  **Global Flag Validation:** Required global flags are checked.
 3.  **Command Identification:** Nova looks at the next argument to see if it matches a command name or alias (including the built-in `help` command).
 4.  **Action Determination:**
-    *   **Command Found:** If it's the `help` command, its action is run. Otherwise, the command's specific flags are parsed and validated. The command's `ActionFunc` is then executed with a `Context` containing command flags, global flags, and remaining arguments.
-    *   **No Command Found & `CLI.Action` Defined:** The global `ActionFunc` is executed with a `Context` containing global flags and all non-flag arguments.
-    *   **No Command Found & No `CLI.Action`:** If arguments were provided but didn't match a command, an "unknown command" error is returned. If no arguments were provided, the main application help is displayed.
+    - **Command Found:** If it's the `help` command, its action is run. Otherwise, the command's specific flags are parsed and validated. The command's `ActionFunc` is then executed with a `Context` containing command flags, global flags, and remaining arguments.
+    - **No Command Found & `CLI.Action` Defined:** The global `ActionFunc` is executed with a `Context` containing global flags and all non-flag arguments.
+    - **No Command Found & No `CLI.Action`:** If arguments were provided but didn't match a command, an "unknown command" error is returned. If no arguments were provided, the main application help is displayed.
 5.  **Error Handling:** Any errors during parsing, validation, or action execution are returned by `Run`.
 
 ## Defining Commands
@@ -225,13 +229,13 @@ Flags provide options and configuration for your application and commands.
 
 Nova provides the following concrete flag types, all implementing the `nova.Flag` interface:
 
-| Type              | Go Type      | Example Usage           | Description                                    |
-| ----------------- | ------------ | ----------------------- | ---------------------------------------------- |
-| `StringFlag`      | `string`     | `--name="John Doe"`     | Accepts a text value.                          |
-| `IntFlag`         | `int`        | `--port=8080`           | Accepts an integer value.                      |
-| `BoolFlag`        | `bool`       | `--verbose`             | Acts as a switch (true if present).            |
-| `Float64Flag`     | `float64`    | `--ratio=1.5`           | Accepts a floating-point number.               |
-| `StringSliceFlag` | `[]string`   | `--tag foo --tag bar`   | Accepts multiple string values (repeatable).   |
+| Type              | Go Type    | Example Usage         | Description                                  |
+| ----------------- | ---------- | --------------------- | -------------------------------------------- |
+| `StringFlag`      | `string`   | `--name="John Doe"`   | Accepts a text value.                        |
+| `IntFlag`         | `int`      | `--port=8080`         | Accepts an integer value.                    |
+| `BoolFlag`        | `bool`     | `--verbose`           | Acts as a switch (true if present).          |
+| `Float64Flag`     | `float64`  | `--ratio=1.5`         | Accepts a floating-point number.             |
+| `StringSliceFlag` | `[]string` | `--tag foo --tag bar` | Accepts multiple string values (repeatable). |
 
 ### Flag Definition
 
@@ -284,10 +288,10 @@ Define flags by creating instances of the flag types and assigning them to `CLI.
 
 ### Global vs. Command Flags
 
--   **Global Flags:** Defined in `CLI.GlobalFlags`. They are available and parsed *before* any command is run. Useful for options like `--config`, `--verbose`, or `--region`.
-    -   **Reserved:** Cannot use `Name: "version"` or `Aliases: []string{"v"}`.
--   **Command Flags:** Defined in `Command.Flags`. They are only available and parsed when that specific command is invoked.
-    -   **Reserved:** Cannot use `Name: "help"` or `Aliases: []string{"h"}`.
+- **Global Flags:** Defined in `CLI.GlobalFlags`. They are available and parsed _before_ any command is run. Useful for options like `--config`, `--verbose`, or `--region`.
+  - **Reserved:** Cannot use `Name: "version"` or `Aliases: []string{"v"}`.
+- **Command Flags:** Defined in `Command.Flags`. They are only available and parsed when that specific command is invoked.
+  - **Reserved:** Cannot use `Name: "help"` or `Aliases: []string{"h"}`.
 
 ```go
 app := &nova.CLI{
@@ -318,7 +322,7 @@ app := &nova.CLI{
 
 ### Required Flags
 
-Set `Required: true` in the flag definition. Nova automatically checks if required flags were provided during the `Run` process *after* parsing. If a required flag is missing, `Run` returns an error. This applies to all flag types except `BoolFlag`. For `StringSliceFlag`, it ensures the flag was provided at least once.
+Set `Required: true` in the flag definition. Nova automatically checks if required flags were provided during the `Run` process _after_ parsing. If a required flag is missing, `Run` returns an error. This applies to all flag types except `BoolFlag`. For `StringSliceFlag`, it ensures the flag was provided at least once.
 
 ```go
 &nova.StringFlag{
@@ -344,8 +348,8 @@ Set the `Default` field in the flag definition. If the user provides the flag, t
 
 The `Aliases` field (`[]string`) provides alternative names for flags.
 
--   Single-character aliases are typically prefixed with a single hyphen (`-a`).
--   Multi-character aliases are prefixed with double hyphens (`--alias`).
+- Single-character aliases are typically prefixed with a single hyphen (`-a`).
+- Multi-character aliases are prefixed with double hyphens (`--alias`).
 
 Nova handles the prefixing automatically based on the alias length when generating help text.
 
@@ -415,20 +419,20 @@ func myAction(ctx *nova.Context) error {
 
 ## Help and Version
 
--   **Version:** Nova automatically adds a global `--version` flag (and `-v` alias). When used, it prints `AppName version AppVersion` and exits. You don't need to define this flag yourself.
--   **Help:** Nova provides a built-in `help` command.
-    -   Running `myapp help` shows the main application help (description, usage, commands, global options).
-    -   Running `myapp help <command>` shows detailed help for that specific command (description, usage, arguments, command-specific options, aliases).
--   **Command Help Flags (`-h`/`--help`):** Nova *reserves* the names `help` and `h` for flags within a command's definition (`Command.Flags`). You cannot define flags with these names. Users should use the `help` command (`myapp help <command>`) to get help for a specific command.
+- **Version:** Nova automatically adds a global `--version` flag (and `-v` alias). When used, it prints `AppName version AppVersion` and exits. You don't need to define this flag yourself.
+- **Help:** Nova provides a built-in `help` command.
+  - Running `myapp help` shows the main application help (description, usage, commands, global options).
+  - Running `myapp help <command>` shows detailed help for that specific command (description, usage, arguments, command-specific options, aliases).
+- **Command Help Flags (`-h`/`--help`):** Nova _reserves_ the names `help` and `h` for flags within a command's definition (`Command.Flags`). You cannot define flags with these names. Users should use the `help` command (`myapp help <command>`) to get help for a specific command.
 
 ## Error Handling
 
--   `nova.NewCLI(app)`: Returns an error if the `CLI` configuration is invalid (e.g., missing `Name`/`Version`, conflicting reserved names). Check this error before proceeding.
--   `cli.Run(args)`: Returns errors encountered during execution:
-    -   Flag parsing errors (e.g., invalid value type).
-    -   Validation errors (e.g., missing required flags).
-    -   "Unknown command" errors.
-    -   Any error returned by your `ActionFunc`.
+- `nova.NewCLI(app)`: Returns an error if the `CLI` configuration is invalid (e.g., missing `Name`/`Version`, conflicting reserved names). Check this error before proceeding.
+- `cli.Run(args)`: Returns errors encountered during execution:
+  - Flag parsing errors (e.g., invalid value type).
+  - Validation errors (e.g., missing required flags).
+  - "Unknown command" errors.
+  - Any error returned by your `ActionFunc`.
 
 Always check the error returned by `Run` and handle it appropriately (e.g., log it, exit with a non-zero status).
 
@@ -645,3 +649,5 @@ func serveAction(ctx *nova.Context) error {
 	select {} // Simulate running server
 }
 ```
+
+{{ endinclude }}

@@ -1,10 +1,14 @@
+{{ title: Nova - OpenAPI }}
+
+{{ include-block: doc.html markdown="true" }}
+
 # OpenAPI
 
 Nova's OpenAPI support automatically generates and serves an OpenAPI 3.0 specification for your routes, plus an embedded Swagger UI. It provides:
 
 - **Automatic Spec Generation:** Reflects Go structs, route definitions, parameters, request bodies, and responses into a valid OpenAPI 3.0 document.
 - **Component Schemas:** Deduplicates and reuses schema definitions for structs, arrays, maps, and basic types.
-- **Path & Operation Mapping:** Converts your router’s methods (`Get`, `Post`, etc.) into OpenAPI `paths` with `OperationObject`s.
+- **Path & Operation Mapping:** Converts your router’s methods (`Get`, `Post`, etc.) into OpenAPI `paths` with `OperationObject`.
 - **Parameter Inference:** Generates path, query, header, and cookie parameters, including required flags and examples.
 - **Request & Response Bodies:** Maps `RequestBody` and `Responses` options to JSON media types and schemas.
 - **Servers Configuration:** Embeds one or more server definitions (URLs) into the spec.
@@ -15,7 +19,6 @@ Nova's OpenAPI support automatically generates and serves an OpenAPI 3.0 specifi
 
 1. [Getting Started](#getting-started)
 2. [Core Concepts](#core-concepts)
-
    - [OpenAPIConfig](#openapiconfig)
    - [RouteOptions & ResponseOption](#routeoptions--responseoption)
    - [Schema Generation](#schema-generation)
@@ -24,34 +27,30 @@ Nova's OpenAPI support automatically generates and serves an OpenAPI 3.0 specifi
 4. [Serving Swagger UI](#serving-swagger-ui)
 5. [Full Example](#full-example)
 
----
-
 ## Getting Started
 
 To enable OpenAPI support in your Nova-powered app:
 
 1. **Import Nova’s router and OpenAPI helpers:**
 
-   ```go
-   import "github.com/xlc-dev/nova/nova"
-   ```
+```go
+import "github.com/xlc-dev/nova/nova"
+```
 
 2. **Define your routes** with `RouteOptions` (including tags, summary, parameters, request/response schemas).
 3. **Call**:
 
-   ```go
-   router.ServeOpenAPISpec("/openapi.json", nova.OpenAPIConfig{
-     Title:       "My Nova API",
-     Version:     "1.0.0",
-     Description: "This is a sample API built with Nova.",
-     Servers:     []nova.Server{{URL: fmt.Sprintf("http://%s:%d", host, port)}},
-   })
-   router.ServeSwaggerUI("/docs")
-   ```
+```go
+router.ServeOpenAPISpec("/openapi.json", nova.OpenAPIConfig{
+ Title:       "My Nova API",
+ Version:     "1.0.0",
+ Description: "This is a sample API built with Nova.",
+ Servers:     []nova.Server{{URL: fmt.Sprintf("http://%s:%d", host, port)}},
+})
+router.ServeSwaggerUI("/docs")
+```
 
 4. **Start** your server as usual: `nova.Serve(ctx, router)`.
-
----
 
 ## Core Concepts
 
@@ -98,7 +97,6 @@ type ResponseOption struct {
 Nova inspects Go types via reflection to build JSON Schemas:
 
 - **Structs:**
-
   - Generates `components.schemas` entries.
   - Honors `json:"..."`, `description:"..."`, `example:"..."` tags.
   - Marks fields non‐nullable or required unless `omitempty`.
@@ -107,8 +105,6 @@ Nova inspects Go types via reflection to build JSON Schemas:
 - **Arrays & Slices:** `type: array` + `items`.
 - **Maps:** `type: object` + `additionalProperties`.
 - **References:** reuses named schemas when the same struct type appears multiple times.
-
----
 
 ## Registering & Serving the Spec
 
@@ -127,8 +123,6 @@ router.ServeOpenAPISpec("/openapi.json", nova.OpenAPIConfig{
 - **Endpoint:** performs a `GET /openapi.json`, returning JSON with `Content-Type: application/json`.
 - **Internal:** calls `GenerateOpenAPISpec(router, config)` under the hood.
 
----
-
 ## Serving Swagger UI
 
 Nova embeds the official Swagger UI and serves it statically:
@@ -138,13 +132,10 @@ router.ServeSwaggerUI("/docs")
 ```
 
 - **Access:**
-
   - `GET /docs` → redirects to `/docs/` and serves `index.html`.
   - `GET /docs/{file}` → serves CSS, JS, and favicon from embedded assets.
 
 - **Customization:** To point the UI at your spec URL, pass query parameters to the `/docs/index.html` link (e.g. `?url=/openapi.json`).
-
----
 
 ## Full Example
 
@@ -222,3 +213,5 @@ func main() {
 	}
 }
 ```
+
+{{ endinclude }}

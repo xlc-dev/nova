@@ -1,3 +1,7 @@
+{{ title: Nova - FAQ }}
+
+{{ include-block: doc.html markdown="true" }}
+
 # FAQ
 
 ### How do I get JSON data from the body of a request (e.g., POST, PUT)?
@@ -167,3 +171,5 @@ func main() {
 	}
 }
 ```
+
+{{ endinclude }}

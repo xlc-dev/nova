@@ -1,3 +1,7 @@
+{{ title: Nova - Database Migrations }}
+
+{{ include-block: doc.html markdown="true" }}
+
 # Database Migrations
 
 Nova provides a simple, file-based database migration tool accessible directly through the `nova` command-line binary. It allows you to manage database schema changes using plain SQL files stored in a dedicated folder, driven by simple commands.
@@ -34,50 +38,52 @@ Nova provides a simple, file-based database migration tool accessible directly t
 
 1.  **Set `DATABASE_URL`:** Ensure the `DATABASE_URL` environment variable is set correctly for your target database. You can also place it in a `.env` file in the directory where you run `nova`.
 
-    ```bash
-    # Example for PostgreSQL
-    export DATABASE_URL="postgres://user:password@host:port/dbname?sslmode=disable"
+```bash
+# Example for PostgreSQL
+export DATABASE_URL="postgres://user:password@host:port/dbname?sslmode=disable"
 
-    # Example for SQLite
-    export DATABASE_URL="file:./my_app_data.db"
-    ```
+# Example for SQLite
+export DATABASE_URL="file:./my_app_data.db"
+```
 
 2.  **Create the `migrations` Folder:** In the root of your project (or where you run `nova`), create the folder:
 
-    ```bash
-    mkdir migrations
-    ```
+```bash
+mkdir migrations
+```
 
 3.  **Create Your First Migration:** Use the `new` command:
 
-    ```bash
-    nova migrate new create_users_table
-    # Output: Created new migration: migrations/1678886400_create_users_table.sql (timestamp will vary)
-    ```
+```bash
+nova migrate new create_users_table
+# Output: Created new migration: migrations/1678886400_create_users_table.sql (timestamp will vary)
+```
 
 4.  **Edit the SQL File:** Open the generated `.sql` file and add your SQL statements under the appropriate delimiters:
 
-    ```sql
-    -- migrations/1678886400_create_users_table.sql
+```sql
+-- migrations/1678886400_create_users_table.sql
 
-    -- migrate:up
-    CREATE TABLE users (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(50) UNIQUE NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+-- migrate:up
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 
-    -- migrate:down
-    DROP TABLE IF EXISTS users;
-    ```
+-- migrate:down
+DROP TABLE IF EXISTS users;
+```
 
 5.  **Apply the Migration:** Use the `up` command:
-    ```bash
-    nova migrate up
-    # Output: Applied migration migrations/1678886400_create_users_table.sql
-    # Output: Successfully applied 1 migration(s).
-    ```
-    Your database schema is now updated!
+
+```bash
+nova migrate up
+# Output: Applied migration migrations/1678886400_create_users_table.sql
+# Output: Successfully applied 1 migration(s).
+```
+
+Your database schema is now updated!
 
 ## Configuration (`DATABASE_URL`)
 
@@ -169,13 +175,13 @@ Applies pending migrations to the database.
   - Prints status messages.
 - **Examples:**
 
-  ```sh
-  # Apply all pending migrations
-  nova migrate up
+```bash
+# Apply all pending migrations
+nova migrate up
 
-  # Apply only the next 2 pending migrations
-  nova migrate up 2
-  ```
+# Apply only the next 2 pending migrations
+nova migrate up 2
+```
 
 ### `nova migrate down`
 
@@ -194,15 +200,15 @@ Rolls back previously applied migrations.
   - Prints status messages.
 - **Examples:**
 
-  ```sh
-  # Roll back the single most recent migration
-  nova migrate down
-  # OR
-  nova migrate down 1
+```bash
+# Roll back the single most recent migration
+nova migrate down
+# OR
+nova migrate down 1
 
-  # Roll back the last 3 applied migrations
-  nova migrate down 3
-  ```
+# Roll back the last 3 applied migrations
+nova migrate down 3
+```
 
 ## Programmatic Usage (Advanced)
 
@@ -312,3 +318,5 @@ if err != nil {
 ```
 
 **Important:** When using these functions programmatically, the status messages (`Applied migration...`, `Rolled back migration...`) are still printed to standard output. You might want to capture/redirect stdout if integrating into a larger system where this output is undesirable.
+
+{{ endinclude }}

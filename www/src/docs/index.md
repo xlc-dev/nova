@@ -1,6 +1,6 @@
 {{ title: Nova - Documentation }}
 
-{{include-block: doc.html markdown="true"}}
+{{ include-block: doc.html markdown="true" }}
 
 # Nova
 
@@ -8,14 +8,14 @@ Nova is a flexible framework that simplifies creating both RESTful APIs and web 
 It extends Go's standard library with sensible defaults and helper utilities for components like routing, middleware, OpenAPI, and HTML templating, minimizing decision fatique.
 Making it easier than ever to build powerful web applications in Go.
 
-## Why Choose Nova?
+## Why Choose Nova
 
 Nova is designed to be a lightweight framework that has as little dependencies as possible.
 It is built on top of Go's standard library, making it easy to integrate with existing Go codebases and libraries.
 
 Together with the CLI tool, Nova provides a streamlined development experience for building web applications.
 
-## Key Features:
+## Key Features
 
 - **CLI Tooling:** Integrated command-line tooling to build any CLI for your application.
 - **Project Scaffolding:** Quickly generate new projects with a sensible default structure using `nova new`.
@@ -60,4 +60,4 @@ To get started with Nova, read the [Quickstart](./quickstart.html) guide, or che
 
 This project is licensed under the [MIT License](https://github.com/xlc-dev/nova/blob/main/LICENSE).
 
-{{endinclude}}
+{{ endinclude }}

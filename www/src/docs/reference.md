@@ -1,263 +1,69 @@
+{{ title: Nova - Reference }}
+
+{{ include-block: doc.html markdown="true" }}
+
 # Reference
 
 ## Table of Contents
 
+- [Constants](#constants)
 - [Variables](#variables)
-  - [`ErrMissingContentType`](#errmissingcontenttype)
-  - [`ErrUnsupportedContentType`](#errunsupportedcontenttype)
 - [Functions](#functions)
-  - [`CreateNewMigration`](#createnewmigration)
-  - [`GetBasicAuthUser`](#getbasicauthuser)
-  - [`GetBasicAuthUserWithKey`](#getbasicauthuserwithkey)
-  - [`GetCSRFToken`](#getcsrftoken)
-  - [`GetCSRFTokenWithKey`](#getcsrftokenwithkey)
-  - [`GetRealIP`](#getrealip)
-  - [`GetRealIPWithKey`](#getrealipwithkey)
-  - [`GetRequestID`](#getrequestid)
-  - [`GetRequestIDWithKey`](#getrequestidwithkey)
-  - [`LoadDotenv`](#loaddotenv)
-  - [`MigrateDown`](#migratedown)
-  - [`MigrateUp`](#migrateup)
-  - [`NewBufferingResponseWriterInterceptor`](#newbufferingresponsewriterinterceptor)
-  - [`NewResponseWriterInterceptor`](#newresponsewriterinterceptor)
-  - [`Serve`](#serve)
 - [Types](#types)
   - [`ActionFunc`](#actionfunc)
   - [`AuthValidator`](#authvalidator)
   - [`BasicAuthConfig`](#basicauthconfig)
   - [`BoolFlag`](#boolflag)
-    - [`BoolFlag.Apply`](#boolflagapply)
-    - [`BoolFlag.GetAliases`](#boolflaggetaliases)
-    - [`BoolFlag.GetName`](#boolflaggetname)
-    - [`BoolFlag.IsRequired`](#boolflagisrequired)
-    - [`BoolFlag.String`](#boolflagstring)
-    - [`BoolFlag.Validate`](#boolflagvalidate)
+    - [Methods](#boolflag-methods)
   - [`CLI`](#cli)
-    - [`NewCLI`](#newcli)
-    - [`CLI.AddCommand`](#cliaddcommand)
-    - [`CLI.Run`](#clirun)
-    - [`CLI.ShowHelp`](#clishowhelp)
+    - [Associated Functions](#cli-functions)
+    - [Methods](#cli-methods)
   - [`CORSConfig`](#corsconfig)
   - [`CSRFConfig`](#csrfconfig)
   - [`CacheControlConfig`](#cachecontrolconfig)
   - [`Command`](#command)
-    - [`Command.ShowHelp`](#commandshowhelp)
+    - [Methods](#command-methods)
   - [`Components`](#components)
   - [`ConcurrencyLimiterConfig`](#concurrencylimiterconfig)
   - [`Context`](#context)
-    - [`Context.Args`](#contextargs)
-    - [`Context.Bool`](#contextbool)
-    - [`Context.Float64`](#contextfloat64)
-    - [`Context.Int`](#contextint)
-    - [`Context.String`](#contextstring)
-    - [`Context.StringSlice`](#contextstringslice)
+    - [Methods](#context-methods)
   - [`DocumentConfig`](#documentconfig)
   - [`ETagConfig`](#etagconfig)
   - [`Element`](#element)
-    - [`A`](#a)
-    - [`Abbr`](#abbr)
-    - [`Address`](#address)
-    - [`Article`](#article)
-    - [`Aside`](#aside)
-    - [`Audio`](#audio)
-    - [`B`](#b)
-    - [`Base`](#base)
-    - [`Blockquote`](#blockquote)
-    - [`Body`](#body)
-    - [`Br`](#br)
-    - [`Button`](#button)
-    - [`ButtonInput`](#buttoninput)
-    - [`Caption`](#caption)
-    - [`CheckboxInput`](#checkboxinput)
-    - [`Cite`](#cite)
-    - [`Code`](#code)
-    - [`Col`](#col)
-    - [`Colgroup`](#colgroup)
-    - [`ColorInput`](#colorinput)
-    - [`Datalist`](#datalist)
-    - [`DateInput`](#dateinput)
-    - [`DateTimeLocalInput`](#datetimelocalinput)
-    - [`Details`](#details)
-    - [`Dfn`](#dfn)
-    - [`DialogEl`](#dialogel)
-    - [`Div`](#div)
-    - [`Em`](#em)
-    - [`EmailInput`](#emailinput)
-    - [`EmbedEl`](#embedel)
-    - [`Favicon`](#favicon)
-    - [`Fieldset`](#fieldset)
-    - [`Figcaption`](#figcaption)
-    - [`Figure`](#figure)
-    - [`FileInput`](#fileinput)
-    - [`Footer`](#footer)
-    - [`Form`](#form)
-    - [`H1`](#h1)
-    - [`H2`](#h2)
-    - [`H3`](#h3)
-    - [`H4`](#h4)
-    - [`H5`](#h5)
-    - [`H6`](#h6)
-    - [`Head`](#head)
-    - [`Header`](#header)
-    - [`HiddenInput`](#hiddeninput)
-    - [`Hr`](#hr)
-    - [`Html`](#html)
-    - [`I`](#i)
-    - [`Iframe`](#iframe)
-    - [`Image`](#image)
-    - [`Img`](#img)
-    - [`InlineScript`](#inlinescript)
-    - [`Input`](#input)
-    - [`Kbd`](#kbd)
-    - [`Label`](#label)
-    - [`Legend`](#legend)
-    - [`Li`](#li)
-    - [`Link`](#link)
-    - [`LinkTag`](#linktag)
-    - [`Main`](#main)
-    - [`Mark`](#mark)
-    - [`Meta`](#meta)
-    - [`MetaCharset`](#metacharset)
-    - [`MetaNameContent`](#metanamecontent)
-    - [`MetaPropertyContent`](#metapropertycontent)
-    - [`MetaViewport`](#metaviewport)
-    - [`MeterEl`](#meterel)
-    - [`MonthInput`](#monthinput)
-    - [`Nav`](#nav)
-    - [`NoScript`](#noscript)
-    - [`NumberInput`](#numberinput)
-    - [`ObjectEl`](#objectel)
-    - [`Ol`](#ol)
-    - [`Optgroup`](#optgroup)
-    - [`Option`](#option)
-    - [`OutputEl`](#outputel)
-    - [`P`](#p)
-    - [`Param`](#param)
-    - [`PasswordInput`](#passwordinput)
-    - [`Pre`](#pre)
-    - [`Preload`](#preload)
-    - [`ProgressEl`](#progressel)
-    - [`Q`](#q)
-    - [`RadioInput`](#radioinput)
-    - [`RangeInput`](#rangeinput)
-    - [`ResetButton`](#resetbutton)
-    - [`Samp`](#samp)
-    - [`Script`](#script)
-    - [`SearchInput`](#searchinput)
-    - [`Section`](#section)
-    - [`Select`](#select)
-    - [`Small`](#small)
-    - [`Source`](#source)
-    - [`Span`](#span)
-    - [`Strong`](#strong)
-    - [`StyleSheet`](#stylesheet)
-    - [`StyleTag`](#styletag)
-    - [`Sub`](#sub)
-    - [`SubmitButton`](#submitbutton)
-    - [`Summary`](#summary)
-    - [`Sup`](#sup)
-    - [`Table`](#table)
-    - [`Tbody`](#tbody)
-    - [`Td`](#td)
-    - [`TelInput`](#telinput)
-    - [`TextInput`](#textinput)
-    - [`Textarea`](#textarea)
-    - [`Th`](#th)
-    - [`Thead`](#thead)
-    - [`TimeEl`](#timeel)
-    - [`TimeInput`](#timeinput)
-    - [`TitleEl`](#titleel)
-    - [`Tr`](#tr)
-    - [`Track`](#track)
-    - [`U`](#u)
-    - [`Ul`](#ul)
-    - [`UrlInput`](#urlinput)
-    - [`VarEl`](#varel)
-    - [`Video`](#video)
-    - [`Wbr`](#wbr)
-    - [`WeekInput`](#weekinput)
-    - [`Element.Add`](#elementadd)
-    - [`Element.Attr`](#elementattr)
-    - [`Element.BoolAttr`](#elementboolattr)
-    - [`Element.Class`](#elementclass)
-    - [`Element.ID`](#elementid)
-    - [`Element.Render`](#elementrender)
-    - [`Element.Style`](#elementstyle)
-    - [`Element.Text`](#elementtext)
+    - [Associated Functions](#element-functions)
+    - [Methods](#element-methods)
   - [`EnforceContentTypeConfig`](#enforcecontenttypeconfig)
   - [`Flag`](#flag)
   - [`Float64Flag`](#float64flag)
-    - [`Float64Flag.Apply`](#float64flagapply)
-    - [`Float64Flag.GetAliases`](#float64flaggetaliases)
-    - [`Float64Flag.GetName`](#float64flaggetname)
-    - [`Float64Flag.IsRequired`](#float64flagisrequired)
-    - [`Float64Flag.String`](#float64flagstring)
-    - [`Float64Flag.Validate`](#float64flagvalidate)
+    - [Methods](#float64flag-methods)
   - [`ForceHTTPSConfig`](#forcehttpsconfig)
   - [`Group`](#group)
-    - [`Group.Delete`](#groupdelete)
-    - [`Group.DeleteFunc`](#groupdeletefunc)
-    - [`Group.Get`](#groupget)
-    - [`Group.GetFunc`](#groupgetfunc)
-    - [`Group.Handle`](#grouphandle)
-    - [`Group.HandleFunc`](#grouphandlefunc)
-    - [`Group.Patch`](#grouppatch)
-    - [`Group.PatchFunc`](#grouppatchfunc)
-    - [`Group.Post`](#grouppost)
-    - [`Group.PostFunc`](#grouppostfunc)
-    - [`Group.Put`](#groupput)
-    - [`Group.PutFunc`](#groupputfunc)
-    - [`Group.Use`](#groupuse)
+    - [Methods](#group-methods)
   - [`GzipConfig`](#gzipconfig)
   - [`HTMLDocument`](#htmldocument)
-    - [`Document`](#document)
-    - [`HTMLDocument.Render`](#htmldocumentrender)
+    - [Associated Functions](#htmldocument-functions)
+    - [Methods](#htmldocument-methods)
   - [`HTMLElement`](#htmlelement)
-    - [`Text`](#text)
+    - [Associated Functions](#htmlelement-functions)
   - [`HandlerFunc`](#handlerfunc)
   - [`HeaderObject`](#headerobject)
   - [`HealthCheckConfig`](#healthcheckconfig)
   - [`IPFilterConfig`](#ipfilterconfig)
   - [`Info`](#info)
   - [`IntFlag`](#intflag)
-    - [`IntFlag.Apply`](#intflagapply)
-    - [`IntFlag.GetAliases`](#intflaggetaliases)
-    - [`IntFlag.GetName`](#intflaggetname)
-    - [`IntFlag.IsRequired`](#intflagisrequired)
-    - [`IntFlag.String`](#intflagstring)
-    - [`IntFlag.Validate`](#intflagvalidate)
+    - [Methods](#intflag-methods)
   - [`LoggingConfig`](#loggingconfig)
   - [`MaintenanceModeConfig`](#maintenancemodeconfig)
   - [`MaxRequestBodySizeConfig`](#maxrequestbodysizeconfig)
   - [`MediaTypeObject`](#mediatypeobject)
   - [`MethodOverrideConfig`](#methodoverrideconfig)
   - [`Middleware`](#middleware)
-    - [`BasicAuthMiddleware`](#basicauthmiddleware)
-    - [`CORSMiddleware`](#corsmiddleware)
-    - [`CSRFMiddleware`](#csrfmiddleware)
-    - [`CacheControlMiddleware`](#cachecontrolmiddleware)
-    - [`ConcurrencyLimiterMiddleware`](#concurrencylimitermiddleware)
-    - [`ETagMiddleware`](#etagmiddleware)
-    - [`EnforceContentTypeMiddleware`](#enforcecontenttypemiddleware)
-    - [`ForceHTTPSMiddleware`](#forcehttpsmiddleware)
-    - [`GzipMiddleware`](#gzipmiddleware)
-    - [`HealthCheckMiddleware`](#healthcheckmiddleware)
-    - [`IPFilterMiddleware`](#ipfiltermiddleware)
-    - [`LoggingMiddleware`](#loggingmiddleware)
-    - [`MaintenanceModeMiddleware`](#maintenancemodemiddleware)
-    - [`MaxRequestBodySizeMiddleware`](#maxrequestbodysizemiddleware)
-    - [`MethodOverrideMiddleware`](#methodoverridemiddleware)
-    - [`RateLimitMiddleware`](#ratelimitmiddleware)
-    - [`RealIPMiddleware`](#realipmiddleware)
-    - [`RecoveryMiddleware`](#recoverymiddleware)
-    - [`RequestIDMiddleware`](#requestidmiddleware)
-    - [`SecurityHeadersMiddleware`](#securityheadersmiddleware)
-    - [`TimeoutMiddleware`](#timeoutmiddleware)
-    - [`TrailingSlashRedirectMiddleware`](#trailingslashredirectmiddleware)
+    - [Associated Functions](#middleware-functions)
   - [`OpenAPI`](#openapi)
-    - [`GenerateOpenAPISpec`](#generateopenapispec)
+    - [Associated Functions](#openapi-functions)
   - [`OpenAPIConfig`](#openapiconfig)
   - [`Operation`](#operation)
+    - [Associated Functions](#operation-functions)
   - [`ParameterObject`](#parameterobject)
   - [`ParameterOption`](#parameteroption)
   - [`PathItem`](#pathitem)
@@ -267,71 +73,68 @@
   - [`RequestBodyObject`](#requestbodyobject)
   - [`RequestIDConfig`](#requestidconfig)
   - [`ResponseContext`](#responsecontext)
-    - [`ResponseContext.Bind`](#responsecontextbind)
-    - [`ResponseContext.BindForm`](#responsecontextbindform)
-    - [`ResponseContext.BindJSON`](#responsecontextbindjson)
-    - [`ResponseContext.BindValidated`](#responsecontextbindvalidated)
-    - [`ResponseContext.HTML`](#responsecontexthtml)
-    - [`ResponseContext.JSON`](#responsecontextjson)
-    - [`ResponseContext.JSONError`](#responsecontextjsonerror)
-    - [`ResponseContext.Redirect`](#responsecontextredirect)
-    - [`ResponseContext.Request`](#responsecontextrequest)
-    - [`ResponseContext.Text`](#responsecontexttext)
-    - [`ResponseContext.URLParam`](#responsecontexturlparam)
-    - [`ResponseContext.WantsJSON`](#responsecontextwantsjson)
-    - [`ResponseContext.Writer`](#responsecontextwriter)
+    - [Methods](#responsecontext-methods)
   - [`ResponseObject`](#responseobject)
   - [`ResponseOption`](#responseoption)
   - [`RouteOptions`](#routeoptions)
   - [`Router`](#router)
-    - [`NewRouter`](#newrouter)
-    - [`Router.Delete`](#routerdelete)
-    - [`Router.DeleteFunc`](#routerdeletefunc)
-    - [`Router.Get`](#routerget)
-    - [`Router.GetFunc`](#routergetfunc)
-    - [`Router.Group`](#routergroup)
-    - [`Router.Handle`](#routerhandle)
-    - [`Router.HandleFunc`](#routerhandlefunc)
-    - [`Router.Patch`](#routerpatch)
-    - [`Router.PatchFunc`](#routerpatchfunc)
-    - [`Router.Post`](#routerpost)
-    - [`Router.PostFunc`](#routerpostfunc)
-    - [`Router.Put`](#routerput)
-    - [`Router.PutFunc`](#routerputfunc)
-    - [`Router.ServeHTTP`](#routerservehttp)
-    - [`Router.ServeOpenAPISpec`](#routerserveopenapispec)
-    - [`Router.ServeSwaggerUI`](#routerserveswaggerui)
-    - [`Router.SetMethodNotAllowedHandler`](#routersetmethodnotallowedhandler)
-    - [`Router.SetNotFoundHandler`](#routersetnotfoundhandler)
-    - [`Router.Static`](#routerstatic)
-    - [`Router.Subrouter`](#routersubrouter)
-    - [`Router.URLParam`](#routerurlparam)
-    - [`Router.Use`](#routeruse)
+    - [Associated Functions](#router-functions)
+    - [Methods](#router-methods)
   - [`SchemaObject`](#schemaobject)
+    - [Associated Functions](#schemaobject-functions)
   - [`SecurityHeadersConfig`](#securityheadersconfig)
   - [`StringFlag`](#stringflag)
-    - [`StringFlag.Apply`](#stringflagapply)
-    - [`StringFlag.GetAliases`](#stringflaggetaliases)
-    - [`StringFlag.GetName`](#stringflaggetname)
-    - [`StringFlag.IsRequired`](#stringflagisrequired)
-    - [`StringFlag.String`](#stringflagstring)
-    - [`StringFlag.Validate`](#stringflagvalidate)
+    - [Methods](#stringflag-methods)
   - [`StringSliceFlag`](#stringsliceflag)
-    - [`StringSliceFlag.Apply`](#stringsliceflagapply)
-    - [`StringSliceFlag.GetAliases`](#stringsliceflaggetaliases)
-    - [`StringSliceFlag.GetName`](#stringsliceflaggetname)
-    - [`StringSliceFlag.IsRequired`](#stringsliceflagisrequired)
-    - [`StringSliceFlag.String`](#stringsliceflagstring)
-    - [`StringSliceFlag.Validate`](#stringsliceflagvalidate)
+    - [Methods](#stringsliceflag-methods)
   - [`TimeoutConfig`](#timeoutconfig)
   - [`TrailingSlashRedirectConfig`](#trailingslashredirectconfig)
   - [`ValidationErrors`](#validationerrors)
-    - [`ValidationErrors.Error`](#validationerrorserror)
+    - [Associated Functions](#validationerrors-functions)
+    - [Methods](#validationerrors-methods)
+  - [`bufferingResponseWriterInterceptor`](#bufferingresponsewriterinterceptor)
+    - [Associated Functions](#bufferingresponsewriterinterceptor-functions)
+    - [Methods](#bufferingresponsewriterinterceptor-methods)
+  - [`contextKey`](#contextkey)
+    - [Associated Constants](#contextkey-constants)
+  - [`gzipResponseWriter`](#gzipresponsewriter)
+    - [Methods](#gzipresponsewriter-methods)
+  - [`responseWriterInterceptor`](#responsewriterinterceptor)
+    - [Associated Functions](#responsewriterinterceptor-functions)
+    - [Methods](#responsewriterinterceptor-methods)
+  - [`route`](#route)
+  - [`schemaGenCtx`](#schemagenctx)
+    - [Associated Functions](#schemagenctx-functions)
+  - [`segment`](#segment)
+    - [Associated Functions](#segment-functions)
+  - [`stringSliceValue`](#stringslicevalue)
+    - [Associated Functions](#stringslicevalue-functions)
+    - [Methods](#stringslicevalue-methods)
+  - [`textNode`](#textnode)
+    - [Methods](#textnode-methods)
+  - [`timeoutResponseWriter`](#timeoutresponsewriter)
+    - [Methods](#timeoutresponsewriter-methods)
+  - [`visitor`](#visitor)
 
+
+## Constants
+
+<a id="migrationsfolder-versiontable"></a>
+### `migrationsFolder, versionTable`
+
+```go
+const (
+	// migrationsFolder is the folder where migration SQL files are stored.
+	migrationsFolder = "migrations"
+	// versionTable is the name of the table used to store the current migration version.
+	versionTable = "schema_version"
+)
+```
 
 ## Variables
 
-### `ErrMissingContentType` {#errmissingcontenttype}
+<a id="errmissingcontenttype"></a>
+### `ErrMissingContentType`
 
 ```go
 var ErrMissingContentType = fmt.Errorf("missing Content-Type header")
@@ -339,9 +142,8 @@ var ErrMissingContentType = fmt.Errorf("missing Content-Type header")
 
 ErrMissingContentType indicates the Content-Type header was absent.
 
----
-
-### `ErrUnsupportedContentType` {#errunsupportedcontenttype}
+<a id="errunsupportedcontenttype"></a>
+### `ErrUnsupportedContentType`
 
 ```go
 var ErrUnsupportedContentType = fmt.Errorf("unsupported Content-Type")
@@ -349,59 +151,197 @@ var ErrUnsupportedContentType = fmt.Errorf("unsupported Content-Type")
 
 ErrUnsupportedContentType indicates the Content-Type was not in the allowed list.
 
----
+<a id="swaggeruifs"></a>
+### `swaggerUIFS`
+
+```go
+var swaggerUIFS embed.FS
+```
+
+<a id="validationmessages"></a>
+### `validationMessages`
+
+```go
+var validationMessages = map[string]map[string]string{
+	"en": {
+		"required":     "Field '%s' is required",
+		"minlength":    "Field '%s' must be at least %d characters long",
+		"maxlength":    "Field '%s' must be at most %d characters long",
+		"min":          "Field '%s' must be at least %v",
+		"max":          "Field '%s' must be at most %v",
+		"pattern":      "Field '%s' does not match required pattern",
+		"enum":         "Field '%s' must be one of: %s",
+		"email":        "Field '%s' must be a valid email address",
+		"url":          "Field '%s' must be a valid URL",
+		"uuid":         "Field '%s' must be a valid UUID",
+		"date-time":    "Field '%s' must be a valid RFC3339 date-time",
+		"date":         "Field '%s' must be a valid date (YYYY-MM-DD)",
+		"time":         "Field '%s' must be a valid time (HH:MM:SS)",
+		"phone":        "Field '%s' must be a valid phone number",
+		"password":     "Field '%s' password must be at least 8 characters long",
+		"alphanumeric": "Field '%s' must contain only alphanumeric characters",
+		"alpha":        "Field '%s' must contain only alphabetic characters",
+		"numeric":      "Field '%s' must contain only numeric characters",
+		"minItems":     "Field '%s' must have at least %d items",
+		"maxItems":     "Field '%s' must have at most %d items",
+		"uniqueItems":  "Field '%s' must have unique items",
+		"multipleOf":   "Field '%s' must be a multiple of %v",
+	},
+	"es": {
+		"required":     "El campo '%s' es obligatorio",
+		"minlength":    "El campo '%s' debe tener al menos %d caracteres",
+		"maxlength":    "El campo '%s' debe tener como máximo %d caracteres",
+		"min":          "El campo '%s' debe ser al menos %v",
+		"max":          "El campo '%s' debe ser como máximo %v",
+		"pattern":      "El campo '%s' no coincide con el patrón requerido",
+		"enum":         "El campo '%s' debe ser uno de: %s",
+		"email":        "El campo '%s' debe ser una dirección de correo válida",
+		"url":          "El campo '%s' debe ser una URL válida",
+		"uuid":         "El campo '%s' debe ser un UUID válido",
+		"date-time":    "El campo '%s' debe ser una fecha-hora RFC3339 válida",
+		"date":         "El campo '%s' debe ser una fecha válida (AAAA-MM-DD)",
+		"time":         "El campo '%s' debe ser una hora válida (HH:MM:SS)",
+		"phone":        "El campo '%s' debe ser un número de teléfono válido",
+		"password":     "El campo '%s' debe tener al menos 8 caracteres",
+		"alphanumeric": "El campo '%s' debe contener solo caracteres alfanuméricos",
+		"alpha":        "El campo '%s' debe contener solo caracteres alfabéticos",
+		"numeric":      "El campo '%s' debe contener solo caracteres numéricos",
+		"minItems":     "El campo '%s' debe tener al menos %d elementos",
+		"maxItems":     "El campo '%s' debe tener como máximo %d elementos",
+		"uniqueItems":  "El campo '%s' debe tener elementos únicos",
+		"multipleOf":   "El campo '%s' debe ser múltiplo de %v",
+	},
+	"fr": {
+		"required":     "Le champ '%s' est obligatoire",
+		"minlength":    "Le champ '%s' doit contenir au moins %d caractères",
+		"maxlength":    "Le champ '%s' doit contenir au plus %d caractères",
+		"min":          "Le champ '%s' doit être d'au moins %v",
+		"max":          "Le champ '%s' doit être d'au plus %v",
+		"pattern":      "Le champ '%s' ne correspond pas au motif requis",
+		"enum":         "Le champ '%s' doit être l'un de: %s",
+		"email":        "Le champ '%s' doit être une adresse email valide",
+		"url":          "Le champ '%s' doit être une URL valide",
+		"uuid":         "Le champ '%s' doit être un UUID valide",
+		"date-time":    "Le champ '%s' doit être une date-heure RFC3339 valide",
+		"date":         "Le champ '%s' doit être une date valide (AAAA-MM-JJ)",
+		"time":         "Le champ '%s' doit être une heure valide (HH:MM:SS)",
+		"phone":        "Le champ '%s' doit être un numéro de téléphone valide",
+		"password":     "Le champ '%s' doit contenir au moins 8 caractères",
+		"alphanumeric": "Le champ '%s' ne doit contenir que des caractères alphanumériques",
+		"alpha":        "Le champ '%s' ne doit contenir que des caractères alphabétiques",
+		"numeric":      "Le champ '%s' ne doit contenir que des caractères numériques",
+		"minItems":     "Le champ '%s' doit avoir au moins %d éléments",
+		"maxItems":     "Le champ '%s' doit avoir au plus %d éléments",
+		"uniqueItems":  "Le champ '%s' doit avoir des éléments uniques",
+		"multipleOf":   "Le champ '%s' doit être un multiple de %v",
+	},
+	"de": {
+		"required":     "Das Feld '%s' ist erforderlich",
+		"minlength":    "Das Feld '%s' muss mindestens %d Zeichen lang sein",
+		"maxlength":    "Das Feld '%s' darf höchstens %d Zeichen lang sein",
+		"min":          "Das Feld '%s' muss mindestens %v sein",
+		"max":          "Das Feld '%s' darf höchstens %v sein",
+		"pattern":      "Das Feld '%s' entspricht nicht dem erforderlichen Muster",
+		"enum":         "Das Feld '%s' muss eines von: %s sein",
+		"email":        "Das Feld '%s' muss eine gültige E-Mail-Adresse sein",
+		"url":          "Das Feld '%s' muss eine gültige URL sein",
+		"uuid":         "Das Feld '%s' muss eine gültige UUID sein",
+		"date-time":    "Das Feld '%s' muss eine gültige RFC3339 Datum-Zeit sein",
+		"date":         "Das Feld '%s' muss ein gültiges Datum sein (JJJJ-MM-TT)",
+		"time":         "Das Feld '%s' muss eine gültige Zeit sein (HH:MM:SS)",
+		"phone":        "Das Feld '%s' muss eine gültige Telefonnummer sein",
+		"password":     "Das Feld '%s' muss mindestens 8 Zeichen lang sein",
+		"alphanumeric": "Das Feld '%s' darf nur alphanumerische Zeichen enthalten",
+		"alpha":        "Das Feld '%s' darf nur alphabetische Zeichen enthalten",
+		"numeric":      "Das Feld '%s' darf nur numerische Zeichen enthalten",
+		"minItems":     "Das Feld '%s' muss mindestens %d Elemente haben",
+		"maxItems":     "Das Feld '%s' darf höchstens %d Elemente haben",
+		"uniqueItems":  "Das Feld '%s' muss eindeutige Elemente haben",
+		"multipleOf":   "Das Feld '%s' muss ein Vielfaches von %v sein",
+	},
+	"nl": {
+		"required":     "Veld '%s' is verplicht",
+		"minlength":    "Veld '%s' moet minimaal %d karakters lang zijn",
+		"maxlength":    "Veld '%s' mag maximaal %d karakters lang zijn",
+		"min":          "Veld '%s' moet minimaal %v zijn",
+		"max":          "Veld '%s' mag maximaal %v zijn",
+		"pattern":      "Veld '%s' voldoet niet aan het vereiste patroon",
+		"enum":         "Veld '%s' moet een van de volgende zijn: %s",
+		"email":        "Veld '%s' moet een geldig e-mailadres zijn",
+		"url":          "Veld '%s' moet een geldige URL zijn",
+		"uuid":         "Veld '%s' moet een geldige UUID zijn",
+		"date-time":    "Veld '%s' moet een geldige RFC3339 datum-tijd zijn",
+		"date":         "Veld '%s' moet een geldige datum zijn (JJJJ-MM-DD)",
+		"time":         "Veld '%s' moet een geldige tijd zijn (UU:MM:SS)",
+		"phone":        "Veld '%s' moet een geldig telefoonnummer zijn",
+		"password":     "Veld '%s' wachtwoord moet minimaal 8 karakters lang zijn",
+		"alphanumeric": "Veld '%s' mag alleen alfanumerieke karakters bevatten",
+		"alpha":        "Veld '%s' mag alleen alfabetische karakters bevatten",
+		"numeric":      "Veld '%s' mag alleen numerieke karakters bevatten",
+		"minItems":     "Veld '%s' moet minimaal %d items bevatten",
+		"maxItems":     "Veld '%s' mag maximaal %d items bevatten",
+		"uniqueItems":  "Veld '%s' moet unieke items bevatten",
+		"multipleOf":   "Veld '%s' moet een veelvoud zijn van %v",
+	},
+}
+```
+
+Translation messages for validation errors.
 
 ## Functions
 
-### `CreateNewMigration` {#createnewmigration}
+<a id="createnewmigration"></a>
+### `CreateNewMigration`
 
 ```go
 func CreateNewMigration(name string) error
 ```
 
-CreateNewMigration creates a new migration file with a basic "up" and "down" template. The new file is named using the current Unix timestamp followed by an underscore and the provided name. The migration file is saved in the migrationsFolder and contains two sections separated by "-- migrate:up" (for the migration) and "-- migrate:down" (for the rollback).
-
+CreateNewMigration creates a new migration file with a basic &quot;up&quot; and &quot;down&quot; template.
+The new file is named using the current Unix timestamp followed by an underscore and the provided name.
+The migration file is saved in the migrationsFolder and contains two sections separated by
+&quot;-- migrate:up&quot; (for the migration) and &quot;-- migrate:down&quot; (for the rollback).
 Parameters:
+```go
+name - A descriptive name for the migration (e.g., &quot;create_users_table&quot;).
 
-```text
-name - A descriptive name for the migration (e.g., "create_users_table").
 ```
 
 Returns an error if the file creation fails, otherwise nil.
 
----
-
-### `GetBasicAuthUser` {#getbasicauthuser}
+<a id="getbasicauthuser"></a>
+### `GetBasicAuthUser`
 
 ```go
 func GetBasicAuthUser(ctx context.Context) string
 ```
 
-GetBasicAuthUser retrieves the authenticated username from the context, if available via BasicAuthMiddleware using the default key and if configured to store it.
+GetBasicAuthUser retrieves the authenticated username from the context, if available
+via BasicAuthMiddleware using the default key and if configured to store it.
 
----
-
-### `GetBasicAuthUserWithKey` {#getbasicauthuserwithkey}
+<a id="getbasicauthuserwithkey"></a>
+### `GetBasicAuthUserWithKey`
 
 ```go
 func GetBasicAuthUserWithKey(ctx context.Context, key contextKey) string
 ```
 
-GetBasicAuthUserWithKey retrieves the authenticated username from the context using a specific key.
+GetBasicAuthUserWithKey retrieves the authenticated username from the context
+using a specific key.
 
----
-
-### `GetCSRFToken` {#getcsrftoken}
+<a id="getcsrftoken"></a>
+### `GetCSRFToken`
 
 ```go
 func GetCSRFToken(ctx context.Context) string
 ```
 
-GetCSRFToken retrieves the CSRF token from the context, if available via CSRFMiddleware using the default key. This is the token expected in subsequent unsafe requests.
+GetCSRFToken retrieves the CSRF token from the context, if available via
+CSRFMiddleware using the default key. This is the token expected in subsequent
+unsafe requests.
 
----
-
-### `GetCSRFTokenWithKey` {#getcsrftokenwithkey}
+<a id="getcsrftokenwithkey"></a>
+### `GetCSRFTokenWithKey`
 
 ```go
 func GetCSRFTokenWithKey(ctx context.Context, key contextKey) string
@@ -409,39 +349,37 @@ func GetCSRFTokenWithKey(ctx context.Context, key contextKey) string
 
 GetCSRFTokenWithKey retrieves the CSRF token from the context using a specific key.
 
----
-
-### `GetRealIP` {#getrealip}
+<a id="getrealip"></a>
+### `GetRealIP`
 
 ```go
 func GetRealIP(ctx context.Context) string
 ```
 
-GetRealIP retrieves the client's real IP from the context, if available via RealIPMiddleware using the default key.
+GetRealIP retrieves the client&apos;s real IP from the context, if available via
+RealIPMiddleware using the default key.
 
----
-
-### `GetRealIPWithKey` {#getrealipwithkey}
+<a id="getrealipwithkey"></a>
+### `GetRealIPWithKey`
 
 ```go
 func GetRealIPWithKey(ctx context.Context, key contextKey) string
 ```
 
-GetRealIPWithKey retrieves the client's real IP from the context using a specific key.
+GetRealIPWithKey retrieves the client&apos;s real IP from the context using a specific key.
 
----
-
-### `GetRequestID` {#getrequestid}
+<a id="getrequestid"></a>
+### `GetRequestID`
 
 ```go
 func GetRequestID(ctx context.Context) string
 ```
 
-GetRequestID retrieves the request ID from the context, if available via RequestIDMiddleware using the default key.
+GetRequestID retrieves the request ID from the context, if available via
+RequestIDMiddleware using the default key.
 
----
-
-### `GetRequestIDWithKey` {#getrequestidwithkey}
+<a id="getrequestidwithkey"></a>
+### `GetRequestIDWithKey`
 
 ```go
 func GetRequestIDWithKey(ctx context.Context, key contextKey) string
@@ -449,109 +387,370 @@ func GetRequestIDWithKey(ctx context.Context, key contextKey) string
 
 GetRequestIDWithKey retrieves the request ID from the context using a specific key.
 
----
-
-### `LoadDotenv` {#loaddotenv}
+<a id="loaddotenv"></a>
+### `LoadDotenv`
 
 ```go
 func LoadDotenv(paths ...string) error
 ```
 
-LoadDotenv loads variables from a .env file, expands them, and sets them as environment variables. If no path is provided, ".env" is used. If the specified file doesn't exist, it is silently ignored.
+LoadDotenv loads variables from a .env file, expands them, and sets them
+as environment variables. If no path is provided, &quot;.env&quot; is used.
+If the specified file doesn&apos;t exist, it is silently ignored.
 
----
-
-### `MigrateDown` {#migratedown}
+<a id="migratedown"></a>
+### `MigrateDown`
 
 ```go
 func MigrateDown(db *sql.DB, steps int) error
 ```
 
-MigrateDown rolls back migrations on the provided database. It reads migration files from the migrations folder, sorts them in descending order, and applies the rollback (down) statements for each migration file where the migration version is less than or equal to the current version. The parameter steps indicates how many migrations to roll back: if steps is 0 the function rolls back one migration by default.
-
+MigrateDown rolls back migrations on the provided database.
+It reads migration files from the migrations folder, sorts them in descending order,
+and applies the rollback (down) statements for each migration file where the migration version
+is less than or equal to the current version. The parameter steps indicates how many migrations to roll back:
+if steps is 0 the function rolls back one migration by default.
 Parameters:
-
-```text
+```go
 db    - The database handle (from database/sql).
 steps - The number of migrations to roll back (0 means 1 migration).
+
 ```
 
 Returns an error if rollback fails, otherwise nil.
 
----
-
-### `MigrateUp` {#migrateup}
+<a id="migrateup"></a>
+### `MigrateUp`
 
 ```go
 func MigrateUp(db *sql.DB, steps int) error
 ```
 
-MigrateUp applies pending migrations to the provided database. It reads migration files from the migrations folder, sorts them in ascending order, and applies each migration with a version greater than the current database version. The parameter steps indicates how many migrations to apply: if steps is 0 the function applies all pending migrations.
-
+MigrateUp applies pending migrations to the provided database.
+It reads migration files from the migrations folder, sorts them in ascending order,
+and applies each migration with a version greater than the current database version.
+The parameter steps indicates how many migrations to apply:
+if steps is 0 the function applies all pending migrations.
 Parameters:
-
-```text
+```go
 db    - The database handle (from database/sql).
 steps - The maximum number of migrations to apply (0 means apply all).
+
 ```
 
 Returns an error if migration fails, otherwise nil.
 
----
-
-### `NewBufferingResponseWriterInterceptor` {#newbufferingresponsewriterinterceptor}
-
-```go
-func NewBufferingResponseWriterInterceptor(w http.ResponseWriter) *bufferingResponseWriterInterceptor
-```
-
-NewBufferingResponseWriterInterceptor creates a new buffering interceptor.
-
----
-
-### `NewResponseWriterInterceptor` {#newresponsewriterinterceptor}
-
-```go
-func NewResponseWriterInterceptor(w http.ResponseWriter) *responseWriterInterceptor
-```
-
-NewResponseWriterInterceptor creates a new interceptor.
-
----
-
-### `Serve` {#serve}
+<a id="serve"></a>
+### `Serve`
 
 ```go
 func Serve(ctx *Context, router http.Handler) error
 ```
 
-Serve launches the web server (concurrently) with graceful shutdown and live reloading (if enabled). It wraps key goroutines with recovery blocks to avoid crashes due to unexpected errors. It also allows for logging customization via context options.
+Serve launches the web server (concurrently) with graceful shutdown and live reloading (if enabled).
+It wraps key goroutines with recovery blocks to avoid crashes due to unexpected errors.
+It also allows for logging customization via context options.
 
----
+<a id="bindformtostruct"></a>
+### `bindFormToStruct`
+
+```go
+func bindFormToStruct(form url.Values, v any) error
+```
+
+bindFormToStruct uses reflection to bind form values to struct fields.
+Field names are matched using JSON tags (without omitempty) or struct field names.
+Supports automatic type conversion for string, bool, int, and float types.
+
+<a id="buildpathstring"></a>
+### `buildPathString`
+
+```go
+func buildPathString(segments []segment, prefix string) string
+```
+
+buildPathString constructs a URI path string from segments and an optional
+parent prefix. Parameters are wrapped in curly braces, e.g., &quot;{id}&quot;.
+
+<a id="checkcommandconflicts"></a>
+### `checkCommandConflicts`
+
+```go
+func checkCommandConflicts(cmd *Command) error
+```
+
+checkCommandConflicts validates a command against reserved names/aliases and basic requirements.
+
+<a id="checkflagconflicts"></a>
+### `checkFlagConflicts`
+
+```go
+func checkFlagConflicts(f Flag, isCommandFlag bool) error
+```
+
+checkFlagConflicts validates a flag against reserved names/aliases and basic requirements.
+`isCommandFlag` determines if command-level restrictions apply (reserving help/h).
+
+<a id="collectroutes"></a>
+### `collectRoutes`
+
+```go
+func collectRoutes(r *Router, spec *OpenAPI, schemaCtx *schemaGenCtx, parentPath string)
+```
+
+collectRoutes traverses the router hierarchy starting at r, and populates
+the OpenAPI spec with PathItems and Operations based on registered routes.
+
+<a id="detectlanguage"></a>
+### `detectLanguage`
+
+```go
+func detectLanguage(acceptLanguage string) string
+```
+
+detectLanguage extracts the preferred language from Accept-Language header
+
+<a id="formatflagnames"></a>
+### `formatFlagNames`
+
+```go
+func formatFlagNames(name string, aliases []string) string
+```
+
+formatFlagNames combines the primary name and aliases into a comma-separated string
+suitable for help text (e.g., &quot;-n, --name&quot;). It sorts them for consistency.
+
+<a id="getcurrentversion"></a>
+### `getCurrentVersion`
+
+```go
+func getCurrentVersion(db *sql.DB) (int64, error)
+```
+
+getCurrentVersion retrieves the current migration version from the version table.
+If the version table does not exist, it creates it and sets the version to 0.
+
+<a id="getmessage"></a>
+### `getMessage`
+
+```go
+func getMessage(lang, key string, args ...any) string
+```
+
+getMessage gets a localized validation message
+
+<a id="getmigrationfiles"></a>
+### `getMigrationFiles`
+
+```go
+func getMigrationFiles() ([]string, error)
+```
+
+getMigrationFiles returns a list of SQL file names found in the migrations folder.
+
+<a id="hasallowedextension"></a>
+### `hasAllowedExtension`
+
+```go
+func hasAllowedExtension(filename string, exts []string) bool
+```
+
+hasAllowedExtension returns true if filename ends with any of the allowed extensions.
+
+<a id="joinpaths"></a>
+### `joinPaths`
+
+```go
+func joinPaths(a, b string) string
+```
+
+joinPaths concatenates two URL path segments ensuring exactly one &quot;/&quot; between them.
+It handles edge cases where either path is empty and normalizes trailing/leading slashes.
+
+<a id="matchsegments"></a>
+### `matchSegments`
+
+```go
+func matchSegments(path string, segments []segment) (bool, map[string]string)
+```
+
+matchSegments checks if the given URL path matches the compiled segments.
+If the path matches, it returns true and a map of parameter names to their values.
+Parameter validation is performed using regex patterns if specified.
+
+<a id="parseflagset"></a>
+### `parseFlagSet`
+
+```go
+func parseFlagSet(cli *CLI, flags []Flag, args []string, name string, output io.Writer) (*flag.FlagSet, error)
+```
+
+parseFlagSet handles the common logic of creating a flag.FlagSet, applying flags to it,
+and parsing arguments. It returns the parsed set and any parsing error.
+
+<a id="parsemigrationversion"></a>
+### `parseMigrationVersion`
+
+```go
+func parseMigrationVersion(fileName string) (int64, error)
+```
+
+parseMigrationVersion attempts to parse a numeric migration version from the given file name.
+The file name is expected to start with a numeric version (typically a timestamp),
+followed by an underscore.
+
+<a id="printflagshelp"></a>
+### `printFlagsHelp`
+
+```go
+func printFlagsHelp(w io.Writer, title string, flags []Flag, isCommandHelp bool)
+```
+
+printFlagsHelp formats and prints a list of flags to the writer.
+
+<a id="recompile"></a>
+### `recompile`
+
+```go
+func recompile(verbose bool) error
+```
+
+recompile triggers the recompilation of the application.
+
+<a id="setfieldvalue"></a>
+### `setFieldValue`
+
+```go
+func setFieldValue(field reflect.Value, value string) error
+```
+
+setFieldValue sets a reflect.Value based on its type and the string value from form data.
+Handles automatic type conversion for common types including special checkbox handling.
+
+<a id="splitsqlstatements"></a>
+### `splitSQLStatements`
+
+```go
+func splitSQLStatements(content, action string) ([]string, error)
+```
+
+splitSQLStatements splits the content of a migration file into separate SQL statements
+based on the provided action (&quot;up&quot; or &quot;down&quot;).
+The migration file must contain delimiters:
+```go
+&quot;-- migrate:up&quot;   marks the start of the statements for applying (up) migration.
+&quot;-- migrate:down&quot; marks the start of the statements for rolling back (down) migration.
+
+```
+
+<a id="updateversiontable"></a>
+### `updateVersionTable`
+
+```go
+func updateVersionTable(db *sql.DB, version int64) error
+```
+
+updateVersionTable updates the current migration version in the version table.
+
+<a id="validateflags"></a>
+### `validateFlags`
+
+```go
+func validateFlags(flags []Flag, set *flag.FlagSet) error
+```
+
+validateFlags iterates through a list of user-defined flags and calls their Validate method
+against the parsed flag set. It collects and returns any validation errors.
+
+<a id="validaterequiredflag"></a>
+### `validateRequiredFlag`
+
+```go
+func validateRequiredFlag(set *flag.FlagSet, name string, required, checkEmpty bool) error
+```
+
+validateRequiredFlag provides common validation logic for required flags (String, Int, Float64).
+It checks if the flag was set and, optionally, if its value is non-empty (for strings).
+
+<a id="validaterequiredsliceflag"></a>
+### `validateRequiredSliceFlag`
+
+```go
+func validateRequiredSliceFlag(set *flag.FlagSet, name string, required bool) error
+```
+
+validateRequiredSliceFlag handles validation for required slice flags.
+
+<a id="validatestruct"></a>
+### `validateStruct`
+
+```go
+func validateStruct(val any, lang string) error
+```
+
+validateStruct walks a struct’s exported fields, applies all tag‐based
+validations, and returns every violation found rather than failing fast.
+val may be a struct or a pointer to struct. lang selects the locale for
+error messages.
+
+<a id="vlog"></a>
+### `vlog`
+
+```go
+func vlog(verbose bool, format string, a ...any)
+```
+
+vlog prints messages only if verbose is enabled.
+
+<a id="watchandcompile"></a>
+### `watchAndCompile`
+
+```go
+func watchAndCompile(dir string, verbose bool, exts []string) error
+```
+
+watchAndCompile watches the given directory for file changes that match allowed extensions
+and triggers a recompilation when a change is detected.
+
+<a id="watchandreload"></a>
+### `watchAndReload`
+
+```go
+func watchAndReload(
+	dir, exe string,
+	verbose bool,
+	exts []string,
+	reloadCh chan<- struct{},
+) error
+```
+
+watchAndReload watches dir for changes to allowed extensions, rebuilds this binary
+in‐place and then signals reloadCh once so Serve can exec the new version.
 
 ## Types
 
-### `ActionFunc` {#actionfunc}
+<a id="actionfunc"></a>
+### `ActionFunc`
 
 ```go
 type ActionFunc func(ctx *Context) error
 ```
 
-ActionFunc defines the function signature for CLI actions (both global and command-specific). It receives a Context containing parsed flags and arguments.
+ActionFunc defines the function signature for CLI actions (both global and command-specific).
+It receives a Context containing parsed flags and arguments.
 
----
-
-### `AuthValidator` {#authvalidator}
+<a id="authvalidator"></a>
+### `AuthValidator`
 
 ```go
 type AuthValidator func(username, password string) bool
 ```
 
-AuthValidator is a function type that validates the provided username and password. It returns true if the credentials are valid.
+AuthValidator is a function type that validates the provided username and password.
+It returns true if the credentials are valid.
 
----
-
-### `BasicAuthConfig` {#basicauthconfig}
+<a id="basicauthconfig"></a>
+### `BasicAuthConfig`
 
 ```go
 type BasicAuthConfig struct {
@@ -570,9 +769,8 @@ type BasicAuthConfig struct {
 
 BasicAuthConfig holds configuration for BasicAuthMiddleware.
 
----
-
-### `BoolFlag` {#boolflag}
+<a id="boolflag"></a>
+### `BoolFlag`
 
 ```go
 type BoolFlag struct {
@@ -591,11 +789,10 @@ type BoolFlag struct {
 
 BoolFlag defines a flag that acts as a boolean switch (true if present, false otherwise).
 
----
-
 #### Methods
 
-### `Apply` {#apply}
+<a id="apply"></a>
+#### `Apply`
 
 ```go
 func (f *BoolFlag) Apply(set *flag.FlagSet, cli *CLI) error
@@ -603,9 +800,8 @@ func (f *BoolFlag) Apply(set *flag.FlagSet, cli *CLI) error
 
 Apply registers the bool flag with the flag.FlagSet.
 
----
-
-### `GetAliases` {#getaliases}
+<a id="getaliases"></a>
+#### `GetAliases`
 
 ```go
 func (f *BoolFlag) GetAliases() []string
@@ -613,9 +809,8 @@ func (f *BoolFlag) GetAliases() []string
 
 GetAliases returns the aliases for the flag.
 
----
-
-### `GetName` {#getname}
+<a id="getname"></a>
+#### `GetName`
 
 ```go
 func (f *BoolFlag) GetName() string
@@ -623,9 +818,8 @@ func (f *BoolFlag) GetName() string
 
 GetName returns the primary name of the flag.
 
----
-
-### `IsRequired` {#isrequired}
+<a id="isrequired"></a>
+#### `IsRequired`
 
 ```go
 func (f *BoolFlag) IsRequired() bool
@@ -633,9 +827,8 @@ func (f *BoolFlag) IsRequired() bool
 
 IsRequired always returns false for boolean flags.
 
----
-
-### `String` {#string}
+<a id="string"></a>
+#### `String`
 
 ```go
 func (f *BoolFlag) String() string
@@ -643,9 +836,8 @@ func (f *BoolFlag) String() string
 
 String returns the help text representation of the flag.
 
----
-
-### `Validate` {#validate}
+<a id="validate"></a>
+#### `Validate`
 
 ```go
 func (f *BoolFlag) Validate(set *flag.FlagSet) error
@@ -653,9 +845,8 @@ func (f *BoolFlag) Validate(set *flag.FlagSet) error
 
 Validate always returns nil for boolean flags.
 
----
-
-### `CLI` {#cli}
+<a id="cli"></a>
+### `CLI`
 
 ```go
 type CLI struct {
@@ -676,49 +867,62 @@ type CLI struct {
 	GlobalFlags []Flag
 	// Authors lists the application's authors, shown in the main help text.
 	Authors string
-	// contains filtered or unexported fields
+
+	// internal storage for the parsed global flag set
+	globalSet *flag.FlagSet
+	// internal storage for the built-in nova flags
+	internalGlobalFlags []Flag
+	// Internal storage for flag values (pointers needed by std/flag)
+	internalFlagPtrs map[string]any // Map flag name to pointer (*string, *int, etc.)
 }
 ```
 
-CLI represents the command-line application structure. It holds the application's metadata, commands, global flags, and the main action. Name and Version are required fields when creating a CLI instance via NewCLI.
-
----
+CLI represents the command-line application structure.
+It holds the application&apos;s metadata, commands, global flags, and the main action.
+Name and Version are required fields when creating a CLI instance via NewCLI.
 
 #### Associated Functions
 
-### `NewCLI` {#newcli}
+<a id="newcli"></a>
+#### `NewCLI`
 
 ```go
 func NewCLI(cli *CLI) (*CLI, error)
 ```
 
-NewCLI creates and validates a new CLI application instance based on the provided configuration. The Name and Version fields in the input CLI struct are required. It checks for conflicts with reserved names/aliases (help command, h alias, version flag, v alias) and basic flag/command requirements. Returns the validated CLI instance or an error if validation fails.
-
----
+NewCLI creates and validates a new CLI application instance based on the provided configuration.
+The Name and Version fields in the input CLI struct are required.
+It checks for conflicts with reserved names/aliases (help command, h alias, version flag, v alias)
+and basic flag/command requirements.
+Returns the validated CLI instance or an error if validation fails.
 
 #### Methods
 
-### `AddCommand` {#addcommand}
+<a id="addcommand"></a>
+#### `AddCommand`
 
 ```go
 func (c *CLI) AddCommand(cmd *Command) error
 ```
 
-AddCommand registers a new command with the application *after* initial NewCLI() validation. It performs the same conflict checks as NewCLI(). It is generally recommended to define all commands and flags within the struct passed to NewCLI().
+AddCommand registers a new command with the application *after* initial NewCLI() validation.
+It performs the same conflict checks as NewCLI(). It is generally recommended to define
+all commands and flags within the struct passed to NewCLI().
 
----
-
-### `Run` {#run}
+<a id="run"></a>
+#### `Run`
 
 ```go
 func (c *CLI) Run(arguments []string) error
 ```
 
-Run executes the CLI application based on the provided command-line arguments. Call NewCLI() to create and validate the CLI instance before calling Run. Run parses flags, handles the built-in version flag and help command, validates required flags, and executes the appropriate action (global or command-specific).
+Run executes the CLI application based on the provided command-line arguments.
+Call NewCLI() to create and validate the CLI instance before calling Run.
+Run parses flags, handles the built-in version flag and help command, validates required flags,
+and executes the appropriate action (global or command-specific).
 
----
-
-### `ShowHelp` {#showhelp}
+<a id="showhelp"></a>
+#### `ShowHelp`
 
 ```go
 func (c *CLI) ShowHelp(w io.Writer)
@@ -726,9 +930,37 @@ func (c *CLI) ShowHelp(w io.Writer)
 
 ShowHelp prints the main help message for the application to the specified writer.
 
----
+<a id="createhelpcommand"></a>
+#### `createHelpCommand`
 
-### `CORSConfig` {#corsconfig}
+```go
+func (c *CLI) createHelpCommand() *Command
+```
+
+createHelpCommand generates the internal help command definition.
+
+<a id="findcommand"></a>
+#### `findCommand`
+
+```go
+func (c *CLI) findCommand(name string) *Command
+```
+
+findCommand searches the CLI&apos;s commands list for a command matching the given name or alias.
+Returns the *Command if found, otherwise nil. It checks commands added by the user
+AND the internal help command.
+
+<a id="setupinternalglobalflags"></a>
+#### `setupInternalGlobalFlags`
+
+```go
+func (c *CLI) setupInternalGlobalFlags()
+```
+
+setupInternalGlobalFlags defines and stores the built-in global flag.
+
+<a id="corsconfig"></a>
+### `CORSConfig`
 
 ```go
 type CORSConfig struct {
@@ -755,9 +987,8 @@ type CORSConfig struct {
 
 CORSConfig holds configuration for CORSMiddleware.
 
----
-
-### `CSRFConfig` {#csrfconfig}
+<a id="csrfconfig"></a>
+### `CSRFConfig`
 
 ```go
 type CSRFConfig struct {
@@ -801,9 +1032,8 @@ type CSRFConfig struct {
 
 CSRFConfig holds configuration for CSRFMiddleware.
 
----
-
-### `CacheControlConfig` {#cachecontrolconfig}
+<a id="cachecontrolconfig"></a>
+### `CacheControlConfig`
 
 ```go
 type CacheControlConfig struct {
@@ -815,9 +1045,8 @@ type CacheControlConfig struct {
 
 CacheControlConfig holds configuration for CacheControlMiddleware.
 
----
-
-### `Command` {#command}
+<a id="command"></a>
+### `Command`
 
 ```go
 type Command struct {
@@ -840,13 +1069,14 @@ type Command struct {
 }
 ```
 
-Command defines a specific action the CLI application can perform. It includes metadata, flags specific to the command, and the action function. Commands named "help" or aliased "h" are reserved.
-
----
+Command defines a specific action the CLI application can perform.
+It includes metadata, flags specific to the command, and the action function.
+Commands named &quot;help&quot; or aliased &quot;h&quot; are reserved.
 
 #### Methods
 
-### `ShowHelp` {#showhelp}
+<a id="showhelp"></a>
+#### `ShowHelp`
 
 ```go
 func (cmd *Command) ShowHelp(w io.Writer, appName string)
@@ -854,9 +1084,8 @@ func (cmd *Command) ShowHelp(w io.Writer, appName string)
 
 ShowHelp prints the help message for a specific command to the specified writer.
 
----
-
-### `Components` {#components}
+<a id="components"></a>
+### `Components`
 
 ```go
 type Components struct {
@@ -866,9 +1095,8 @@ type Components struct {
 
 Components holds reusable schema definitions for the OpenAPI spec.
 
----
-
-### `ConcurrencyLimiterConfig` {#concurrencylimiterconfig}
+<a id="concurrencylimiterconfig"></a>
+### `ConcurrencyLimiterConfig`
 
 ```go
 type ConcurrencyLimiterConfig struct {
@@ -885,9 +1113,8 @@ type ConcurrencyLimiterConfig struct {
 
 ConcurrencyLimiterConfig holds configuration for ConcurrencyLimiterMiddleware.
 
----
-
-### `Context` {#context}
+<a id="context"></a>
+### `Context`
 
 ```go
 type Context struct {
@@ -895,17 +1122,24 @@ type Context struct {
 	CLI *CLI
 	// Command points to the specific command being executed (nil for the global action).
 	Command *Command
-	// contains filtered or unexported fields
+	// flagSet holds the parsed flag set relevant to the current context
+	// (either command-specific or global if no command is running).
+	flagSet *flag.FlagSet
+	// args holds the non-flag arguments remaining after flag parsing.
+	args []string
+	// globalSet always holds the parsed global flag set for accessing global flags
+	// even within a command context.
+	globalSet *flag.FlagSet
 }
 ```
 
-Context provides access to parsed flags, arguments, and application/command metadata within an ActionFunc.
-
----
+Context provides access to parsed flags, arguments, and application/command metadata
+within an ActionFunc.
 
 #### Methods
 
-### `Args` {#args}
+<a id="args"></a>
+#### `Args`
 
 ```go
 func (c *Context) Args() []string
@@ -913,78 +1147,78 @@ func (c *Context) Args() []string
 
 Args returns the non-flag arguments remaining after parsing for the current context.
 
----
-
-### `Bool` {#bool}
+<a id="bool"></a>
+#### `Bool`
 
 ```go
 func (c *Context) Bool(name string) bool
 ```
 
-Bool returns the boolean value of a flag specified by name. It checks command flags first, then global flags. Returns false if not found or type mismatch.
+Bool returns the boolean value of a flag specified by name.
+It checks command flags first, then global flags. Returns false if not found or type mismatch.
 
----
-
-### `Float64` {#float64}
+<a id="float64"></a>
+#### `Float64`
 
 ```go
 func (c *Context) Float64(name string) float64
 ```
 
-Float64 returns the float64 value of a flag specified by name. It checks command flags first, then global flags. Returns 0.0 if not found or type mismatch.
+Float64 returns the float64 value of a flag specified by name.
+It checks command flags first, then global flags. Returns 0.0 if not found or type mismatch.
 
----
-
-### `Int` {#int}
+<a id="int"></a>
+#### `Int`
 
 ```go
 func (c *Context) Int(name string) int
 ```
 
-Int returns the integer value of a flag specified by name. It checks command flags first, then global flags. Returns 0 if not found or type mismatch.
+Int returns the integer value of a flag specified by name.
+It checks command flags first, then global flags. Returns 0 if not found or type mismatch.
 
----
-
-### `String` {#string}
+<a id="string"></a>
+#### `String`
 
 ```go
 func (c *Context) String(name string) string
 ```
 
-String returns the string value of a flag specified by name. It checks command flags first, then global flags. Returns "" if not found or type mismatch.
+String returns the string value of a flag specified by name.
+It checks command flags first, then global flags. Returns &quot;&quot; if not found or type mismatch.
 
----
-
-### `StringSlice` {#stringslice}
+<a id="stringslice"></a>
+#### `StringSlice`
 
 ```go
 func (c *Context) StringSlice(name string) []string
 ```
 
-StringSlice returns the []string value of a flag specified by name. It checks command flags first, then global flags. Returns nil if not found or type mismatch.
+StringSlice returns the []string value of a flag specified by name.
+It checks command flags first, then global flags. Returns nil if not found or type mismatch.
 
----
-
-### `DocumentConfig` {#documentconfig}
+<a id="documentconfig"></a>
+### `DocumentConfig`
 
 ```go
 type DocumentConfig struct {
-	Lang        string        // Lang attribute for <html> tag, defaults to "en".
-	Title       string        // Content for <title> tag, defaults to "Document".
-	Charset     string        // Charset for <meta charset>, defaults to "utf-8".
-	Viewport    string        // Content for <meta name="viewport">, defaults to "width=device-width, initial-scale=1".
-	Description string        // Content for <meta name="description">. If empty, tag is omitted.
-	Keywords    string        // Content for <meta name="keywords">. If empty, tag is omitted.
-	Author      string        // Content for <meta name="author">. If empty, tag is omitted.
-	HeadExtras  []HTMLElement // Additional HTMLElements to be included in the <head> section.
+	Lang        string        // Lang attribute for `<html>` tag, defaults to "en".
+	Title       string        // Content for `<title>` tag, defaults to "Document".
+	Charset     string        // Charset for `<meta charset>`, defaults to "utf-8".
+	Viewport    string        // Content for `<meta name="viewport">`, defaults to "width=device-width, initial-scale=1".
+	Description string        // Content for `<meta name="description">`. If empty, tag is omitted.
+	Keywords    string        // Content for `<meta name="keywords">`. If empty, tag is omitted.
+	Author      string        // Content for `<meta name="author">`. If empty, tag is omitted.
+	HeadExtras  []HTMLElement // Additional HTMLElements to be included in the `<head>` section.
 }
 ```
 
-DocumentConfig provides configuration options for creating a new HTML document. Fields left as zero-values (e.g., empty strings) will use sensible defaults or be omitted if optional (like Description, Keywords, Author).
+DocumentConfig provides configuration options for creating a new HTML document.
+Fields left as zero-values (e.g., empty strings) will use sensible defaults
+or be omitted if optional (like Description, Keywords, Author).
 
----
-
-### `ETagConfig` {#etagconfig}
+<a id="etagconfig"></a>
+### `ETagConfig`
 
 ```go
 type ETagConfig struct {
@@ -1000,1245 +1234,1128 @@ type ETagConfig struct {
 
 ETagConfig holds configuration for ETagMiddleware.
 
----
-
-### `Element` {#element}
+<a id="element"></a>
+### `Element`
 
 ```go
 type Element struct {
-	// contains filtered or unexported fields
+	tag        string
+	content    string
+	attributes map[string]string
+	children   []HTMLElement
+	selfClose  bool
 }
 ```
 
-Element represents an HTML element with attributes, content, and child elements. It supports both self-closing elements (like <img>) and container elements (like <div>). Elements can be chained using fluent API methods for convenient construction.
-
----
+Element represents an HTML element with attributes, content, and child elements.
+It supports both self-closing elements (like `&lt;img&gt;`) and container elements (like `&lt;div&gt;`).
+Elements can be chained using fluent API methods for convenient construction.
 
 #### Associated Functions
 
-### `A` {#a}
+<a id="a"></a>
+#### `A`
 
 ```go
 func A(href string, content ...HTMLElement) *Element
 ```
 
-A creates an <a> anchor element.
+A creates an `&lt;a&gt;` anchor element.
 
----
-
-### `Abbr` {#abbr}
+<a id="abbr"></a>
+#### `Abbr`
 
 ```go
 func Abbr(content ...HTMLElement) *Element
 ```
 
-Abbr creates an <abbr> abbreviation element.
+Abbr creates an `&lt;abbr&gt;` abbreviation element.
 
----
-
-### `Address` {#address}
+<a id="address"></a>
+#### `Address`
 
 ```go
 func Address(content ...HTMLElement) *Element
 ```
 
-Address creates an <address> semantic element.
+Address creates an `&lt;address&gt;` semantic element.
 
----
-
-### `Article` {#article}
+<a id="article"></a>
+#### `Article`
 
 ```go
 func Article(content ...HTMLElement) *Element
 ```
 
-Article creates an <article> semantic element.
+Article creates an `&lt;article&gt;` semantic element.
 
----
-
-### `Aside` {#aside}
+<a id="aside"></a>
+#### `Aside`
 
 ```go
 func Aside(content ...HTMLElement) *Element
 ```
 
-Aside creates an <aside> semantic element.
+Aside creates an `&lt;aside&gt;` semantic element.
 
----
-
-### `Audio` {#audio}
+<a id="audio"></a>
+#### `Audio`
 
 ```go
 func Audio(content ...HTMLElement) *Element
 ```
 
-Audio creates an <audio> element.
+Audio creates an `&lt;audio&gt;` element.
 
----
-
-### `B` {#b}
+<a id="b"></a>
+#### `B`
 
 ```go
 func B(content ...HTMLElement) *Element
 ```
 
-B creates a <b> element for stylistically offset text.
+B creates a `&lt;b&gt;` element for stylistically offset text.
 
----
-
-### `Base` {#base}
+<a id="base"></a>
+#### `Base`
 
 ```go
 func Base(href string) *Element
 ```
 
-Base creates a <base> element.
+Base creates a `&lt;base&gt;` element.
 
----
-
-### `Blockquote` {#blockquote}
+<a id="blockquote"></a>
+#### `Blockquote`
 
 ```go
 func Blockquote(content ...HTMLElement) *Element
 ```
 
-Blockquote creates a <blockquote> element.
+Blockquote creates a `&lt;blockquote&gt;` element.
 
----
-
-### `Body` {#body}
+<a id="body"></a>
+#### `Body`
 
 ```go
 func Body(content ...HTMLElement) *Element
 ```
 
-Body creates a <body> element.
+Body creates a `&lt;body&gt;` element.
 
----
-
-### `Br` {#br}
+<a id="br"></a>
+#### `Br`
 
 ```go
 func Br() *Element
 ```
 
-Br creates a self-closing <br> line break element.
+Br creates a self-closing `&lt;br&gt;` line break element.
 
----
-
-### `Button` {#button}
+<a id="button"></a>
+#### `Button`
 
 ```go
 func Button(content ...HTMLElement) *Element
 ```
 
-Button creates a <button> element.
+Button creates a `&lt;button&gt;` element.
 
----
-
-### `ButtonInput` {#buttoninput}
+<a id="buttoninput"></a>
+#### `ButtonInput`
 
 ```go
 func ButtonInput(valueText string) *Element
 ```
 
-ButtonInput creates an <input type="button">.
+ButtonInput creates an `&lt;input type=&quot;button&quot;&gt;`.
 
----
-
-### `Caption` {#caption}
+<a id="caption"></a>
+#### `Caption`
 
 ```go
 func Caption(content ...HTMLElement) *Element
 ```
 
-Caption creates a <caption> element for a table.
+Caption creates a `&lt;caption&gt;` element for a table.
 
----
-
-### `CheckboxInput` {#checkboxinput}
+<a id="checkboxinput"></a>
+#### `CheckboxInput`
 
 ```go
 func CheckboxInput(name string) *Element
 ```
 
-CheckboxInput creates an <input type="checkbox">.
+CheckboxInput creates an `&lt;input type=&quot;checkbox&quot;&gt;`.
 
----
-
-### `Cite` {#cite}
+<a id="cite"></a>
+#### `Cite`
 
 ```go
 func Cite(content ...HTMLElement) *Element
 ```
 
-Cite creates a <cite> element.
+Cite creates a `&lt;cite&gt;` element.
 
----
-
-### `Code` {#code}
+<a id="code"></a>
+#### `Code`
 
 ```go
 func Code(content ...HTMLElement) *Element
 ```
 
-Code creates a <code> element.
+Code creates a `&lt;code&gt;` element.
 
----
-
-### `Col` {#col}
+<a id="col"></a>
+#### `Col`
 
 ```go
 func Col() *Element
 ```
 
-Col creates a <col> element. It's self-closing.
+Col creates a `&lt;col&gt;` element. It&apos;s self-closing.
 
----
-
-### `Colgroup` {#colgroup}
+<a id="colgroup"></a>
+#### `Colgroup`
 
 ```go
 func Colgroup(content ...HTMLElement) *Element
 ```
 
-Colgroup creates a <colgroup> element.
+Colgroup creates a `&lt;colgroup&gt;` element.
 
----
-
-### `ColorInput` {#colorinput}
+<a id="colorinput"></a>
+#### `ColorInput`
 
 ```go
 func ColorInput(name string) *Element
 ```
 
-ColorInput creates an <input type="color"> field.
+ColorInput creates an `&lt;input type=&quot;color&quot;&gt;` field.
 
----
-
-### `Datalist` {#datalist}
+<a id="datalist"></a>
+#### `Datalist`
 
 ```go
 func Datalist(id string, content ...HTMLElement) *Element
 ```
 
-Datalist creates a <datalist> element.
+Datalist creates a `&lt;datalist&gt;` element.
 
----
-
-### `DateInput` {#dateinput}
+<a id="dateinput"></a>
+#### `DateInput`
 
 ```go
 func DateInput(name string) *Element
 ```
 
-DateInput creates an <input type="date"> field.
+DateInput creates an `&lt;input type=&quot;date&quot;&gt;` field.
 
----
-
-### `DateTimeLocalInput` {#datetimelocalinput}
+<a id="datetimelocalinput"></a>
+#### `DateTimeLocalInput`
 
 ```go
 func DateTimeLocalInput(name string) *Element
 ```
 
-DateTimeLocalInput creates an <input type="datetime-local"> field.
+DateTimeLocalInput creates an `&lt;input type=&quot;datetime-local&quot;&gt;` field.
 
----
-
-### `Details` {#details}
+<a id="details"></a>
+#### `Details`
 
 ```go
 func Details(content ...HTMLElement) *Element
 ```
 
-Details creates a <details> element.
+Details creates a `&lt;details&gt;` element.
 
----
-
-### `Dfn` {#dfn}
+<a id="dfn"></a>
+#### `Dfn`
 
 ```go
 func Dfn(content ...HTMLElement) *Element
 ```
 
-Dfn creates a <dfn> definition element.
+Dfn creates a `&lt;dfn&gt;` definition element.
 
----
-
-### `DialogEl` {#dialogel}
+<a id="dialogel"></a>
+#### `DialogEl`
 
 ```go
 func DialogEl(content ...HTMLElement) *Element
 ```
 
-DialogEl creates a <dialog> element. Renamed to avoid potential conflicts.
+DialogEl creates a `&lt;dialog&gt;` element. Renamed to avoid potential conflicts.
 
----
-
-### `Div` {#div}
+<a id="div"></a>
+#### `Div`
 
 ```go
 func Div(content ...HTMLElement) *Element
 ```
 
-Div creates a <div> element.
+Div creates a `&lt;div&gt;` element.
 
----
-
-### `Em` {#em}
+<a id="em"></a>
+#### `Em`
 
 ```go
 func Em(content ...HTMLElement) *Element
 ```
 
-Em creates an <em> emphasis element.
+Em creates an `&lt;em&gt;` emphasis element.
 
----
-
-### `EmailInput` {#emailinput}
+<a id="emailinput"></a>
+#### `EmailInput`
 
 ```go
 func EmailInput(name string) *Element
 ```
 
-EmailInput creates an <input type="email"> field.
+EmailInput creates an `&lt;input type=&quot;email&quot;&gt;` field.
 
----
-
-### `EmbedEl` {#embedel}
+<a id="embedel"></a>
+#### `EmbedEl`
 
 ```go
 func EmbedEl(src string, embedType string) *Element
 ```
 
-EmbedEl creates an <embed> element. It's self-closing. Renamed to avoid keyword conflict.
+EmbedEl creates an `&lt;embed&gt;` element. It&apos;s self-closing. Renamed to avoid keyword conflict.
 
----
-
-### `Favicon` {#favicon}
+<a id="favicon"></a>
+#### `Favicon`
 
 ```go
 func Favicon(href string, rel ...string) *Element
 ```
 
-Favicon creates a <link> element for a favicon.
+Favicon creates a `&lt;link&gt;` element for a favicon.
 
----
-
-### `Fieldset` {#fieldset}
+<a id="fieldset"></a>
+#### `Fieldset`
 
 ```go
 func Fieldset(content ...HTMLElement) *Element
 ```
 
-Fieldset creates a <fieldset> element.
+Fieldset creates a `&lt;fieldset&gt;` element.
 
----
-
-### `Figcaption` {#figcaption}
+<a id="figcaption"></a>
+#### `Figcaption`
 
 ```go
 func Figcaption(content ...HTMLElement) *Element
 ```
 
-Figcaption creates a <figcaption> element.
+Figcaption creates a `&lt;figcaption&gt;` element.
 
----
-
-### `Figure` {#figure}
+<a id="figure"></a>
+#### `Figure`
 
 ```go
 func Figure(content ...HTMLElement) *Element
 ```
 
-Figure creates a <figure> element.
+Figure creates a `&lt;figure&gt;` element.
 
----
-
-### `FileInput` {#fileinput}
+<a id="fileinput"></a>
+#### `FileInput`
 
 ```go
 func FileInput(name string) *Element
 ```
 
-FileInput creates an <input type="file"> field.
+FileInput creates an `&lt;input type=&quot;file&quot;&gt;` field.
 
----
-
-### `Footer` {#footer}
+<a id="footer"></a>
+#### `Footer`
 
 ```go
 func Footer(content ...HTMLElement) *Element
 ```
 
-Footer creates a <footer> semantic element.
+Footer creates a `&lt;footer&gt;` semantic element.
 
----
-
-### `Form` {#form}
+<a id="form"></a>
+#### `Form`
 
 ```go
 func Form(content ...HTMLElement) *Element
 ```
 
-Form creates a <form> element.
+Form creates a `&lt;form&gt;` element.
 
----
-
-### `H1` {#h1}
+<a id="h1"></a>
+#### `H1`
 
 ```go
 func H1(content ...HTMLElement) *Element
 ```
 
-H1 creates an <h1> heading element.
+H1 creates an `&lt;h1&gt;` heading element.
 
----
-
-### `H2` {#h2}
+<a id="h2"></a>
+#### `H2`
 
 ```go
 func H2(content ...HTMLElement) *Element
 ```
 
-H2 creates an <h2> heading element.
+H2 creates an `&lt;h2&gt;` heading element.
 
----
-
-### `H3` {#h3}
+<a id="h3"></a>
+#### `H3`
 
 ```go
 func H3(content ...HTMLElement) *Element
 ```
 
-H3 creates an <h3> heading element.
+H3 creates an `&lt;h3&gt;` heading element.
 
----
-
-### `H4` {#h4}
+<a id="h4"></a>
+#### `H4`
 
 ```go
 func H4(content ...HTMLElement) *Element
 ```
 
-H4 creates an <h4> heading element.
+H4 creates an `&lt;h4&gt;` heading element.
 
----
-
-### `H5` {#h5}
+<a id="h5"></a>
+#### `H5`
 
 ```go
 func H5(content ...HTMLElement) *Element
 ```
 
-H5 creates an <h5> heading element.
+H5 creates an `&lt;h5&gt;` heading element.
 
----
-
-### `H6` {#h6}
+<a id="h6"></a>
+#### `H6`
 
 ```go
 func H6(content ...HTMLElement) *Element
 ```
 
-H6 creates an <h6> heading element.
+H6 creates an `&lt;h6&gt;` heading element.
 
----
-
-### `Head` {#head}
+<a id="head"></a>
+#### `Head`
 
 ```go
 func Head(content ...HTMLElement) *Element
 ```
 
-Head creates a <head> element.
+Head creates a `&lt;head&gt;` element.
 
----
-
-### `Header` {#header}
+<a id="header"></a>
+#### `Header`
 
 ```go
 func Header(content ...HTMLElement) *Element
 ```
 
-Header creates a <header> semantic element.
+Header creates a `&lt;header&gt;` semantic element.
 
----
-
-### `HiddenInput` {#hiddeninput}
+<a id="hiddeninput"></a>
+#### `HiddenInput`
 
 ```go
 func HiddenInput(name string, value string) *Element
 ```
 
-HiddenInput creates an <input type="hidden"> field.
+HiddenInput creates an `&lt;input type=&quot;hidden&quot;&gt;` field.
 
----
-
-### `Hr` {#hr}
+<a id="hr"></a>
+#### `Hr`
 
 ```go
 func Hr() *Element
 ```
 
-Hr creates a self-closing <hr> horizontal rule element.
+Hr creates a self-closing `&lt;hr&gt;` horizontal rule element.
 
----
-
-### `Html` {#html}
+<a id="html"></a>
+#### `Html`
 
 ```go
 func Html(content ...HTMLElement) *Element
 ```
 
-Html creates an <html> element.
+Html creates an `&lt;html&gt;` element.
 
----
-
-### `I` {#i}
+<a id="i"></a>
+#### `I`
 
 ```go
 func I(content ...HTMLElement) *Element
 ```
 
-I creates an <i> idiomatic text element.
+I creates an `&lt;i&gt;` idiomatic text element.
 
----
-
-### `Iframe` {#iframe}
+<a id="iframe"></a>
+#### `Iframe`
 
 ```go
 func Iframe(src string) *Element
 ```
 
-Iframe creates an <iframe> element.
+Iframe creates an `&lt;iframe&gt;` element.
 
----
-
-### `Image` {#image}
+<a id="image"></a>
+#### `Image`
 
 ```go
 func Image(src, alt string) *Element
 ```
 
-Image creates an <img> element (alias for Img).
+Image creates an `&lt;img&gt;` element (alias for Img).
 
----
-
-### `Img` {#img}
+<a id="img"></a>
+#### `Img`
 
 ```go
 func Img(src, alt string) *Element
 ```
 
-Img creates a self-closing <img> element.
+Img creates a self-closing `&lt;img&gt;` element.
 
----
-
-### `InlineScript` {#inlinescript}
+<a id="inlinescript"></a>
+#### `InlineScript`
 
 ```go
 func InlineScript(scriptContent string) *Element
 ```
 
-InlineScript creates a <script> element with inline JavaScript content.
+InlineScript creates a `&lt;script&gt;` element with inline JavaScript content.
 
----
-
-### `Input` {#input}
+<a id="input"></a>
+#### `Input`
 
 ```go
 func Input(inputType string) *Element
 ```
 
-Input creates a self-closing <input> element.
+Input creates a self-closing `&lt;input&gt;` element.
 
----
-
-### `Kbd` {#kbd}
+<a id="kbd"></a>
+#### `Kbd`
 
 ```go
 func Kbd(content ...HTMLElement) *Element
 ```
 
-Kbd creates a <kbd> keyboard input element.
+Kbd creates a `&lt;kbd&gt;` keyboard input element.
 
----
-
-### `Label` {#label}
+<a id="label"></a>
+#### `Label`
 
 ```go
 func Label(content ...HTMLElement) *Element
 ```
 
-Label creates a <label> element.
+Label creates a `&lt;label&gt;` element.
 
----
-
-### `Legend` {#legend}
+<a id="legend"></a>
+#### `Legend`
 
 ```go
 func Legend(content ...HTMLElement) *Element
 ```
 
-Legend creates a <legend> element.
+Legend creates a `&lt;legend&gt;` element.
 
----
-
-### `Li` {#li}
+<a id="li"></a>
+#### `Li`
 
 ```go
 func Li(content ...HTMLElement) *Element
 ```
 
-Li creates a <li> list item element.
+Li creates a `&lt;li&gt;` list item element.
 
----
-
-### `Link` {#link}
+<a id="link"></a>
+#### `Link`
 
 ```go
 func Link(href, textContent string) *Element
 ```
 
-Link creates an <a> anchor element with href and text content.
+Link creates an `&lt;a&gt;` anchor element with href and text content.
 
----
-
-### `LinkTag` {#linktag}
+<a id="linktag"></a>
+#### `LinkTag`
 
 ```go
 func LinkTag() *Element
 ```
 
-LinkTag creates a generic <link> element. It's self-closing.
+LinkTag creates a generic `&lt;link&gt;` element. It&apos;s self-closing.
 
----
-
-### `Main` {#main}
+<a id="main"></a>
+#### `Main`
 
 ```go
 func Main(content ...HTMLElement) *Element
 ```
 
-Main creates a <main> semantic element.
+Main creates a `&lt;main&gt;` semantic element.
 
----
-
-### `Mark` {#mark}
+<a id="mark"></a>
+#### `Mark`
 
 ```go
 func Mark(content ...HTMLElement) *Element
 ```
 
-Mark creates a <mark> element.
+Mark creates a `&lt;mark&gt;` element.
 
----
-
-### `Meta` {#meta}
+<a id="meta"></a>
+#### `Meta`
 
 ```go
 func Meta() *Element
 ```
 
-Meta creates a generic <meta> element. It's self-closing.
+Meta creates a generic `&lt;meta&gt;` element. It&apos;s self-closing.
 
----
-
-### `MetaCharset` {#metacharset}
+<a id="metacharset"></a>
+#### `MetaCharset`
 
 ```go
 func MetaCharset(charset string) *Element
 ```
 
-MetaCharset creates a <meta charset="..."> element.
+MetaCharset creates a `&lt;meta charset=&quot;...&quot;&gt;` element.
 
----
-
-### `MetaNameContent` {#metanamecontent}
+<a id="metanamecontent"></a>
+#### `MetaNameContent`
 
 ```go
 func MetaNameContent(name, contentVal string) *Element
 ```
 
-MetaNameContent creates a <meta name="..." content="..."> element.
+MetaNameContent creates a `&lt;meta name=&quot;...&quot; content=&quot;...&quot;&gt;` element.
 
----
-
-### `MetaPropertyContent` {#metapropertycontent}
+<a id="metapropertycontent"></a>
+#### `MetaPropertyContent`
 
 ```go
 func MetaPropertyContent(property, contentVal string) *Element
 ```
 
-MetaPropertyContent creates a <meta property="..." content="..."> element.
+MetaPropertyContent creates a `&lt;meta property=&quot;...&quot; content=&quot;...&quot;&gt;` element.
 
----
-
-### `MetaViewport` {#metaviewport}
+<a id="metaviewport"></a>
+#### `MetaViewport`
 
 ```go
 func MetaViewport(contentVal string) *Element
 ```
 
-MetaViewport creates a <meta name="viewport" content="..."> element.
+MetaViewport creates a `&lt;meta name=&quot;viewport&quot; content=&quot;...&quot;&gt;` element.
 
----
-
-### `MeterEl` {#meterel}
+<a id="meterel"></a>
+#### `MeterEl`
 
 ```go
 func MeterEl(content ...HTMLElement) *Element
 ```
 
-MeterEl creates a <meter> element. Renamed to avoid potential conflicts.
+MeterEl creates a `&lt;meter&gt;` element. Renamed to avoid potential conflicts.
 
----
-
-### `MonthInput` {#monthinput}
+<a id="monthinput"></a>
+#### `MonthInput`
 
 ```go
 func MonthInput(name string) *Element
 ```
 
-MonthInput creates an <input type="month"> field.
+MonthInput creates an `&lt;input type=&quot;month&quot;&gt;` field.
 
----
-
-### `Nav` {#nav}
+<a id="nav"></a>
+#### `Nav`
 
 ```go
 func Nav(content ...HTMLElement) *Element
 ```
 
-Nav creates a <nav> semantic element.
+Nav creates a `&lt;nav&gt;` semantic element.
 
----
-
-### `NoScript` {#noscript}
+<a id="noscript"></a>
+#### `NoScript`
 
 ```go
 func NoScript(content ...HTMLElement) *Element
 ```
 
-NoScript creates a <noscript> element.
+NoScript creates a `&lt;noscript&gt;` element.
 
----
-
-### `NumberInput` {#numberinput}
+<a id="numberinput"></a>
+#### `NumberInput`
 
 ```go
 func NumberInput(name string) *Element
 ```
 
-NumberInput creates an <input type="number"> field.
+NumberInput creates an `&lt;input type=&quot;number&quot;&gt;` field.
 
----
-
-### `ObjectEl` {#objectel}
+<a id="objectel"></a>
+#### `ObjectEl`
 
 ```go
 func ObjectEl(content ...HTMLElement) *Element
 ```
 
-ObjectEl creates an <object> element. Renamed to avoid keyword conflict.
+ObjectEl creates an `&lt;object&gt;` element. Renamed to avoid keyword conflict.
 
----
-
-### `Ol` {#ol}
+<a id="ol"></a>
+#### `Ol`
 
 ```go
 func Ol(content ...HTMLElement) *Element
 ```
 
-Ol creates an <ol> ordered list element.
+Ol creates an `&lt;ol&gt;` ordered list element.
 
----
-
-### `Optgroup` {#optgroup}
+<a id="optgroup"></a>
+#### `Optgroup`
 
 ```go
 func Optgroup(label string, content ...HTMLElement) *Element
 ```
 
-Optgroup creates an <optgroup> element.
+Optgroup creates an `&lt;optgroup&gt;` element.
 
----
-
-### `Option` {#option}
+<a id="option"></a>
+#### `Option`
 
 ```go
 func Option(value string, content ...HTMLElement) *Element
 ```
 
-Option creates an <option> element.
+Option creates an `&lt;option&gt;` element.
 
----
-
-### `OutputEl` {#outputel}
+<a id="outputel"></a>
+#### `OutputEl`
 
 ```go
 func OutputEl(content ...HTMLElement) *Element
 ```
 
-OutputEl creates an <output> element. Renamed to avoid potential conflicts.
+OutputEl creates an `&lt;output&gt;` element. Renamed to avoid potential conflicts.
 
----
-
-### `P` {#p}
+<a id="p"></a>
+#### `P`
 
 ```go
 func P(content ...HTMLElement) *Element
 ```
 
-P creates a <p> paragraph element.
+P creates a `&lt;p&gt;` paragraph element.
 
----
-
-### `Param` {#param}
+<a id="param"></a>
+#### `Param`
 
 ```go
 func Param(name, value string) *Element
 ```
 
-Param creates a <param> element. It's self-closing.
+Param creates a `&lt;param&gt;` element. It&apos;s self-closing.
 
----
-
-### `PasswordInput` {#passwordinput}
+<a id="passwordinput"></a>
+#### `PasswordInput`
 
 ```go
 func PasswordInput(name string) *Element
 ```
 
-PasswordInput creates an <input type="password"> field.
+PasswordInput creates an `&lt;input type=&quot;password&quot;&gt;` field.
 
----
-
-### `Pre` {#pre}
+<a id="pre"></a>
+#### `Pre`
 
 ```go
 func Pre(content ...HTMLElement) *Element
 ```
 
-Pre creates a <pre> element.
+Pre creates a `&lt;pre&gt;` element.
 
----
-
-### `Preload` {#preload}
+<a id="preload"></a>
+#### `Preload`
 
 ```go
 func Preload(href string, asType string) *Element
 ```
 
-Preload creates a <link rel="preload"> element.
+Preload creates a `&lt;link rel=&quot;preload&quot;&gt;` element.
 
----
-
-### `ProgressEl` {#progressel}
+<a id="progressel"></a>
+#### `ProgressEl`
 
 ```go
 func ProgressEl(content ...HTMLElement) *Element
 ```
 
-ProgressEl creates a <progress> element. Renamed to avoid potential conflicts.
+ProgressEl creates a `&lt;progress&gt;` element. Renamed to avoid potential conflicts.
 
----
-
-### `Q` {#q}
+<a id="q"></a>
+#### `Q`
 
 ```go
 func Q(content ...HTMLElement) *Element
 ```
 
-Q creates a <q> inline quotation element.
+Q creates a `&lt;q&gt;` inline quotation element.
 
----
-
-### `RadioInput` {#radioinput}
+<a id="radioinput"></a>
+#### `RadioInput`
 
 ```go
 func RadioInput(name, value string) *Element
 ```
 
-RadioInput creates an <input type="radio">.
+RadioInput creates an `&lt;input type=&quot;radio&quot;&gt;`.
 
----
-
-### `RangeInput` {#rangeinput}
+<a id="rangeinput"></a>
+#### `RangeInput`
 
 ```go
 func RangeInput(name string) *Element
 ```
 
-RangeInput creates an <input type="range"> field.
+RangeInput creates an `&lt;input type=&quot;range&quot;&gt;` field.
 
----
-
-### `ResetButton` {#resetbutton}
+<a id="resetbutton"></a>
+#### `ResetButton`
 
 ```go
 func ResetButton(text string) *Element
 ```
 
-ResetButton creates a <button type="reset">.
+ResetButton creates a `&lt;button type=&quot;reset&quot;&gt;`.
 
----
-
-### `Samp` {#samp}
+<a id="samp"></a>
+#### `Samp`
 
 ```go
 func Samp(content ...HTMLElement) *Element
 ```
 
-Samp creates a <samp> sample output element.
+Samp creates a `&lt;samp&gt;` sample output element.
 
----
-
-### `Script` {#script}
+<a id="script"></a>
+#### `Script`
 
 ```go
 func Script(src string) *Element
 ```
 
-Script creates a <script> element for external JavaScript files.
+Script creates a `&lt;script&gt;` element for external JavaScript files.
 
----
-
-### `SearchInput` {#searchinput}
+<a id="searchinput"></a>
+#### `SearchInput`
 
 ```go
 func SearchInput(name string) *Element
 ```
 
-SearchInput creates an <input type="search"> field.
+SearchInput creates an `&lt;input type=&quot;search&quot;&gt;` field.
 
----
-
-### `Section` {#section}
+<a id="section"></a>
+#### `Section`
 
 ```go
 func Section(content ...HTMLElement) *Element
 ```
 
-Section creates a <section> semantic element.
+Section creates a `&lt;section&gt;` semantic element.
 
----
-
-### `Select` {#select}
+<a id="select"></a>
+#### `Select`
 
 ```go
 func Select(content ...HTMLElement) *Element
 ```
 
-Select creates a <select> dropdown element.
+Select creates a `&lt;select&gt;` dropdown element.
 
----
-
-### `Small` {#small}
+<a id="small"></a>
+#### `Small`
 
 ```go
 func Small(content ...HTMLElement) *Element
 ```
 
-Small creates a <small> element.
+Small creates a `&lt;small&gt;` element.
 
----
-
-### `Source` {#source}
+<a id="source"></a>
+#### `Source`
 
 ```go
 func Source(src string, mediaType string) *Element
 ```
 
-Source creates a <source> element. It's self-closing.
+Source creates a `&lt;source&gt;` element. It&apos;s self-closing.
 
----
-
-### `Span` {#span}
+<a id="span"></a>
+#### `Span`
 
 ```go
 func Span(content ...HTMLElement) *Element
 ```
 
-Span creates a <span> inline element.
+Span creates a `&lt;span&gt;` inline element.
 
----
-
-### `Strong` {#strong}
+<a id="strong"></a>
+#### `Strong`
 
 ```go
 func Strong(content ...HTMLElement) *Element
 ```
 
-Strong creates a <strong> element.
+Strong creates a `&lt;strong&gt;` element.
 
----
-
-### `StyleSheet` {#stylesheet}
+<a id="stylesheet"></a>
+#### `StyleSheet`
 
 ```go
 func StyleSheet(href string) *Element
 ```
 
-StyleSheet creates a <link rel="stylesheet"> element.
+StyleSheet creates a `&lt;link rel=&quot;stylesheet&quot;&gt;` element.
 
----
-
-### `StyleTag` {#styletag}
+<a id="styletag"></a>
+#### `StyleTag`
 
 ```go
 func StyleTag(cssContent string) *Element
 ```
 
-StyleTag creates a <style> element for embedding CSS.
+StyleTag creates a `&lt;style&gt;` element for embedding CSS.
 
----
-
-### `Sub` {#sub}
+<a id="sub"></a>
+#### `Sub`
 
 ```go
 func Sub(content ...HTMLElement) *Element
 ```
 
-Sub creates a <sub> subscript element.
+Sub creates a `&lt;sub&gt;` subscript element.
 
----
-
-### `SubmitButton` {#submitbutton}
+<a id="submitbutton"></a>
+#### `SubmitButton`
 
 ```go
 func SubmitButton(text string) *Element
 ```
 
-SubmitButton creates a <button type="submit">.
+SubmitButton creates a `&lt;button type=&quot;submit&quot;&gt;`.
 
----
-
-### `Summary` {#summary}
+<a id="summary"></a>
+#### `Summary`
 
 ```go
 func Summary(content ...HTMLElement) *Element
 ```
 
-Summary creates a <summary> element.
+Summary creates a `&lt;summary&gt;` element.
 
----
-
-### `Sup` {#sup}
+<a id="sup"></a>
+#### `Sup`
 
 ```go
 func Sup(content ...HTMLElement) *Element
 ```
 
-Sup creates a <sup> superscript element.
+Sup creates a `&lt;sup&gt;` superscript element.
 
----
-
-### `Table` {#table}
+<a id="table"></a>
+#### `Table`
 
 ```go
 func Table(content ...HTMLElement) *Element
 ```
 
-Table creates a <table> element.
+Table creates a `&lt;table&gt;` element.
 
----
-
-### `Tbody` {#tbody}
+<a id="tbody"></a>
+#### `Tbody`
 
 ```go
 func Tbody(content ...HTMLElement) *Element
 ```
 
-Tbody creates a <tbody> table body group element.
+Tbody creates a `&lt;tbody&gt;` table body group element.
 
----
-
-### `Td` {#td}
+<a id="td"></a>
+#### `Td`
 
 ```go
 func Td(content ...HTMLElement) *Element
 ```
 
-Td creates a <td> table data cell element.
+Td creates a `&lt;td&gt;` table data cell element.
 
----
-
-### `TelInput` {#telinput}
+<a id="telinput"></a>
+#### `TelInput`
 
 ```go
 func TelInput(name string) *Element
 ```
 
-TelInput creates an <input type="tel"> field.
+TelInput creates an `&lt;input type=&quot;tel&quot;&gt;` field.
 
----
-
-### `TextInput` {#textinput}
+<a id="textinput"></a>
+#### `TextInput`
 
 ```go
 func TextInput(name string) *Element
 ```
 
-TextInput creates an <input type="text"> field.
+TextInput creates an `&lt;input type=&quot;text&quot;&gt;` field.
 
----
-
-### `Textarea` {#textarea}
+<a id="textarea"></a>
+#### `Textarea`
 
 ```go
 func Textarea(content ...HTMLElement) *Element
 ```
 
-Textarea creates a <textarea> element.
+Textarea creates a `&lt;textarea&gt;` element.
 
----
-
-### `Th` {#th}
+<a id="th"></a>
+#### `Th`
 
 ```go
 func Th(content ...HTMLElement) *Element
 ```
 
-Th creates a <th> table header cell element.
+Th creates a `&lt;th&gt;` table header cell element.
 
----
-
-### `Thead` {#thead}
+<a id="thead"></a>
+#### `Thead`
 
 ```go
 func Thead(content ...HTMLElement) *Element
 ```
 
-Thead creates a <thead> table header group element.
+Thead creates a `&lt;thead&gt;` table header group element.
 
----
-
-### `TimeEl` {#timeel}
+<a id="timeel"></a>
+#### `TimeEl`
 
 ```go
 func TimeEl(content ...HTMLElement) *Element
 ```
 
-TimeEl creates a <time> element. Renamed to avoid potential conflicts.
+TimeEl creates a `&lt;time&gt;` element. Renamed to avoid potential conflicts.
 
----
-
-### `TimeInput` {#timeinput}
+<a id="timeinput"></a>
+#### `TimeInput`
 
 ```go
 func TimeInput(name string) *Element
 ```
 
-TimeInput creates an <input type="time"> field.
+TimeInput creates an `&lt;input type=&quot;time&quot;&gt;` field.
 
----
-
-### `TitleEl` {#titleel}
+<a id="titleel"></a>
+#### `TitleEl`
 
 ```go
 func TitleEl(titleText string) *Element
 ```
 
-TitleEl creates a <title> element with the specified text. Renamed from Title to TitleEl to avoid conflict with (*Element).Title method if it existed.
+TitleEl creates a `&lt;title&gt;` element with the specified text.
+Renamed from Title to TitleEl to avoid conflict with (*Element).Title method if it existed.
 
----
-
-### `Tr` {#tr}
+<a id="tr"></a>
+#### `Tr`
 
 ```go
 func Tr(content ...HTMLElement) *Element
 ```
 
-Tr creates a <tr> table row element.
+Tr creates a `&lt;tr&gt;` table row element.
 
----
-
-### `Track` {#track}
+<a id="track"></a>
+#### `Track`
 
 ```go
 func Track(kind, src, srclang string) *Element
 ```
 
-Track creates a <track> element. It's self-closing.
+Track creates a `&lt;track&gt;` element. It&apos;s self-closing.
 
----
-
-### `U` {#u}
+<a id="u"></a>
+#### `U`
 
 ```go
 func U(content ...HTMLElement) *Element
 ```
 
-U creates a <u> unarticulated annotation element.
+U creates a `&lt;u&gt;` unarticulated annotation element.
 
----
-
-### `Ul` {#ul}
+<a id="ul"></a>
+#### `Ul`
 
 ```go
 func Ul(content ...HTMLElement) *Element
 ```
 
-Ul creates a <ul> unordered list element.
+Ul creates a `&lt;ul&gt;` unordered list element.
 
----
-
-### `UrlInput` {#urlinput}
+<a id="urlinput"></a>
+#### `UrlInput`
 
 ```go
 func UrlInput(name string) *Element
 ```
 
-UrlInput creates an <input type="url"> field.
+UrlInput creates an `&lt;input type=&quot;url&quot;&gt;` field.
 
----
-
-### `VarEl` {#varel}
+<a id="varel"></a>
+#### `VarEl`
 
 ```go
 func VarEl(content ...HTMLElement) *Element
 ```
 
-VarEl creates a <var> variable element. Renamed to avoid keyword conflict.
+VarEl creates a `&lt;var&gt;` variable element. Renamed to avoid keyword conflict.
 
----
-
-### `Video` {#video}
+<a id="video"></a>
+#### `Video`
 
 ```go
 func Video(content ...HTMLElement) *Element
 ```
 
-Video creates a <video> element.
+Video creates a `&lt;video&gt;` element.
 
----
-
-### `Wbr` {#wbr}
+<a id="wbr"></a>
+#### `Wbr`
 
 ```go
 func Wbr() *Element
 ```
 
-Wbr creates a <wbr> word break opportunity element. It's self-closing.
+Wbr creates a `&lt;wbr&gt;` word break opportunity element. It&apos;s self-closing.
 
----
-
-### `WeekInput` {#weekinput}
+<a id="weekinput"></a>
+#### `WeekInput`
 
 ```go
 func WeekInput(name string) *Element
 ```
 
-WeekInput creates an <input type="week"> field.
-
----
+WeekInput creates an `&lt;input type=&quot;week&quot;&gt;` field.
 
 #### Methods
 
-### `Add` {#add}
+<a id="add"></a>
+#### `Add`
 
 ```go
 func (e *Element) Add(children ...HTMLElement) *Element
@@ -2246,9 +2363,8 @@ func (e *Element) Add(children ...HTMLElement) *Element
 
 Add appends child elements to this element.
 
----
-
-### `Attr` {#attr}
+<a id="attr"></a>
+#### `Attr`
 
 ```go
 func (e *Element) Attr(key, value string) *Element
@@ -2256,19 +2372,19 @@ func (e *Element) Attr(key, value string) *Element
 
 Attr sets an attribute on the element and returns the element for method chaining.
 
----
-
-### `BoolAttr` {#boolattr}
+<a id="boolattr"></a>
+#### `BoolAttr`
 
 ```go
 func (e *Element) BoolAttr(key string, present bool) *Element
 ```
 
-BoolAttr sets or removes a boolean attribute on the element. If present is true, the attribute is added (e.g., <input disabled>). If present is false, the attribute is removed if it exists.
+BoolAttr sets or removes a boolean attribute on the element.
+If present is true, the attribute is added (e.g., `&lt;input disabled&gt;`).
+If present is false, the attribute is removed if it exists.
 
----
-
-### `Class` {#class}
+<a id="class"></a>
+#### `Class`
 
 ```go
 func (e *Element) Class(class string) *Element
@@ -2276,9 +2392,8 @@ func (e *Element) Class(class string) *Element
 
 Class sets the class attribute on the element.
 
----
-
-### `ID` {#id}
+<a id="id"></a>
+#### `ID`
 
 ```go
 func (e *Element) ID(id string) *Element
@@ -2286,19 +2401,21 @@ func (e *Element) ID(id string) *Element
 
 ID sets the id attribute on the element.
 
----
-
-### `Render` {#render}
+<a id="render"></a>
+#### `Render`
 
 ```go
 func (e *Element) Render() string
 ```
 
-Render converts the element to its HTML string representation. It handles both self-closing and container elements, attributes, content, and children. The output is properly formatted HTML that can be sent to browsers. Content and attribute values are HTML-escaped to prevent XSS, except for specific tags like <script> and <style> whose content must be raw.
+Render converts the element to its HTML string representation.
+It handles both self-closing and container elements, attributes, content, and children.
+The output is properly formatted HTML that can be sent to browsers.
+Content and attribute values are HTML-escaped to prevent XSS, except for
+specific tags like `&lt;script&gt;` and `&lt;style&gt;` whose content must be raw.
 
----
-
-### `Style` {#style}
+<a id="style"></a>
+#### `Style`
 
 ```go
 func (e *Element) Style(style string) *Element
@@ -2306,9 +2423,8 @@ func (e *Element) Style(style string) *Element
 
 Style sets the style attribute on the element.
 
----
-
-### `Text` {#text}
+<a id="text"></a>
+#### `Text`
 
 ```go
 func (e *Element) Text(text string) *Element
@@ -2316,9 +2432,8 @@ func (e *Element) Text(text string) *Element
 
 Text sets the text content of the element. This content is HTML-escaped during rendering.
 
----
-
-### `EnforceContentTypeConfig` {#enforcecontenttypeconfig}
+<a id="enforcecontenttypeconfig"></a>
+### `EnforceContentTypeConfig`
 
 ```go
 type EnforceContentTypeConfig struct {
@@ -2336,9 +2451,8 @@ type EnforceContentTypeConfig struct {
 
 EnforceContentTypeConfig holds configuration for EnforceContentTypeMiddleware.
 
----
-
-### `Flag` {#flag}
+<a id="flag"></a>
+### `Flag`
 
 ```go
 type Flag interface {
@@ -2358,11 +2472,11 @@ type Flag interface {
 }
 ```
 
-Flag defines the interface for command-line flags. Concrete types like StringFlag, IntFlag, BoolFlag implement this interface.
+Flag defines the interface for command-line flags.
+Concrete types like StringFlag, IntFlag, BoolFlag implement this interface.
 
----
-
-### `Float64Flag` {#float64flag}
+<a id="float64flag"></a>
+### `Float64Flag`
 
 ```go
 type Float64Flag struct {
@@ -2381,11 +2495,10 @@ type Float64Flag struct {
 
 Float64Flag defines a flag that accepts a float64 value.
 
----
-
 #### Methods
 
-### `Apply` {#apply}
+<a id="apply"></a>
+#### `Apply`
 
 ```go
 func (f *Float64Flag) Apply(set *flag.FlagSet, cli *CLI) error
@@ -2393,9 +2506,8 @@ func (f *Float64Flag) Apply(set *flag.FlagSet, cli *CLI) error
 
 Apply registers the float64 flag with the flag.FlagSet.
 
----
-
-### `GetAliases` {#getaliases}
+<a id="getaliases"></a>
+#### `GetAliases`
 
 ```go
 func (f *Float64Flag) GetAliases() []string
@@ -2403,9 +2515,8 @@ func (f *Float64Flag) GetAliases() []string
 
 GetAliases returns the aliases for the flag.
 
----
-
-### `GetName` {#getname}
+<a id="getname"></a>
+#### `GetName`
 
 ```go
 func (f *Float64Flag) GetName() string
@@ -2413,9 +2524,8 @@ func (f *Float64Flag) GetName() string
 
 GetName returns the primary name of the flag.
 
----
-
-### `IsRequired` {#isrequired}
+<a id="isrequired"></a>
+#### `IsRequired`
 
 ```go
 func (f *Float64Flag) IsRequired() bool
@@ -2423,9 +2533,8 @@ func (f *Float64Flag) IsRequired() bool
 
 IsRequired returns true if the flag must be provided.
 
----
-
-### `String` {#string}
+<a id="string"></a>
+#### `String`
 
 ```go
 func (f *Float64Flag) String() string
@@ -2433,9 +2542,8 @@ func (f *Float64Flag) String() string
 
 String returns the help text representation of the flag.
 
----
-
-### `Validate` {#validate}
+<a id="validate"></a>
+#### `Validate`
 
 ```go
 func (f *Float64Flag) Validate(set *flag.FlagSet) error
@@ -2443,9 +2551,8 @@ func (f *Float64Flag) Validate(set *flag.FlagSet) error
 
 Validate checks if the required flag was provided.
 
----
-
-### `ForceHTTPSConfig` {#forcehttpsconfig}
+<a id="forcehttpsconfig"></a>
+### `ForceHTTPSConfig`
 
 ```go
 type ForceHTTPSConfig struct {
@@ -2466,23 +2573,28 @@ type ForceHTTPSConfig struct {
 
 ForceHTTPSConfig holds configuration for ForceHTTPSMiddleware.
 
----
-
-### `Group` {#group}
+<a id="group"></a>
+### `Group`
 
 ```go
 type Group struct {
-	// contains filtered or unexported fields
+	// prefix is the URL path prefix applied to all routes in this group.
+	prefix string
+	// router is the parent router that actually stores the routes.
+	router *Router
+	// middlewares contains middleware functions applied only to routes in this group.
+	middlewares []Middleware
 }
 ```
 
-Group is a lightweight helper that allows users to register a set of routes that share a common prefix and/or middleware. It delegates to the parent router while applying its own prefix and middleware chain.
-
----
+Group is a lightweight helper that allows users to register a set of routes
+that share a common prefix and/or middleware. It delegates to the parent router
+while applying its own prefix and middleware chain.
 
 #### Methods
 
-### `Delete` {#delete}
+<a id="delete"></a>
+#### `Delete`
 
 ```go
 func (g *Group) Delete(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -2490,9 +2602,8 @@ func (g *Group) Delete(pattern string, handler http.HandlerFunc, options ...*Rou
 
 Delete registers a new route for HTTP DELETE requests within the group.
 
----
-
-### `DeleteFunc` {#deletefunc}
+<a id="deletefunc"></a>
+#### `DeleteFunc`
 
 ```go
 func (g *Group) DeleteFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -2500,9 +2611,8 @@ func (g *Group) DeleteFunc(pattern string, handler HandlerFunc, options ...*Rout
 
 DeleteFunc registers a new enhanced route for HTTP DELETE requests within the group.
 
----
-
-### `Get` {#get}
+<a id="get"></a>
+#### `Get`
 
 ```go
 func (g *Group) Get(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -2510,9 +2620,8 @@ func (g *Group) Get(pattern string, handler http.HandlerFunc, options ...*RouteO
 
 Get registers a new route for HTTP GET requests within the group.
 
----
-
-### `GetFunc` {#getfunc}
+<a id="getfunc"></a>
+#### `GetFunc`
 
 ```go
 func (g *Group) GetFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -2520,29 +2629,28 @@ func (g *Group) GetFunc(pattern string, handler HandlerFunc, options ...*RouteOp
 
 GetFunc registers a new enhanced route for HTTP GET requests within the group.
 
----
-
-### `Handle` {#handle}
+<a id="handle"></a>
+#### `Handle`
 
 ```go
 func (g *Group) Handle(method, pattern string, handler http.HandlerFunc, opts ...*RouteOptions)
 ```
 
-Handle registers a new route within the group, applying the group's prefix and middleware. The route is ultimately registered with the parent router after transformations.
+Handle registers a new route within the group, applying the group&apos;s prefix and middleware.
+The route is ultimately registered with the parent router after transformations.
 
----
-
-### `HandleFunc` {#handlefunc}
+<a id="handlefunc"></a>
+#### `HandleFunc`
 
 ```go
 func (g *Group) HandleFunc(method, pattern string, handler HandlerFunc, opts ...*RouteOptions)
 ```
 
-HandleFunc registers a new enhanced route within the group, applying the group's prefix and middleware. Uses the enhanced handler signature for better error handling.
+HandleFunc registers a new enhanced route within the group, applying the group&apos;s
+prefix and middleware. Uses the enhanced handler signature for better error handling.
 
----
-
-### `Patch` {#patch}
+<a id="patch"></a>
+#### `Patch`
 
 ```go
 func (g *Group) Patch(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -2550,9 +2658,8 @@ func (g *Group) Patch(pattern string, handler http.HandlerFunc, options ...*Rout
 
 Patch registers a new route for HTTP PATCH requests within the group.
 
----
-
-### `PatchFunc` {#patchfunc}
+<a id="patchfunc"></a>
+#### `PatchFunc`
 
 ```go
 func (g *Group) PatchFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -2560,9 +2667,8 @@ func (g *Group) PatchFunc(pattern string, handler HandlerFunc, options ...*Route
 
 PatchFunc registers a new enhanced route for HTTP PATCH requests within the group.
 
----
-
-### `Post` {#post}
+<a id="post"></a>
+#### `Post`
 
 ```go
 func (g *Group) Post(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -2570,9 +2676,8 @@ func (g *Group) Post(pattern string, handler http.HandlerFunc, options ...*Route
 
 Post registers a new route for HTTP POST requests within the group.
 
----
-
-### `PostFunc` {#postfunc}
+<a id="postfunc"></a>
+#### `PostFunc`
 
 ```go
 func (g *Group) PostFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -2580,9 +2685,8 @@ func (g *Group) PostFunc(pattern string, handler HandlerFunc, options ...*RouteO
 
 PostFunc registers a new enhanced route for HTTP POST requests within the group.
 
----
-
-### `Put` {#put}
+<a id="put"></a>
+#### `Put`
 
 ```go
 func (g *Group) Put(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -2590,9 +2694,8 @@ func (g *Group) Put(pattern string, handler http.HandlerFunc, options ...*RouteO
 
 Put registers a new route for HTTP PUT requests within the group.
 
----
-
-### `PutFunc` {#putfunc}
+<a id="putfunc"></a>
+#### `PutFunc`
 
 ```go
 func (g *Group) PutFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -2600,19 +2703,18 @@ func (g *Group) PutFunc(pattern string, handler HandlerFunc, options ...*RouteOp
 
 PutFunc registers a new enhanced route for HTTP PUT requests within the group.
 
----
-
-### `Use` {#use}
+<a id="use"></a>
+#### `Use`
 
 ```go
 func (g *Group) Use(mws ...Middleware)
 ```
 
-Use adds middleware functions to the group. These middleware functions apply only to routes registered through the group, not to the parent router.
+Use adds middleware functions to the group. These middleware functions apply
+only to routes registered through the group, not to the parent router.
 
----
-
-### `GzipConfig` {#gzipconfig}
+<a id="gzipconfig"></a>
+### `GzipConfig`
 
 ```go
 type GzipConfig struct {
@@ -2635,47 +2737,49 @@ type GzipConfig struct {
 
 GzipConfig holds configuration options for the GzipMiddleware.
 
----
-
-### `HTMLDocument` {#htmldocument}
+<a id="htmldocument"></a>
+### `HTMLDocument`
 
 ```go
 type HTMLDocument struct {
-	// contains filtered or unexported fields
+	rootElement *Element // The root `<html>` element.
 }
 ```
 
-HTMLDocument represents a full HTML document, including the DOCTYPE. Its Render method produces the complete HTML string.
-
----
+HTMLDocument represents a full HTML document, including the DOCTYPE.
+Its Render method produces the complete HTML string.
 
 #### Associated Functions
 
-### `Document` {#document}
+<a id="document"></a>
+#### `Document`
 
 ```go
 func Document(config DocumentConfig, bodyContent ...HTMLElement) *HTMLDocument
 ```
 
-Document creates a complete HTML5 document structure, encapsulated in an HTMLDocument. The returned HTMLDocument's Render method will produce the full HTML string, including the DOCTYPE.
-
-It uses DocumentConfig to customize the document's head and html attributes, and accepts variadic arguments for the body content. Sensible defaults are applied for common attributes and meta tags if not specified in the config.
-
----
+Document creates a complete HTML5 document structure, encapsulated in an HTMLDocument.
+The returned HTMLDocument&apos;s Render method will produce the full HTML string,
+including the DOCTYPE.
+It uses DocumentConfig to customize the document&apos;s head and html attributes,
+and accepts variadic arguments for the body content.
+Sensible defaults are applied for common attributes and meta tags if not specified
+in the config.
 
 #### Methods
 
-### `Render` {#render}
+<a id="render"></a>
+#### `Render`
 
 ```go
 func (d *HTMLDocument) Render() string
 ```
 
-Render converts the HTMLDocument to its full string representation, prepending the HTML5 DOCTYPE declaration.
+Render converts the HTMLDocument to its full string representation,
+prepending the HTML5 DOCTYPE declaration.
 
----
-
-### `HTMLElement` {#htmlelement}
+<a id="htmlelement"></a>
+### `HTMLElement`
 
 ```go
 type HTMLElement interface {
@@ -2683,13 +2787,14 @@ type HTMLElement interface {
 }
 ```
 
-HTMLElement represents any HTML element that can be rendered to a string. This interface allows for composition of complex HTML structures using both predefined elements and custom implementations.
-
----
+HTMLElement represents any HTML element that can be rendered to a string.
+This interface allows for composition of complex HTML structures using
+both predefined elements and custom implementations.
 
 #### Associated Functions
 
-### `Text` {#text}
+<a id="text"></a>
+#### `Text`
 
 ```go
 func Text(text string) HTMLElement
@@ -2697,19 +2802,18 @@ func Text(text string) HTMLElement
 
 Text creates a raw text node.
 
----
-
-### `HandlerFunc` {#handlerfunc}
+<a id="handlerfunc"></a>
+### `HandlerFunc`
 
 ```go
 type HandlerFunc func(*ResponseContext) error
 ```
 
-HandlerFunc is an enhanced handler function that receives a ResponseContext and returns an error. This allows for cleaner error handling and response management compared to standard http.HandlerFunc.
+HandlerFunc is an enhanced handler function that receives a ResponseContext and returns an error.
+This allows for cleaner error handling and response management compared to standard http.HandlerFunc.
 
----
-
-### `HeaderObject` {#headerobject}
+<a id="headerobject"></a>
+### `HeaderObject`
 
 ```go
 type HeaderObject struct {
@@ -2720,9 +2824,8 @@ type HeaderObject struct {
 
 HeaderObject describes a response header in an Operation.
 
----
-
-### `HealthCheckConfig` {#healthcheckconfig}
+<a id="healthcheckconfig"></a>
+### `HealthCheckConfig`
 
 ```go
 type HealthCheckConfig struct {
@@ -2737,9 +2840,8 @@ type HealthCheckConfig struct {
 
 HealthCheckConfig holds configuration for HealthCheckMiddleware.
 
----
-
-### `IPFilterConfig` {#ipfilterconfig}
+<a id="ipfilterconfig"></a>
+### `IPFilterConfig`
 
 ```go
 type IPFilterConfig struct {
@@ -2761,9 +2863,8 @@ type IPFilterConfig struct {
 
 IPFilterConfig holds configuration for IP filtering.
 
----
-
-### `Info` {#info}
+<a id="info"></a>
+### `Info`
 
 ```go
 type Info struct {
@@ -2775,9 +2876,8 @@ type Info struct {
 
 Info provides metadata about the API: title, version, and optional description.
 
----
-
-### `IntFlag` {#intflag}
+<a id="intflag"></a>
+### `IntFlag`
 
 ```go
 type IntFlag struct {
@@ -2796,11 +2896,10 @@ type IntFlag struct {
 
 IntFlag defines a flag that accepts an integer value.
 
----
-
 #### Methods
 
-### `Apply` {#apply}
+<a id="apply"></a>
+#### `Apply`
 
 ```go
 func (f *IntFlag) Apply(set *flag.FlagSet, cli *CLI) error
@@ -2808,9 +2907,8 @@ func (f *IntFlag) Apply(set *flag.FlagSet, cli *CLI) error
 
 Apply registers the int flag with the flag.FlagSet.
 
----
-
-### `GetAliases` {#getaliases}
+<a id="getaliases"></a>
+#### `GetAliases`
 
 ```go
 func (f *IntFlag) GetAliases() []string
@@ -2818,9 +2916,8 @@ func (f *IntFlag) GetAliases() []string
 
 GetAliases returns the aliases for the flag.
 
----
-
-### `GetName` {#getname}
+<a id="getname"></a>
+#### `GetName`
 
 ```go
 func (f *IntFlag) GetName() string
@@ -2828,9 +2925,8 @@ func (f *IntFlag) GetName() string
 
 GetName returns the primary name of the flag.
 
----
-
-### `IsRequired` {#isrequired}
+<a id="isrequired"></a>
+#### `IsRequired`
 
 ```go
 func (f *IntFlag) IsRequired() bool
@@ -2838,9 +2934,8 @@ func (f *IntFlag) IsRequired() bool
 
 IsRequired returns true if the flag must be provided.
 
----
-
-### `String` {#string}
+<a id="string"></a>
+#### `String`
 
 ```go
 func (f *IntFlag) String() string
@@ -2848,9 +2943,8 @@ func (f *IntFlag) String() string
 
 String returns the help text representation of the flag.
 
----
-
-### `Validate` {#validate}
+<a id="validate"></a>
+#### `Validate`
 
 ```go
 func (f *IntFlag) Validate(set *flag.FlagSet) error
@@ -2858,9 +2952,8 @@ func (f *IntFlag) Validate(set *flag.FlagSet) error
 
 Validate checks if the required flag was provided.
 
----
-
-### `LoggingConfig` {#loggingconfig}
+<a id="loggingconfig"></a>
+### `LoggingConfig`
 
 ```go
 type LoggingConfig struct {
@@ -2877,9 +2970,8 @@ type LoggingConfig struct {
 
 LoggingConfig holds configuration for LoggingMiddleware.
 
----
-
-### `MaintenanceModeConfig` {#maintenancemodeconfig}
+<a id="maintenancemodeconfig"></a>
+### `MaintenanceModeConfig`
 
 ```go
 type MaintenanceModeConfig struct {
@@ -2900,9 +2992,8 @@ type MaintenanceModeConfig struct {
 
 MaintenanceModeConfig holds configuration for MaintenanceModeMiddleware.
 
----
-
-### `MaxRequestBodySizeConfig` {#maxrequestbodysizeconfig}
+<a id="maxrequestbodysizeconfig"></a>
+### `MaxRequestBodySizeConfig`
 
 ```go
 type MaxRequestBodySizeConfig struct {
@@ -2916,9 +3007,8 @@ type MaxRequestBodySizeConfig struct {
 
 MaxRequestBodySizeConfig holds configuration for MaxRequestBodySizeMiddleware.
 
----
-
-### `MediaTypeObject` {#mediatypeobject}
+<a id="mediatypeobject"></a>
+### `MediaTypeObject`
 
 ```go
 type MediaTypeObject struct {
@@ -2928,9 +3018,8 @@ type MediaTypeObject struct {
 
 MediaTypeObject holds the schema defining the media type for a request or response.
 
----
-
-### `MethodOverrideConfig` {#methodoverrideconfig}
+<a id="methodoverrideconfig"></a>
+### `MethodOverrideConfig`
 
 ```go
 type MethodOverrideConfig struct {
@@ -2946,21 +3035,21 @@ type MethodOverrideConfig struct {
 
 MethodOverrideConfig holds configuration for MethodOverrideMiddleware.
 
----
-
-### `Middleware` {#middleware}
+<a id="middleware"></a>
+### `Middleware`
 
 ```go
 type Middleware func(http.Handler) http.Handler
 ```
 
-Middleware defines the function signature for middleware. A middleware is a function that wraps an http.Handler, adding extra behavior such as logging, authentication, or request modification.
-
----
+Middleware defines the function signature for middleware.
+A middleware is a function that wraps an http.Handler, adding extra behavior
+such as logging, authentication, or request modification.
 
 #### Associated Functions
 
-### `BasicAuthMiddleware` {#basicauthmiddleware}
+<a id="basicauthmiddleware"></a>
+#### `BasicAuthMiddleware`
 
 ```go
 func BasicAuthMiddleware(config BasicAuthConfig) Middleware
@@ -2968,9 +3057,8 @@ func BasicAuthMiddleware(config BasicAuthConfig) Middleware
 
 BasicAuthMiddleware provides simple HTTP Basic Authentication.
 
----
-
-### `CORSMiddleware` {#corsmiddleware}
+<a id="corsmiddleware"></a>
+#### `CORSMiddleware`
 
 ```go
 func CORSMiddleware(config CORSConfig) Middleware
@@ -2978,19 +3066,21 @@ func CORSMiddleware(config CORSConfig) Middleware
 
 CORSMiddleware sets Cross-Origin Resource Sharing headers.
 
----
-
-### `CSRFMiddleware` {#csrfmiddleware}
+<a id="csrfmiddleware"></a>
+#### `CSRFMiddleware`
 
 ```go
 func CSRFMiddleware(config *CSRFConfig) Middleware
 ```
 
-CSRFMiddleware provides Cross-Site Request Forgery protection. It uses the "Double Submit Cookie" pattern. A random token is generated and set in a secure, HttpOnly cookie. For unsafe methods (POST, PUT, etc.), the middleware expects the same token to be present in a request header (e.g., X-CSRF-Token) or form field, sent by the frontend JavaScript.
+CSRFMiddleware provides Cross-Site Request Forgery protection.
+It uses the &quot;Double Submit Cookie&quot; pattern. A random token is generated and
+set in a secure, HttpOnly cookie. For unsafe methods (POST, PUT, etc.),
+the middleware expects the same token to be present in a request header
+(e.g., X-CSRF-Token) or form field, sent by the frontend JavaScript.
 
----
-
-### `CacheControlMiddleware` {#cachecontrolmiddleware}
+<a id="cachecontrolmiddleware"></a>
+#### `CacheControlMiddleware`
 
 ```go
 func CacheControlMiddleware(config CacheControlConfig) Middleware
@@ -2998,9 +3088,8 @@ func CacheControlMiddleware(config CacheControlConfig) Middleware
 
 CacheControlMiddleware sets the Cache-Control header for responses.
 
----
-
-### `ConcurrencyLimiterMiddleware` {#concurrencylimitermiddleware}
+<a id="concurrencylimitermiddleware"></a>
+#### `ConcurrencyLimiterMiddleware`
 
 ```go
 func ConcurrencyLimiterMiddleware(config ConcurrencyLimiterConfig) Middleware
@@ -3008,29 +3097,29 @@ func ConcurrencyLimiterMiddleware(config ConcurrencyLimiterConfig) Middleware
 
 ConcurrencyLimiterMiddleware limits the number of concurrent requests.
 
----
-
-### `ETagMiddleware` {#etagmiddleware}
+<a id="etagmiddleware"></a>
+#### `ETagMiddleware`
 
 ```go
 func ETagMiddleware(config *ETagConfig) Middleware
 ```
 
-ETagMiddleware adds ETag headers to responses and handles If-None-Match conditional requests, potentially returning a 304 Not Modified status. Note: This middleware buffers the entire response body in memory to calculate the ETag hash. This may be inefficient for very large responses.
+ETagMiddleware adds ETag headers to responses and handles If-None-Match
+conditional requests, potentially returning a 304 Not Modified status.
+Note: This middleware buffers the entire response body in memory to calculate
+the ETag hash. This may be inefficient for very large responses.
 
----
-
-### `EnforceContentTypeMiddleware` {#enforcecontenttypemiddleware}
+<a id="enforcecontenttypemiddleware"></a>
+#### `EnforceContentTypeMiddleware`
 
 ```go
 func EnforceContentTypeMiddleware(config EnforceContentTypeConfig) Middleware
 ```
 
-EnforceContentTypeMiddleware checks if the request's Content-Type header is allowed.
+EnforceContentTypeMiddleware checks if the request&apos;s Content-Type header is allowed.
 
----
-
-### `ForceHTTPSMiddleware` {#forcehttpsmiddleware}
+<a id="forcehttpsmiddleware"></a>
+#### `ForceHTTPSMiddleware`
 
 ```go
 func ForceHTTPSMiddleware(config ForceHTTPSConfig) Middleware
@@ -3038,19 +3127,18 @@ func ForceHTTPSMiddleware(config ForceHTTPSConfig) Middleware
 
 ForceHTTPSMiddleware redirects HTTP requests to HTTPS.
 
----
-
-### `GzipMiddleware` {#gzipmiddleware}
+<a id="gzipmiddleware"></a>
+#### `GzipMiddleware`
 
 ```go
 func GzipMiddleware(config *GzipConfig) Middleware
 ```
 
-GzipMiddleware returns middleware that compresses response bodies using gzip if the client indicates support via the Accept-Encoding header.
+GzipMiddleware returns middleware that compresses response bodies using gzip
+if the client indicates support via the Accept-Encoding header.
 
----
-
-### `HealthCheckMiddleware` {#healthcheckmiddleware}
+<a id="healthcheckmiddleware"></a>
+#### `HealthCheckMiddleware`
 
 ```go
 func HealthCheckMiddleware(config *HealthCheckConfig) Middleware
@@ -3058,9 +3146,8 @@ func HealthCheckMiddleware(config *HealthCheckConfig) Middleware
 
 HealthCheckMiddleware provides a simple health check endpoint.
 
----
-
-### `IPFilterMiddleware` {#ipfiltermiddleware}
+<a id="ipfiltermiddleware"></a>
+#### `IPFilterMiddleware`
 
 ```go
 func IPFilterMiddleware(config IPFilterConfig) Middleware
@@ -3068,9 +3155,8 @@ func IPFilterMiddleware(config IPFilterConfig) Middleware
 
 IPFilterMiddleware restricts access based on client IP address.
 
----
-
-### `LoggingMiddleware` {#loggingmiddleware}
+<a id="loggingmiddleware"></a>
+#### `LoggingMiddleware`
 
 ```go
 func LoggingMiddleware(config *LoggingConfig) Middleware
@@ -3078,9 +3164,8 @@ func LoggingMiddleware(config *LoggingConfig) Middleware
 
 LoggingMiddleware logs request details including method, path, status, size, and duration.
 
----
-
-### `MaintenanceModeMiddleware` {#maintenancemodemiddleware}
+<a id="maintenancemodemiddleware"></a>
+#### `MaintenanceModeMiddleware`
 
 ```go
 func MaintenanceModeMiddleware(config MaintenanceModeConfig) Middleware
@@ -3088,9 +3173,8 @@ func MaintenanceModeMiddleware(config MaintenanceModeConfig) Middleware
 
 MaintenanceModeMiddleware returns a 503 Service Unavailable if enabled, allowing bypass for specific IPs.
 
----
-
-### `MaxRequestBodySizeMiddleware` {#maxrequestbodysizemiddleware}
+<a id="maxrequestbodysizemiddleware"></a>
+#### `MaxRequestBodySizeMiddleware`
 
 ```go
 func MaxRequestBodySizeMiddleware(config MaxRequestBodySizeConfig) Middleware
@@ -3098,9 +3182,8 @@ func MaxRequestBodySizeMiddleware(config MaxRequestBodySizeConfig) Middleware
 
 MaxRequestBodySizeMiddleware limits the size of incoming request bodies.
 
----
-
-### `MethodOverrideMiddleware` {#methodoverridemiddleware}
+<a id="methodoverridemiddleware"></a>
+#### `MethodOverrideMiddleware`
 
 ```go
 func MethodOverrideMiddleware(config *MethodOverrideConfig) Middleware
@@ -3108,32 +3191,31 @@ func MethodOverrideMiddleware(config *MethodOverrideConfig) Middleware
 
 MethodOverrideMiddleware checks a header or form field to override the request method.
 
----
-
-### `RateLimitMiddleware` {#ratelimitmiddleware}
+<a id="ratelimitmiddleware"></a>
+#### `RateLimitMiddleware`
 
 ```go
 func RateLimitMiddleware(config RateLimiterConfig) Middleware
 ```
 
-RateLimitMiddleware provides basic in-memory rate limiting. Warning: This simple implementation has limitations:
- - Memory usage can grow indefinitely without CleanupInterval set.
- - Not suitable for distributed systems (limit is per instance).
- - Accuracy decreases slightly under very high concurrency due to locking.
+RateLimitMiddleware provides basic in-memory rate limiting.
+Warning: This simple implementation has limitations:
+- Memory usage can grow indefinitely without CleanupInterval set.
+- Not suitable for distributed systems (limit is per instance).
+- Accuracy decreases slightly under very high concurrency due to locking.
 
----
-
-### `RealIPMiddleware` {#realipmiddleware}
+<a id="realipmiddleware"></a>
+#### `RealIPMiddleware`
 
 ```go
 func RealIPMiddleware(config RealIPConfig) Middleware
 ```
 
-RealIPMiddleware extracts the client's real IP address from proxy headers. Warning: Only use this if you have a trusted proxy setting these headers correctly.
+RealIPMiddleware extracts the client&apos;s real IP address from proxy headers.
+Warning: Only use this if you have a trusted proxy setting these headers correctly.
 
----
-
-### `RecoveryMiddleware` {#recoverymiddleware}
+<a id="recoverymiddleware"></a>
+#### `RecoveryMiddleware`
 
 ```go
 func RecoveryMiddleware(config *RecoveryConfig) Middleware
@@ -3141,19 +3223,18 @@ func RecoveryMiddleware(config *RecoveryConfig) Middleware
 
 RecoveryMiddleware recovers from panics in downstream handlers.
 
----
-
-### `RequestIDMiddleware` {#requestidmiddleware}
+<a id="requestidmiddleware"></a>
+#### `RequestIDMiddleware`
 
 ```go
 func RequestIDMiddleware(config *RequestIDConfig) Middleware
 ```
 
-RequestIDMiddleware retrieves a request ID from a header or generates one. It sets the ID in the response header and request context.
+RequestIDMiddleware retrieves a request ID from a header or generates one.
+It sets the ID in the response header and request context.
 
----
-
-### `SecurityHeadersMiddleware` {#securityheadersmiddleware}
+<a id="securityheadersmiddleware"></a>
+#### `SecurityHeadersMiddleware`
 
 ```go
 func SecurityHeadersMiddleware(config SecurityHeadersConfig) Middleware
@@ -3161,9 +3242,8 @@ func SecurityHeadersMiddleware(config SecurityHeadersConfig) Middleware
 
 SecurityHeadersMiddleware sets common security headers.
 
----
-
-### `TimeoutMiddleware` {#timeoutmiddleware}
+<a id="timeoutmiddleware"></a>
+#### `TimeoutMiddleware`
 
 ```go
 func TimeoutMiddleware(config TimeoutConfig) Middleware
@@ -3171,9 +3251,8 @@ func TimeoutMiddleware(config TimeoutConfig) Middleware
 
 TimeoutMiddleware sets a maximum duration for handling requests.
 
----
-
-### `TrailingSlashRedirectMiddleware` {#trailingslashredirectmiddleware}
+<a id="trailingslashredirectmiddleware"></a>
+#### `TrailingSlashRedirectMiddleware`
 
 ```go
 func TrailingSlashRedirectMiddleware(config TrailingSlashRedirectConfig) Middleware
@@ -3181,9 +3260,8 @@ func TrailingSlashRedirectMiddleware(config TrailingSlashRedirectConfig) Middlew
 
 TrailingSlashRedirectMiddleware redirects requests to add or remove a trailing slash.
 
----
-
-### `OpenAPI` {#openapi}
+<a id="openapi"></a>
+### `OpenAPI`
 
 ```go
 type OpenAPI struct {
@@ -3196,21 +3274,20 @@ type OpenAPI struct {
 
 OpenAPI is the root document object for an OpenAPI 3 specification.
 
----
-
 #### Associated Functions
 
-### `GenerateOpenAPISpec` {#generateopenapispec}
+<a id="generateopenapispec"></a>
+#### `GenerateOpenAPISpec`
 
 ```go
 func GenerateOpenAPISpec(router *Router, config OpenAPIConfig) *OpenAPI
 ```
 
-GenerateOpenAPISpec constructs an OpenAPI 3.0 specification from the given router and configuration, including paths, operations, and components.
+GenerateOpenAPISpec constructs an OpenAPI 3.0 specification from the given
+router and configuration, including paths, operations, and components.
 
----
-
-### `OpenAPIConfig` {#openapiconfig}
+<a id="openapiconfig"></a>
+### `OpenAPIConfig`
 
 ```go
 type OpenAPIConfig struct {
@@ -3222,9 +3299,8 @@ type OpenAPIConfig struct {
 
 OpenAPIConfig holds metadata for generating an OpenAPI specification.
 
----
-
-### `Operation` {#operation}
+<a id="operation"></a>
+### `Operation`
 
 ```go
 type Operation struct {
@@ -3241,9 +3317,20 @@ type Operation struct {
 
 Operation describes a single API operation on a path.
 
----
+#### Associated Functions
 
-### `ParameterObject` {#parameterobject}
+<a id="buildoperation"></a>
+#### `buildOperation`
+
+```go
+func buildOperation(route route, schemaCtx *schemaGenCtx) *Operation
+```
+
+buildOperation creates an OpenAPI OperationObject from a route and schema
+generation context, adding parameters, requestBody, and responses.
+
+<a id="parameterobject"></a>
+### `ParameterObject`
 
 ```go
 type ParameterObject struct {
@@ -3259,9 +3346,8 @@ type ParameterObject struct {
 
 ParameterObject describes a single parameter for an Operation or PathItem.
 
----
-
-### `ParameterOption` {#parameteroption}
+<a id="parameteroption"></a>
+### `ParameterOption`
 
 ```go
 type ParameterOption struct {
@@ -3274,11 +3360,12 @@ type ParameterOption struct {
 }
 ```
 
-ParameterOption configures an Operation parameter. Name and In ("query", "header", "path", "cookie") are required. Required, Schema and Example further customize the generated parameter.
+ParameterOption configures an Operation parameter.
+Name and In (&quot;query&quot;, &quot;header&quot;, &quot;path&quot;, &quot;cookie&quot;) are required.
+Required, Schema and Example further customize the generated parameter.
 
----
-
-### `PathItem` {#pathitem}
+<a id="pathitem"></a>
+### `PathItem`
 
 ```go
 type PathItem struct {
@@ -3293,11 +3380,11 @@ type PathItem struct {
 }
 ```
 
-PathItem describes the operations available on a single API path. One of Get, Post, Put, Delete, Patch may be non-nil.
+PathItem describes the operations available on a single API path.
+One of Get, Post, Put, Delete, Patch may be non-nil.
 
----
-
-### `RateLimiterConfig` {#ratelimiterconfig}
+<a id="ratelimiterconfig"></a>
+### `RateLimiterConfig`
 
 ```go
 type RateLimiterConfig struct {
@@ -3325,9 +3412,8 @@ type RateLimiterConfig struct {
 
 RateLimiterConfig holds configuration for the simple rate limiter.
 
----
-
-### `RealIPConfig` {#realipconfig}
+<a id="realipconfig"></a>
+### `RealIPConfig`
 
 ```go
 type RealIPConfig struct {
@@ -3348,9 +3434,8 @@ type RealIPConfig struct {
 
 RealIPConfig holds configuration for RealIPMiddleware.
 
----
-
-### `RecoveryConfig` {#recoveryconfig}
+<a id="recoveryconfig"></a>
+### `RecoveryConfig`
 
 ```go
 type RecoveryConfig struct {
@@ -3371,9 +3456,8 @@ type RecoveryConfig struct {
 
 RecoveryConfig holds configuration for RecoveryMiddleware.
 
----
-
-### `RequestBodyObject` {#requestbodyobject}
+<a id="requestbodyobject"></a>
+### `RequestBodyObject`
 
 ```go
 type RequestBodyObject struct {
@@ -3385,9 +3469,8 @@ type RequestBodyObject struct {
 
 RequestBodyObject describes a request body for an Operation.
 
----
-
-### `RequestIDConfig` {#requestidconfig}
+<a id="requestidconfig"></a>
+### `RequestIDConfig`
 
 ```go
 type RequestIDConfig struct {
@@ -3406,53 +3489,60 @@ type RequestIDConfig struct {
 
 RequestIDConfig holds configuration for RequestIDMiddleware.
 
----
-
-### `ResponseContext` {#responsecontext}
+<a id="responsecontext"></a>
+### `ResponseContext`
 
 ```go
 type ResponseContext struct {
-	// contains filtered or unexported fields
+	// w is the underlying HTTP response writer for sending responses to the client.
+	w http.ResponseWriter
+	// r is the incoming HTTP request containing headers, body, and URL parameters.
+	r *http.Request
+	// router is the parent router instance used for URL parameter extraction.
+	router *Router
 }
 ```
 
-ResponseContext provides helper methods for sending HTTP responses with reduced boilerplate. It wraps the http.ResponseWriter and http.Request along with router context to provide convenient methods for JSON, HTML, text responses, and automatic data binding.
-
----
+ResponseContext provides helper methods for sending HTTP responses with reduced boilerplate.
+It wraps the http.ResponseWriter and http.Request along with router context to provide
+convenient methods for JSON, HTML, text responses, and automatic data binding.
 
 #### Methods
 
-### `Bind` {#bind}
+<a id="bind"></a>
+#### `Bind`
 
 ```go
 func (rc *ResponseContext) Bind(v any) error
 ```
 
-Bind automatically unmarshals and validates request data into the provided struct. It supports both JSON and form data, with automatic content-type detection. The struct should be a pointer. Validation is performed if validation middleware is active.
+Bind automatically unmarshals and validates request data into the provided struct.
+It supports both JSON and form data, with automatic content-type detection.
+The struct should be a pointer. Validation is performed if validation middleware is active.
 
----
-
-### `BindForm` {#bindform}
+<a id="bindform"></a>
+#### `BindForm`
 
 ```go
 func (rc *ResponseContext) BindForm(v any) error
 ```
 
-BindForm binds form data into the provided struct using reflection. The struct should be a pointer. Field names are matched using JSON tags or struct field names. Supports string, bool, int, and float fields with automatic type conversion.
+BindForm binds form data into the provided struct using reflection.
+The struct should be a pointer. Field names are matched using JSON tags or struct field names.
+Supports string, bool, int, and float fields with automatic type conversion.
 
----
-
-### `BindJSON` {#bindjson}
+<a id="bindjson"></a>
+#### `BindJSON`
 
 ```go
 func (rc *ResponseContext) BindJSON(v any) error
 ```
 
-BindJSON unmarshals JSON request body into the provided struct. The struct should be a pointer. Returns an error if the body is nil or JSON is invalid.
+BindJSON unmarshals JSON request body into the provided struct.
+The struct should be a pointer. Returns an error if the body is nil or JSON is invalid.
 
----
-
-### `BindValidated` {#bindvalidated}
+<a id="bindvalidated"></a>
+#### `BindValidated`
 
 ```go
 func (rc *ResponseContext) BindValidated(v any) error
@@ -3460,99 +3550,101 @@ func (rc *ResponseContext) BindValidated(v any) error
 
 BindValidated binds and validates request data (JSON or form) with comprehensive validation.
 
----
-
-### `HTML` {#html}
+<a id="html"></a>
+#### `HTML`
 
 ```go
 func (rc *ResponseContext) HTML(statusCode int, content HTMLElement) error
 ```
 
-HTML sends an HTML response with the given status code and content. It automatically sets the Content-Type header to "text/html; charset=utf-8" and renders the provided HTMLElement to string.
+HTML sends an HTML response with the given status code and content.
+It automatically sets the Content-Type header to &quot;text/html; charset=utf-8&quot;
+and renders the provided HTMLElement to string.
 
----
-
-### `JSON` {#json}
+<a id="json"></a>
+#### `JSON`
 
 ```go
 func (rc *ResponseContext) JSON(statusCode int, data any) error
 ```
 
-JSON sends a JSON response with the given status code and data. It automatically sets the Content-Type header to "application/json" and handles JSON encoding. Returns an error if encoding fails.
+JSON sends a JSON response with the given status code and data.
+It automatically sets the Content-Type header to &quot;application/json&quot; and
+handles JSON encoding. Returns an error if encoding fails.
 
----
-
-### `JSONError` {#jsonerror}
+<a id="jsonerror"></a>
+#### `JSONError`
 
 ```go
 func (rc *ResponseContext) JSONError(statusCode int, message string) error
 ```
 
-JSONError sends a JSON error response with the given status code and message. It creates a standardized error response format with an "error" field.
+JSONError sends a JSON error response with the given status code and message.
+It creates a standardized error response format with an &quot;error&quot; field.
 
----
-
-### `Redirect` {#redirect}
+<a id="redirect"></a>
+#### `Redirect`
 
 ```go
 func (rc *ResponseContext) Redirect(statusCode int, url string) error
 ```
 
-Redirect sends an HTTP redirect response with the given status code and URL. Common status codes are 301 (permanent), 302 (temporary), and 307 (temporary, preserve method).
+Redirect sends an HTTP redirect response with the given status code and URL.
+Common status codes are 301 (permanent), 302 (temporary), and 307 (temporary, preserve method).
 
----
-
-### `Request` {#request}
+<a id="request"></a>
+#### `Request`
 
 ```go
 func (rc *ResponseContext) Request() *http.Request
 ```
 
-Request returns the underlying http.Request for advanced request handling when the ResponseContext helpers are not sufficient.
+Request returns the underlying http.Request for advanced request handling
+when the ResponseContext helpers are not sufficient.
 
----
-
-### `Text` {#text}
+<a id="text"></a>
+#### `Text`
 
 ```go
 func (rc *ResponseContext) Text(statusCode int, text string) error
 ```
 
-Text sends a plain text response with the given status code and text content. It automatically sets the Content-Type header to "text/plain; charset=utf-8".
+Text sends a plain text response with the given status code and text content.
+It automatically sets the Content-Type header to &quot;text/plain; charset=utf-8&quot;.
 
----
-
-### `URLParam` {#urlparam}
+<a id="urlparam"></a>
+#### `URLParam`
 
 ```go
 func (rc *ResponseContext) URLParam(key string) string
 ```
 
-URLParam retrieves the URL parameter for the given key from the request context. Returns an empty string if the parameter is not present or if the request doesn't contain URL parameters.
+URLParam retrieves the URL parameter for the given key from the request context.
+Returns an empty string if the parameter is not present or if the request
+doesn&apos;t contain URL parameters.
 
----
-
-### `WantsJSON` {#wantsjson}
+<a id="wantsjson"></a>
+#### `WantsJSON`
 
 ```go
 func (rc *ResponseContext) WantsJSON() bool
 ```
 
-WantsJSON returns true if the request expects a JSON response based on Content-Type or Accept headers. Useful for dual HTML/JSON endpoints.
+WantsJSON returns true if the request expects a JSON response based on
+Content-Type or Accept headers. Useful for dual HTML/JSON endpoints.
 
----
-
-### `Writer` {#writer}
+<a id="writer"></a>
+#### `Writer`
 
 ```go
 func (rc *ResponseContext) Writer() http.ResponseWriter
 ```
 
-Writer returns the underlying http.ResponseWriter for advanced response handling when the ResponseContext helpers are not sufficient.
+Writer returns the underlying http.ResponseWriter for advanced response handling
+when the ResponseContext helpers are not sufficient.
 
----
-
-### `ResponseObject` {#responseobject}
+<a id="responseobject"></a>
+### `ResponseObject`
 
 ```go
 type ResponseObject struct {
@@ -3564,9 +3656,8 @@ type ResponseObject struct {
 
 ResponseObject describes a single response in an Operation.
 
----
-
-### `ResponseOption` {#responseoption}
+<a id="responseoption"></a>
+### `ResponseOption`
 
 ```go
 type ResponseOption struct {
@@ -3575,11 +3666,11 @@ type ResponseOption struct {
 }
 ```
 
-ResponseOption configures a single HTTP response in an Operation. Description is required; Body, if non-nil, is used to generate a schema.
+ResponseOption configures a single HTTP response in an Operation.
+Description is required; Body, if non-nil, is used to generate a schema.
 
----
-
-### `RouteOptions` {#routeoptions}
+<a id="routeoptions"></a>
+### `RouteOptions`
 
 ```go
 type RouteOptions struct {
@@ -3594,25 +3685,43 @@ type RouteOptions struct {
 }
 ```
 
-RouteOptions holds OpenAPI metadata for a single route. Tags, Summary, Description, and OperationID map directly into the corresponding Operation fields. RequestBody, Responses, and Parameters drive schema generation for request bodies, responses, and parameters.
+RouteOptions holds OpenAPI metadata for a single route.
+Tags, Summary, Description, and OperationID map directly into the
+corresponding Operation fields. RequestBody, Responses, and Parameters
+drive schema generation for request bodies, responses, and parameters.
 
----
-
-### `Router` {#router}
+<a id="router"></a>
+### `Router`
 
 ```go
 type Router struct {
-	// contains filtered or unexported fields
+	// routes contains all registered routes with their patterns and handlers.
+	routes []route
+	// subrouters contains mounted child routers with their own base paths.
+	subrouters []*Router
+	// paramsKey is the context key used to store URL parameters in request context.
+	paramsKey any
+	// middlewares contains all registered middleware functions applied to routes.
+	middlewares []Middleware
+	// chain is the composed middleware chain function applied to all routes.
+	chain func(http.Handler) http.Handler
+	// basePath is the prefix path for this router, used in subrouters and groups.
+	basePath string
+	// notFoundHandler is the custom handler for 404 Not Found responses.
+	notFoundHandler http.Handler
+	// methodNotAllowedHandler is the custom handler for 405 Method Not Allowed responses.
+	methodNotAllowedHandler http.Handler
 }
 ```
 
-Router is a minimal HTTP router that supports dynamic routes with regex validation in path parameters and can mount subrouters. It provides middleware support, custom error handlers, and both traditional and enhanced handler functions.
-
----
+Router is a minimal HTTP router that supports dynamic routes with regex validation
+in path parameters and can mount subrouters. It provides middleware support,
+custom error handlers, and both traditional and enhanced handler functions.
 
 #### Associated Functions
 
-### `NewRouter` {#newrouter}
+<a id="newrouter"></a>
+#### `NewRouter`
 
 ```go
 func NewRouter() *Router
@@ -3620,11 +3729,10 @@ func NewRouter() *Router
 
 NewRouter creates and returns a new Router instance with default configuration.
 
----
-
 #### Methods
 
-### `Delete` {#delete}
+<a id="delete"></a>
+#### `Delete`
 
 ```go
 func (r *Router) Delete(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -3632,9 +3740,8 @@ func (r *Router) Delete(pattern string, handler http.HandlerFunc, options ...*Ro
 
 Delete registers a new route for HTTP DELETE requests using the standard handler signature.
 
----
-
-### `DeleteFunc` {#deletefunc}
+<a id="deletefunc"></a>
+#### `DeleteFunc`
 
 ```go
 func (r *Router) DeleteFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -3642,9 +3749,8 @@ func (r *Router) DeleteFunc(pattern string, handler HandlerFunc, options ...*Rou
 
 DeleteFunc registers a new route for HTTP DELETE requests using the enhanced handler signature.
 
----
-
-### `Get` {#get}
+<a id="get"></a>
+#### `Get`
 
 ```go
 func (r *Router) Get(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -3652,9 +3758,8 @@ func (r *Router) Get(pattern string, handler http.HandlerFunc, options ...*Route
 
 Get registers a new route for HTTP GET requests using the standard handler signature.
 
----
-
-### `GetFunc` {#getfunc}
+<a id="getfunc"></a>
+#### `GetFunc`
 
 ```go
 func (r *Router) GetFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -3662,39 +3767,41 @@ func (r *Router) GetFunc(pattern string, handler HandlerFunc, options ...*RouteO
 
 GetFunc registers a new route for HTTP GET requests using the enhanced handler signature.
 
----
-
-### `Group` {#group}
+<a id="group"></a>
+#### `Group`
 
 ```go
 func (r *Router) Group(prefix string, mws ...Middleware) *Group
 ```
 
-Group creates and returns a new Group with the given prefix. A group is a lightweight convenience wrapper that prefixes routes and can add its own middleware without creating a separate router instance.
+Group creates and returns a new Group with the given prefix. A group is a lightweight
+convenience wrapper that prefixes routes and can add its own middleware without
+creating a separate router instance.
 
----
-
-### `Handle` {#handle}
+<a id="handle"></a>
+#### `Handle`
 
 ```go
 func (r *Router) Handle(method, pattern string, handler http.HandlerFunc, opts ...*RouteOptions)
 ```
 
-Handle registers a new route with the given HTTP method, URL pattern, and handler. If the router has a non-empty basePath, it is automatically prepended to the pattern. Optional RouteOptions can be provided for OpenAPI documentation.
+Handle registers a new route with the given HTTP method, URL pattern, and handler.
+If the router has a non-empty basePath, it is automatically prepended to the pattern.
+Optional RouteOptions can be provided for OpenAPI documentation.
 
----
-
-### `HandleFunc` {#handlefunc}
+<a id="handlefunc"></a>
+#### `HandleFunc`
 
 ```go
 func (r *Router) HandleFunc(method, pattern string, handler HandlerFunc, opts ...*RouteOptions)
 ```
 
-HandleFunc registers a new enhanced route that receives a ResponseContext instead of separate ResponseWriter and Request parameters. This enables cleaner error handling and response management with automatic data binding capabilities.
+HandleFunc registers a new enhanced route that receives a ResponseContext instead
+of separate ResponseWriter and Request parameters. This enables cleaner error handling
+and response management with automatic data binding capabilities.
 
----
-
-### `Patch` {#patch}
+<a id="patch"></a>
+#### `Patch`
 
 ```go
 func (r *Router) Patch(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -3702,9 +3809,8 @@ func (r *Router) Patch(pattern string, handler http.HandlerFunc, options ...*Rou
 
 Patch registers a new route for HTTP PATCH requests using the standard handler signature.
 
----
-
-### `PatchFunc` {#patchfunc}
+<a id="patchfunc"></a>
+#### `PatchFunc`
 
 ```go
 func (r *Router) PatchFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -3712,9 +3818,8 @@ func (r *Router) PatchFunc(pattern string, handler HandlerFunc, options ...*Rout
 
 PatchFunc registers a new route for HTTP PATCH requests using the enhanced handler signature.
 
----
-
-### `Post` {#post}
+<a id="post"></a>
+#### `Post`
 
 ```go
 func (r *Router) Post(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -3722,9 +3827,8 @@ func (r *Router) Post(pattern string, handler http.HandlerFunc, options ...*Rout
 
 Post registers a new route for HTTP POST requests using the standard handler signature.
 
----
-
-### `PostFunc` {#postfunc}
+<a id="postfunc"></a>
+#### `PostFunc`
 
 ```go
 func (r *Router) PostFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -3732,9 +3836,8 @@ func (r *Router) PostFunc(pattern string, handler HandlerFunc, options ...*Route
 
 PostFunc registers a new route for HTTP POST requests using the enhanced handler signature.
 
----
-
-### `Put` {#put}
+<a id="put"></a>
+#### `Put`
 
 ```go
 func (r *Router) Put(pattern string, handler http.HandlerFunc, options ...*RouteOptions)
@@ -3742,9 +3845,8 @@ func (r *Router) Put(pattern string, handler http.HandlerFunc, options ...*Route
 
 Put registers a new route for HTTP PUT requests using the standard handler signature.
 
----
-
-### `PutFunc` {#putfunc}
+<a id="putfunc"></a>
+#### `PutFunc`
 
 ```go
 func (r *Router) PutFunc(pattern string, handler HandlerFunc, options ...*RouteOptions)
@@ -3752,59 +3854,60 @@ func (r *Router) PutFunc(pattern string, handler HandlerFunc, options ...*RouteO
 
 PutFunc registers a new route for HTTP PUT requests using the enhanced handler signature.
 
----
-
-### `ServeHTTP` {#servehttp}
+<a id="servehttp"></a>
+#### `ServeHTTP`
 
 ```go
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request)
 ```
 
-ServeHTTP implements the http.Handler interface. It first checks subrouters based on their base path, then its own routes. If a URL pattern matches but the HTTP method does not, a 405 Method Not Allowed is returned. If no routes match, a 404 Not Found is returned.
+ServeHTTP implements the http.Handler interface.
+It first checks subrouters based on their base path, then its own routes.
+If a URL pattern matches but the HTTP method does not, a 405 Method Not Allowed is returned.
+If no routes match, a 404 Not Found is returned.
 
----
-
-### `ServeOpenAPISpec` {#serveopenapispec}
+<a id="serveopenapispec"></a>
+#### `ServeOpenAPISpec`
 
 ```go
 func (r *Router) ServeOpenAPISpec(path string, config OpenAPIConfig)
 ```
 
-ServeOpenAPISpec makes your OpenAPI specification available at `path` (e.g. "/openapi.json")
+ServeOpenAPISpec makes your OpenAPI specification available at `path` (e.g. &quot;/openapi.json&quot;)
 
----
-
-### `ServeSwaggerUI` {#serveswaggerui}
+<a id="serveswaggerui"></a>
+#### `ServeSwaggerUI`
 
 ```go
 func (r *Router) ServeSwaggerUI(prefix string)
 ```
 
-ServeSwaggerUI shows swaggerUI at `prefix` (e.g. "/docs")
+ServeSwaggerUI shows swaggerUI at `prefix` (e.g. &quot;/docs&quot;)
 
----
-
-### `SetMethodNotAllowedHandler` {#setmethodnotallowedhandler}
+<a id="setmethodnotallowedhandler"></a>
+#### `SetMethodNotAllowedHandler`
 
 ```go
 func (r *Router) SetMethodNotAllowedHandler(h http.Handler)
 ```
 
-SetMethodNotAllowedHandler allows users to supply a custom http.Handler for requests that match a route pattern but use an unsupported HTTP method. If not set, a default 405 Method Not Allowed response is returned.
+SetMethodNotAllowedHandler allows users to supply a custom http.Handler
+for requests that match a route pattern but use an unsupported HTTP method.
+If not set, a default 405 Method Not Allowed response is returned.
 
----
-
-### `SetNotFoundHandler` {#setnotfoundhandler}
+<a id="setnotfoundhandler"></a>
+#### `SetNotFoundHandler`
 
 ```go
 func (r *Router) SetNotFoundHandler(h http.Handler)
 ```
 
-SetNotFoundHandler allows users to supply a custom http.Handler for requests that do not match any route. If not set, the standard http.NotFound handler is used.
+SetNotFoundHandler allows users to supply a custom http.Handler
+for requests that do not match any route. If not set, the standard
+http.NotFound handler is used.
 
----
-
-### `Static` {#static}
+<a id="static"></a>
+#### `Static`
 
 ```go
 func (r *Router) Static(urlPathPrefix string, subFS fs.FS)
@@ -3812,39 +3915,51 @@ func (r *Router) Static(urlPathPrefix string, subFS fs.FS)
 
 Static mounts an fs.FS under the given URL prefix.
 
----
-
-### `Subrouter` {#subrouter}
+<a id="subrouter"></a>
+#### `Subrouter`
 
 ```go
 func (r *Router) Subrouter(prefix string) *Router
 ```
 
-Subrouter creates a new Router mounted at the given prefix. The subrouter inherits the parent's context key, global middleware, and error handlers. Its routes will automatically receive the combined prefix.
+Subrouter creates a new Router mounted at the given prefix.
+The subrouter inherits the parent&apos;s context key, global middleware,
+and error handlers. Its routes will automatically receive the combined prefix.
 
----
-
-### `URLParam` {#urlparam}
+<a id="urlparam"></a>
+#### `URLParam`
 
 ```go
 func (r *Router) URLParam(req *http.Request, key string) string
 ```
 
-URLParam retrieves the URL parameter for the given key from the request context. It returns an empty string if the parameter is not present. This method should only be called within route handlers that were registered with this router.
+URLParam retrieves the URL parameter for the given key from the request context.
+It returns an empty string if the parameter is not present. This method should
+only be called within route handlers that were registered with this router.
 
----
-
-### `Use` {#use}
+<a id="use"></a>
+#### `Use`
 
 ```go
 func (r *Router) Use(mws ...Middleware)
 ```
 
-Use registers one or more middleware functions that will be applied globally to every matched route handler. Middleware is applied in the order it is registered.
+Use registers one or more middleware functions that will be applied globally
+to every matched route handler. Middleware is applied in the order it is registered.
 
----
+<a id="rebuildchain"></a>
+#### `rebuildChain`
 
-### `SchemaObject` {#schemaobject}
+```go
+func (r *Router) rebuildChain()
+```
+
+rebuildChain reconstructs the composed middleware chain based on the
+currently registered middlewares. Middleware is applied in reverse order
+so that the first registered middleware wraps the outermost layer.
+
+<a id="schemaobject"></a>
+### `SchemaObject`
 
 ```go
 type SchemaObject struct {
@@ -3864,9 +3979,21 @@ type SchemaObject struct {
 
 SchemaObject represents an OpenAPI Schema or a reference to one.
 
----
+#### Associated Functions
 
-### `SecurityHeadersConfig` {#securityheadersconfig}
+<a id="generateschema"></a>
+#### `generateSchema`
+
+```go
+func generateSchema(instance any, ctx *schemaGenCtx) *SchemaObject
+```
+
+generateSchema inspects an example instance via reflection and adds or reuses
+a SchemaObject in the context for components. Supports structs, arrays,
+maps, and basic Go types.
+
+<a id="securityheadersconfig"></a>
+### `SecurityHeadersConfig`
 
 ```go
 type SecurityHeadersConfig struct {
@@ -3897,9 +4024,8 @@ type SecurityHeadersConfig struct {
 
 SecurityHeadersConfig holds configuration for SecurityHeadersMiddleware.
 
----
-
-### `StringFlag` {#stringflag}
+<a id="stringflag"></a>
+### `StringFlag`
 
 ```go
 type StringFlag struct {
@@ -3918,11 +4044,10 @@ type StringFlag struct {
 
 StringFlag defines a flag that accepts a string value.
 
----
-
 #### Methods
 
-### `Apply` {#apply}
+<a id="apply"></a>
+#### `Apply`
 
 ```go
 func (f *StringFlag) Apply(set *flag.FlagSet, cli *CLI) error
@@ -3930,9 +4055,8 @@ func (f *StringFlag) Apply(set *flag.FlagSet, cli *CLI) error
 
 Apply registers the string flag with the flag.FlagSet.
 
----
-
-### `GetAliases` {#getaliases}
+<a id="getaliases"></a>
+#### `GetAliases`
 
 ```go
 func (f *StringFlag) GetAliases() []string
@@ -3940,9 +4064,8 @@ func (f *StringFlag) GetAliases() []string
 
 GetAliases returns the aliases for the flag.
 
----
-
-### `GetName` {#getname}
+<a id="getname"></a>
+#### `GetName`
 
 ```go
 func (f *StringFlag) GetName() string
@@ -3950,9 +4073,8 @@ func (f *StringFlag) GetName() string
 
 GetName returns the primary name of the flag.
 
----
-
-### `IsRequired` {#isrequired}
+<a id="isrequired"></a>
+#### `IsRequired`
 
 ```go
 func (f *StringFlag) IsRequired() bool
@@ -3960,9 +4082,8 @@ func (f *StringFlag) IsRequired() bool
 
 IsRequired returns true if the flag must be provided.
 
----
-
-### `String` {#string}
+<a id="string"></a>
+#### `String`
 
 ```go
 func (f *StringFlag) String() string
@@ -3970,9 +4091,8 @@ func (f *StringFlag) String() string
 
 String returns the help text representation of the flag.
 
----
-
-### `Validate` {#validate}
+<a id="validate"></a>
+#### `Validate`
 
 ```go
 func (f *StringFlag) Validate(set *flag.FlagSet) error
@@ -3980,9 +4100,8 @@ func (f *StringFlag) Validate(set *flag.FlagSet) error
 
 Validate checks if the required flag was provided and is not empty.
 
----
-
-### `StringSliceFlag` {#stringsliceflag}
+<a id="stringsliceflag"></a>
+### `StringSliceFlag`
 
 ```go
 type StringSliceFlag struct {
@@ -3999,13 +4118,13 @@ type StringSliceFlag struct {
 }
 ```
 
-StringSliceFlag defines a flag that accepts multiple string values. The flag can be repeated on the command line (e.g., --tag foo --tag bar).
-
----
+StringSliceFlag defines a flag that accepts multiple string values.
+The flag can be repeated on the command line (e.g., --tag foo --tag bar).
 
 #### Methods
 
-### `Apply` {#apply}
+<a id="apply"></a>
+#### `Apply`
 
 ```go
 func (f *StringSliceFlag) Apply(set *flag.FlagSet, cli *CLI) error
@@ -4013,9 +4132,8 @@ func (f *StringSliceFlag) Apply(set *flag.FlagSet, cli *CLI) error
 
 Apply registers the string slice flag with the flag.FlagSet using a custom Value.
 
----
-
-### `GetAliases` {#getaliases}
+<a id="getaliases"></a>
+#### `GetAliases`
 
 ```go
 func (f *StringSliceFlag) GetAliases() []string
@@ -4023,9 +4141,8 @@ func (f *StringSliceFlag) GetAliases() []string
 
 GetAliases returns the aliases for the flag.
 
----
-
-### `GetName` {#getname}
+<a id="getname"></a>
+#### `GetName`
 
 ```go
 func (f *StringSliceFlag) GetName() string
@@ -4033,9 +4150,8 @@ func (f *StringSliceFlag) GetName() string
 
 GetName returns the primary name of the flag.
 
----
-
-### `IsRequired` {#isrequired}
+<a id="isrequired"></a>
+#### `IsRequired`
 
 ```go
 func (f *StringSliceFlag) IsRequired() bool
@@ -4043,9 +4159,8 @@ func (f *StringSliceFlag) IsRequired() bool
 
 IsRequired returns true if the flag must be provided.
 
----
-
-### `String` {#string}
+<a id="string"></a>
+#### `String`
 
 ```go
 func (f *StringSliceFlag) String() string
@@ -4053,9 +4168,8 @@ func (f *StringSliceFlag) String() string
 
 String returns the help text representation of the flag.
 
----
-
-### `Validate` {#validate}
+<a id="validate"></a>
+#### `Validate`
 
 ```go
 func (f *StringSliceFlag) Validate(set *flag.FlagSet) error
@@ -4063,9 +4177,8 @@ func (f *StringSliceFlag) Validate(set *flag.FlagSet) error
 
 Validate checks if the required flag was provided and resulted in a non-empty slice.
 
----
-
-### `TimeoutConfig` {#timeoutconfig}
+<a id="timeoutconfig"></a>
+### `TimeoutConfig`
 
 ```go
 type TimeoutConfig struct {
@@ -4082,9 +4195,8 @@ type TimeoutConfig struct {
 
 TimeoutConfig holds configuration for TimeoutMiddleware.
 
----
-
-### `TrailingSlashRedirectConfig` {#trailingslashredirectconfig}
+<a id="trailingslashredirectconfig"></a>
+### `TrailingSlashRedirectConfig`
 
 ```go
 type TrailingSlashRedirectConfig struct {
@@ -4098,9 +4210,8 @@ type TrailingSlashRedirectConfig struct {
 
 TrailingSlashRedirectConfig holds configuration for TrailingSlashRedirectMiddleware.
 
----
-
-### `ValidationErrors` {#validationerrors}
+<a id="validationerrors"></a>
+### `ValidationErrors`
 
 ```go
 type ValidationErrors []error
@@ -4108,11 +4219,68 @@ type ValidationErrors []error
 
 ValidationErrors collects one or more validation violations and implements error.
 
----
+#### Associated Functions
+
+<a id="validatefield"></a>
+#### `validateField`
+
+```go
+func validateField(
+	fv reflect.Value,
+	f reflect.StructField,
+	fieldName, lang, custom string,
+) ValidationErrors
+```
+
+validateField routes to the appropriate validator based on kind,
+returning all errors for that field.
+
+<a id="validatenumericfield"></a>
+#### `validateNumericField`
+
+```go
+func validateNumericField(
+	num float64,
+	f reflect.StructField,
+	fieldName, lang, custom string,
+) ValidationErrors
+```
+
+validateNumericField applies min, max, and multipleOf checks on num,
+returning every violation.
+
+<a id="validateslicefield"></a>
+#### `validateSliceField`
+
+```go
+func validateSliceField(
+	fv reflect.Value,
+	f reflect.StructField,
+	fieldName, lang, custom string,
+) ValidationErrors
+```
+
+validateSliceField applies minItems, maxItems, uniqueItems and recurses
+into elements, returning every violation.
+
+<a id="validatestringfield"></a>
+#### `validateStringField`
+
+```go
+func validateStringField(
+	s string,
+	f reflect.StructField,
+	fieldName, lang, custom string,
+) ValidationErrors
+```
+
+validateStringField applies minlength, maxlength, pattern, enum and format
+checks on s, returning every violation.
 
 #### Methods
 
-### `Error` {#error}
+<a id="error"></a>
+#### `Error`
 
 ```go
 func (ve ValidationErrors) Error() string
@@ -4120,5 +4288,425 @@ func (ve ValidationErrors) Error() string
 
 Error joins all contained error messages into a single string.
 
----
+<a id="bufferingresponsewriterinterceptor"></a>
+### `bufferingResponseWriterInterceptor`
 
+```go
+type bufferingResponseWriterInterceptor struct {
+	http.ResponseWriter
+	statusCode  int
+	size        int64
+	wroteHeader bool
+	buffer      *bytes.Buffer // Buffer to hold the response body
+}
+```
+
+bufferingResponseWriterInterceptor wraps http.ResponseWriter to capture status, size,
+and buffer the response body.
+
+#### Associated Functions
+
+<a id="newbufferingresponsewriterinterceptor"></a>
+#### `NewBufferingResponseWriterInterceptor`
+
+```go
+func NewBufferingResponseWriterInterceptor(w http.ResponseWriter) *bufferingResponseWriterInterceptor
+```
+
+NewBufferingResponseWriterInterceptor creates a new buffering interceptor.
+
+#### Methods
+
+<a id="body"></a>
+#### `Body`
+
+```go
+func (w *bufferingResponseWriterInterceptor) Body() []byte
+```
+
+Body returns the buffered response body bytes.
+
+<a id="flush"></a>
+#### `Flush`
+
+```go
+func (w *bufferingResponseWriterInterceptor) Flush()
+```
+
+Flush implements the http.Flusher interface if the underlying writer supports it.
+
+<a id="size"></a>
+#### `Size`
+
+```go
+func (w *bufferingResponseWriterInterceptor) Size() int64
+```
+
+Size returns the captured response size.
+
+<a id="statuscode"></a>
+#### `StatusCode`
+
+```go
+func (w *bufferingResponseWriterInterceptor) StatusCode() int
+```
+
+StatusCode returns the captured status code.
+
+<a id="write"></a>
+#### `Write`
+
+```go
+func (w *bufferingResponseWriterInterceptor) Write(b []byte) (int, error)
+```
+
+Write captures the number of bytes written and writes to the internal buffer.
+It also sets the status code implicitly if not already set.
+
+<a id="writecaptureddata"></a>
+#### `WriteCapturedData`
+
+```go
+func (w *bufferingResponseWriterInterceptor) WriteCapturedData() (int64, error)
+```
+
+WriteCapturedData writes the captured status code, headers, and buffered body
+to the original ResponseWriter. Returns the number of bytes written from the body.
+
+<a id="writeheader"></a>
+#### `WriteHeader`
+
+```go
+func (w *bufferingResponseWriterInterceptor) WriteHeader(statusCode int)
+```
+
+WriteHeader captures the status code. Does NOT write to underlying writer yet.
+
+<a id="contextkey"></a>
+### `contextKey`
+
+```go
+type contextKey string
+```
+
+contextKey is a private type used for context keys to avoid collisions.
+
+#### Associated Constants
+
+<a id="requestidkey-realipkey-basicauthuserkey-csrftokenkey"></a>
+#### `requestIDKey, realIPKey, basicAuthUserKey, csrfTokenKey`
+
+```go
+const (
+	// requestIDKey is the context key used for storing the request ID.
+	requestIDKey contextKey = "requestID"
+	// realIPKey is the context key used for storing the real client IP.
+	realIPKey contextKey = "realIP"
+	// basicAuthUserKey is the context key used for storing the authenticated user.
+	basicAuthUserKey contextKey = "basicAuthUser"
+	// csrfTokenKey is the context key used for storing the generated CSRF token.
+	csrfTokenKey contextKey = "csrfToken"
+)
+```
+
+<a id="gzipresponsewriter"></a>
+### `gzipResponseWriter`
+
+```go
+type gzipResponseWriter struct {
+	http.ResponseWriter              // Underlying writer
+	Writer              *gzip.Writer // gzip writer
+}
+```
+
+gzipResponseWriter wraps http.ResponseWriter to provide gzip compression.
+It implements http.ResponseWriter and optionally http.Flusher.
+
+#### Methods
+
+<a id="flush"></a>
+#### `Flush`
+
+```go
+func (w *gzipResponseWriter) Flush()
+```
+
+Flush implements http.Flusher if the underlying ResponseWriter supports it.
+
+<a id="header"></a>
+#### `Header`
+
+```go
+func (w *gzipResponseWriter) Header() http.Header
+```
+
+Header returns the header map of the underlying ResponseWriter.
+
+<a id="write"></a>
+#### `Write`
+
+```go
+func (w *gzipResponseWriter) Write(b []byte) (int, error)
+```
+
+Write writes the data to the gzip writer.
+
+<a id="writeheader"></a>
+#### `WriteHeader`
+
+```go
+func (w *gzipResponseWriter) WriteHeader(statusCode int)
+```
+
+WriteHeader sends the HTTP status code using the underlying ResponseWriter.
+
+<a id="responsewriterinterceptor"></a>
+### `responseWriterInterceptor`
+
+```go
+type responseWriterInterceptor struct {
+	http.ResponseWriter
+	statusCode  int
+	size        int64
+	wroteHeader bool // Track if WriteHeader was called explicitly
+}
+```
+
+responseWriterInterceptor wraps http.ResponseWriter to capture status code and size.
+
+#### Associated Functions
+
+<a id="newresponsewriterinterceptor"></a>
+#### `NewResponseWriterInterceptor`
+
+```go
+func NewResponseWriterInterceptor(w http.ResponseWriter) *responseWriterInterceptor
+```
+
+NewResponseWriterInterceptor creates a new interceptor.
+
+#### Methods
+
+<a id="flush"></a>
+#### `Flush`
+
+```go
+func (w *responseWriterInterceptor) Flush()
+```
+
+Flush implements the http.Flusher interface if the underlying writer supports it.
+
+<a id="write"></a>
+#### `Write`
+
+```go
+func (w *responseWriterInterceptor) Write(b []byte) (int, error)
+```
+
+Write captures the number of bytes written and calls the underlying Write.
+It also calls WriteHeader implicitly if not already called.
+
+<a id="writeheader"></a>
+#### `WriteHeader`
+
+```go
+func (w *responseWriterInterceptor) WriteHeader(statusCode int)
+```
+
+WriteHeader captures the status code.
+
+<a id="route"></a>
+### `route`
+
+```go
+type route struct {
+	// method is the HTTP method (GET, POST, PUT, etc.) for this route.
+	method string
+	// handler is the HTTP handler function that processes requests to this route.
+	handler http.HandlerFunc
+	// segments contains the compiled URL pattern segments for path matching.
+	segments []segment
+	// options contains optional metadata for OpenAPI documentation and validation.
+	options *RouteOptions
+}
+```
+
+route represents an individual route with its compiled URL pattern and associated handler.
+It stores the HTTP method, handler function, compiled path segments, and optional metadata.
+
+<a id="schemagenctx"></a>
+### `schemaGenCtx`
+
+```go
+type schemaGenCtx struct {
+	componentsSchemas map[string]*SchemaObject
+	generatedNames    map[reflect.Type]string
+}
+```
+
+schemaGenCtx tracks state during schema generation, to de-duplicate
+component schemas and reuse references.
+
+#### Associated Functions
+
+<a id="newschemagenctx"></a>
+#### `newSchemaGenCtx`
+
+```go
+func newSchemaGenCtx() *schemaGenCtx
+```
+
+newSchemaGenCtx creates and returns an empty schemaGenCtx to drive
+generateSchema and collect component definitions.
+
+<a id="segment"></a>
+### `segment`
+
+```go
+type segment struct {
+	// isParam indicates whether this segment is a dynamic parameter ({name}) or literal text.
+	isParam bool
+	// literal contains the exact text to match when isParam is false.
+	literal string
+	// paramName is the parameter name when isParam is true (e.g., "id" from "{id}").
+	paramName string
+	// regex is the compiled regular expression for parameter validation, if specified.
+	regex *regexp.Regexp
+}
+```
+
+segment represents a part of the URL path. It may be a literal string or a dynamic
+parameter with an optional regex pattern for validation.
+
+#### Associated Functions
+
+<a id="compilepattern"></a>
+#### `compilePattern`
+
+```go
+func compilePattern(pattern string) ([]segment, error)
+```
+
+compilePattern converts a URL pattern string into a slice of segments.
+Parameters are declared as {name} or {name:regex}. In the latter case,
+the regex is precompiled and validated during route registration.
+
+<a id="stringslicevalue"></a>
+### `stringSliceValue`
+
+```go
+type stringSliceValue struct {
+	destination *[]string // Pointer to the underlying slice
+	hasBeenSet  bool      // Track if the flag was set at all (for default handling)
+}
+```
+
+stringSliceValue implements the flag.Value interface for string slices.
+
+#### Associated Functions
+
+<a id="newstringslicevalue"></a>
+#### `newStringSliceValue`
+
+```go
+func newStringSliceValue(dest *[]string, defaults []string) *stringSliceValue
+```
+
+newStringSliceValue creates a new value for string slice flags.
+
+#### Methods
+
+<a id="get"></a>
+#### `Get`
+
+```go
+func (s *stringSliceValue) Get() any
+```
+
+Get returns the underlying slice.
+
+<a id="set"></a>
+#### `Set`
+
+```go
+func (s *stringSliceValue) Set(value string) error
+```
+
+Set appends the provided value to the slice. Called by flag package for each occurrence.
+
+<a id="string"></a>
+#### `String`
+
+```go
+func (s *stringSliceValue) String() string
+```
+
+String returns a comma-separated representation of the slice (required by flag.Value).
+
+<a id="textnode"></a>
+### `textNode`
+
+```go
+type textNode struct {
+	text string
+}
+```
+
+textNode represents raw text content that should be rendered without HTML tags.
+It implements HTMLElement to allow text to be mixed with HTML elements in compositions.
+
+#### Methods
+
+<a id="render"></a>
+#### `Render`
+
+```go
+func (t *textNode) Render() string
+```
+
+Render returns the raw text content, HTML-escaped.
+
+<a id="timeoutresponsewriter"></a>
+### `timeoutResponseWriter`
+
+```go
+type timeoutResponseWriter struct {
+	http.ResponseWriter
+	mu          sync.Mutex
+	wroteHeader bool
+}
+```
+
+timeoutResponseWriter wraps http.ResponseWriter to prevent panics from
+superfluous WriteHeader calls after a timeout.
+
+#### Methods
+
+<a id="write"></a>
+#### `Write`
+
+```go
+func (w *timeoutResponseWriter) Write(b []byte) (int, error)
+```
+
+<a id="writeheader"></a>
+#### `WriteHeader`
+
+```go
+func (w *timeoutResponseWriter) WriteHeader(statusCode int)
+```
+
+<a id="visitor"></a>
+### `visitor`
+
+```go
+type visitor struct {
+	tokens    float64   // Current number of available tokens
+	lastToken time.Time // Time when tokens were last refilled
+	lastSeen  time.Time // Timestamp of the last request seen (for cleanup)
+}
+```
+
+visitor tracks request counts and timestamps for rate limiting.
+
+{{ endinclude }}
