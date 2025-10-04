@@ -42,6 +42,21 @@ type projectGenerator struct {
 	useMakefile    bool
 }
 
+// cleanupOnFailure removes the project directory if generation failed.
+// Only call this if the directory was partially created.
+func (g *projectGenerator) cleanupOnFailure() error {
+	if g.projectDir == "" {
+		return nil // Nothing to clean
+	}
+	if _, err := os.Stat(g.projectDir); os.IsNotExist(err) {
+		return nil // Already doesn't exist, no cleanup needed
+	}
+	if g.isVerbose {
+		fmt.Printf("Cleaning up partial project: %s\n", g.projectDir)
+	}
+	return os.RemoveAll(g.projectDir)
+}
+
 // newProjectGenerator is the constructor for our generator.
 func newProjectGenerator(
 	projectName string,
@@ -347,8 +362,9 @@ func main() {
 					},
 					&nova.StringFlag{
 						Name:    "output",
-						Default: "./docs/src/reference.md",
-						Usage:   "Path to the output Markdown file",
+						Aliases: []string{"o"},
+						Default: "reference.md",
+						Usage:   "Output file for the generated markdown",
 					},
 				},
 				Action: func(ctx *nova.Context) error {
@@ -452,7 +468,10 @@ func main() {
 
 					defer func() {
 						if err != nil {
-							// g.cleanupOnFailure()
+							cleanupErr := g.cleanupOnFailure()
+							if cleanupErr != nil && g.isVerbose {
+								fmt.Printf("Warning: Cleanup failed: %v\n", cleanupErr)
+							}
 						}
 					}()
 

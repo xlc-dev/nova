@@ -1017,6 +1017,10 @@ func (c *CLI) Run(arguments []string) error {
 
 	// Handle global parsing errors.
 	if err != nil {
+		if err == flag.ErrHelp {
+			c.ShowHelp(os.Stdout)
+			return nil
+		}
 		return err
 	}
 
@@ -1049,6 +1053,12 @@ func (c *CLI) Run(arguments []string) error {
 		ctx.flagSet = cmdSet
 
 		if cmdErr != nil {
+			// If the error is `flag.ErrHelp`, it means `-h` or `--help` was used.
+			// Show the command-specific help and exit gracefully.
+			if cmdErr == flag.ErrHelp {
+				cmd.ShowHelp(os.Stdout, c.Name)
+				return nil
+			}
 			return cmdErr
 		}
 		if err := validateFlags(cmd.Flags, cmdSet); err != nil {

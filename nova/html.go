@@ -14,7 +14,7 @@ type HTMLElement interface {
 }
 
 // Element represents an HTML element with attributes, content, and child elements.
-// It supports both self-closing elements (like <img>) and container elements (like <div>).
+// It supports both self-closing elements (like `<img>`) and container elements (like `<div>`).
 // Elements can be chained using fluent API methods for convenient construction.
 type Element struct {
 	tag        string
@@ -34,20 +34,20 @@ type textNode struct {
 // Fields left as zero-values (e.g., empty strings) will use sensible defaults
 // or be omitted if optional (like Description, Keywords, Author).
 type DocumentConfig struct {
-	Lang        string        // Lang attribute for <html> tag, defaults to "en".
-	Title       string        // Content for <title> tag, defaults to "Document".
-	Charset     string        // Charset for <meta charset>, defaults to "utf-8".
-	Viewport    string        // Content for <meta name="viewport">, defaults to "width=device-width, initial-scale=1".
-	Description string        // Content for <meta name="description">. If empty, tag is omitted.
-	Keywords    string        // Content for <meta name="keywords">. If empty, tag is omitted.
-	Author      string        // Content for <meta name="author">. If empty, tag is omitted.
-	HeadExtras  []HTMLElement // Additional HTMLElements to be included in the <head> section.
+	Lang        string        // Lang attribute for `<html>` tag, defaults to "en".
+	Title       string        // Content for `<title>` tag, defaults to "Document".
+	Charset     string        // Charset for `<meta charset>`, defaults to "utf-8".
+	Viewport    string        // Content for `<meta name="viewport">`, defaults to "width=device-width, initial-scale=1".
+	Description string        // Content for `<meta name="description">`. If empty, tag is omitted.
+	Keywords    string        // Content for `<meta name="keywords">`. If empty, tag is omitted.
+	Author      string        // Content for `<meta name="author">`. If empty, tag is omitted.
+	HeadExtras  []HTMLElement // Additional HTMLElements to be included in the `<head>` section.
 }
 
 // HTMLDocument represents a full HTML document, including the DOCTYPE.
 // Its Render method produces the complete HTML string.
 type HTMLDocument struct {
-	rootElement *Element // The root <html> element.
+	rootElement *Element // The root `<html>` element.
 }
 
 // Render converts the HTMLDocument to its full string representation,
@@ -118,7 +118,7 @@ func Document(config DocumentConfig, bodyContent ...HTMLElement) *HTMLDocument {
 // It handles both self-closing and container elements, attributes, content, and children.
 // The output is properly formatted HTML that can be sent to browsers.
 // Content and attribute values are HTML-escaped to prevent XSS, except for
-// specific tags like <script> and <style> whose content must be raw.
+// specific tags like `<script>` and `<style>` whose content must be raw.
 func (e *Element) Render() string {
 	var sb strings.Builder
 
@@ -144,7 +144,7 @@ func (e *Element) Render() string {
 
 	if e.content != "" {
 		if _, isRaw := rawTextTags[e.tag]; isRaw {
-			sb.WriteString(e.content) // Write raw content for <style>, <script>
+			sb.WriteString(e.content) // Write raw content for `<style>`, `<script>`
 		} else {
 			sb.WriteString(html.EscapeString(e.content)) // Escape for other tags
 		}
@@ -171,7 +171,7 @@ func (e *Element) Attr(key, value string) *Element {
 }
 
 // BoolAttr sets or removes a boolean attribute on the element.
-// If present is true, the attribute is added (e.g., <input disabled>).
+// If present is true, the attribute is added (e.g., `<input disabled>`).
 // If present is false, the attribute is removed if it exists.
 func (e *Element) BoolAttr(key string, present bool) *Element {
 	if e.attributes == nil && present {
@@ -219,68 +219,68 @@ func (t *textNode) Render() string {
 	return html.EscapeString(t.text)
 }
 
-// Html creates an <html> element.
+// Html creates an `<html>` element.
 func Html(content ...HTMLElement) *Element {
 	return &Element{tag: "html", children: content}
 }
 
-// Head creates a <head> element.
+// Head creates a `<head>` element.
 func Head(content ...HTMLElement) *Element {
 	return &Element{tag: "head", children: content}
 }
 
-// Body creates a <body> element.
+// Body creates a `<body>` element.
 func Body(content ...HTMLElement) *Element {
 	return &Element{tag: "body", children: content}
 }
 
-// TitleEl creates a <title> element with the specified text.
+// TitleEl creates a `<title>` element with the specified text.
 // Renamed from Title to TitleEl to avoid conflict with (*Element).Title method if it existed.
 func TitleEl(titleText string) *Element {
 	return &Element{tag: "title", content: titleText}
 }
 
-// Meta creates a generic <meta> element. It's self-closing.
+// Meta creates a generic `<meta>` element. It's self-closing.
 func Meta() *Element {
 	return &Element{tag: "meta", selfClose: true}
 }
 
-// MetaCharset creates a <meta charset="..."> element.
+// MetaCharset creates a `<meta charset="...">` element.
 func MetaCharset(charset string) *Element {
 	return Meta().Attr("charset", charset)
 }
 
-// MetaNameContent creates a <meta name="..." content="..."> element.
+// MetaNameContent creates a `<meta name="..." content="...">` element.
 func MetaNameContent(name, contentVal string) *Element {
 	return Meta().Attr("name", name).Attr("content", contentVal)
 }
 
-// MetaPropertyContent creates a <meta property="..." content="..."> element.
+// MetaPropertyContent creates a `<meta property="..." content="...">` element.
 func MetaPropertyContent(property, contentVal string) *Element {
 	return Meta().Attr("property", property).Attr("content", contentVal)
 }
 
-// MetaViewport creates a <meta name="viewport" content="..."> element.
+// MetaViewport creates a `<meta name="viewport" content="...">` element.
 func MetaViewport(contentVal string) *Element {
 	return MetaNameContent("viewport", contentVal)
 }
 
-// Base creates a <base> element.
+// Base creates a `<base>` element.
 func Base(href string) *Element {
 	return &Element{tag: "base", selfClose: true, attributes: map[string]string{"href": href}}
 }
 
-// LinkTag creates a generic <link> element. It's self-closing.
+// LinkTag creates a generic `<link>` element. It's self-closing.
 func LinkTag() *Element {
 	return &Element{tag: "link", selfClose: true}
 }
 
-// StyleSheet creates a <link rel="stylesheet"> element.
+// StyleSheet creates a `<link rel="stylesheet">` element.
 func StyleSheet(href string) *Element {
 	return LinkTag().Attr("rel", "stylesheet").Attr("href", href)
 }
 
-// Favicon creates a <link> element for a favicon.
+// Favicon creates a `<link>` element for a favicon.
 func Favicon(href string, rel ...string) *Element {
 	link := LinkTag().Attr("href", href)
 	if len(rel) > 0 && rel[0] != "" {
@@ -291,27 +291,27 @@ func Favicon(href string, rel ...string) *Element {
 	return link
 }
 
-// Preload creates a <link rel="preload"> element.
+// Preload creates a `<link rel="preload">` element.
 func Preload(href string, asType string) *Element {
 	return LinkTag().Attr("rel", "preload").Attr("href", href).Attr("as", asType)
 }
 
-// Script creates a <script> element for external JavaScript files.
+// Script creates a `<script>` element for external JavaScript files.
 func Script(src string) *Element {
 	return &Element{tag: "script", attributes: map[string]string{"src": src}}
 }
 
-// InlineScript creates a <script> element with inline JavaScript content.
+// InlineScript creates a `<script>` element with inline JavaScript content.
 func InlineScript(scriptContent string) *Element {
 	return &Element{tag: "script", content: scriptContent}
 }
 
-// StyleTag creates a <style> element for embedding CSS.
+// StyleTag creates a `<style>` element for embedding CSS.
 func StyleTag(cssContent string) *Element {
 	return &Element{tag: "style", content: cssContent}
 }
 
-// NoScript creates a <noscript> element.
+// NoScript creates a `<noscript>` element.
 func NoScript(content ...HTMLElement) *Element {
 	return &Element{tag: "noscript", children: content}
 }
@@ -321,332 +321,332 @@ func Text(text string) HTMLElement {
 	return &textNode{text: text}
 }
 
-// Div creates a <div> element.
+// Div creates a `<div>` element.
 func Div(content ...HTMLElement) *Element {
 	return &Element{tag: "div", children: content}
 }
 
-// P creates a <p> paragraph element.
+// P creates a `<p>` paragraph element.
 func P(content ...HTMLElement) *Element {
 	return &Element{tag: "p", children: content}
 }
 
-// Span creates a <span> inline element.
+// Span creates a `<span>` inline element.
 func Span(content ...HTMLElement) *Element {
 	return &Element{tag: "span", children: content}
 }
 
-// H1 creates an <h1> heading element.
+// H1 creates an `<h1>` heading element.
 func H1(content ...HTMLElement) *Element {
 	return &Element{tag: "h1", children: content}
 }
 
-// H2 creates an <h2> heading element.
+// H2 creates an `<h2>` heading element.
 func H2(content ...HTMLElement) *Element {
 	return &Element{tag: "h2", children: content}
 }
 
-// H3 creates an <h3> heading element.
+// H3 creates an `<h3>` heading element.
 func H3(content ...HTMLElement) *Element {
 	return &Element{tag: "h3", children: content}
 }
 
-// H4 creates an <h4> heading element.
+// H4 creates an `<h4>` heading element.
 func H4(content ...HTMLElement) *Element {
 	return &Element{tag: "h4", children: content}
 }
 
-// H5 creates an <h5> heading element.
+// H5 creates an `<h5>` heading element.
 func H5(content ...HTMLElement) *Element {
 	return &Element{tag: "h5", children: content}
 }
 
-// H6 creates an <h6> heading element.
+// H6 creates an `<h6>` heading element.
 func H6(content ...HTMLElement) *Element {
 	return &Element{tag: "h6", children: content}
 }
 
-// Br creates a self-closing <br> line break element.
+// Br creates a self-closing `<br>` line break element.
 func Br() *Element {
 	return &Element{tag: "br", selfClose: true}
 }
 
-// Hr creates a self-closing <hr> horizontal rule element.
+// Hr creates a self-closing `<hr>` horizontal rule element.
 func Hr() *Element {
 	return &Element{tag: "hr", selfClose: true}
 }
 
-// Header creates a <header> semantic element.
+// Header creates a `<header>` semantic element.
 func Header(content ...HTMLElement) *Element {
 	return &Element{tag: "header", children: content}
 }
 
-// Footer creates a <footer> semantic element.
+// Footer creates a `<footer>` semantic element.
 func Footer(content ...HTMLElement) *Element {
 	return &Element{tag: "footer", children: content}
 }
 
-// Main creates a <main> semantic element.
+// Main creates a `<main>` semantic element.
 func Main(content ...HTMLElement) *Element {
 	return &Element{tag: "main", children: content}
 }
 
-// Nav creates a <nav> semantic element.
+// Nav creates a `<nav>` semantic element.
 func Nav(content ...HTMLElement) *Element {
 	return &Element{tag: "nav", children: content}
 }
 
-// Section creates a <section> semantic element.
+// Section creates a `<section>` semantic element.
 func Section(content ...HTMLElement) *Element {
 	return &Element{tag: "section", children: content}
 }
 
-// Article creates an <article> semantic element.
+// Article creates an `<article>` semantic element.
 func Article(content ...HTMLElement) *Element {
 	return &Element{tag: "article", children: content}
 }
 
-// Aside creates an <aside> semantic element.
+// Aside creates an `<aside>` semantic element.
 func Aside(content ...HTMLElement) *Element {
 	return &Element{tag: "aside", children: content}
 }
 
-// Address creates an <address> semantic element.
+// Address creates an `<address>` semantic element.
 func Address(content ...HTMLElement) *Element {
 	return &Element{tag: "address", children: content}
 }
 
-// Figure creates a <figure> element.
+// Figure creates a `<figure>` element.
 func Figure(content ...HTMLElement) *Element {
 	return &Element{tag: "figure", children: content}
 }
 
-// Figcaption creates a <figcaption> element.
+// Figcaption creates a `<figcaption>` element.
 func Figcaption(content ...HTMLElement) *Element {
 	return &Element{tag: "figcaption", children: content}
 }
 
-// Details creates a <details> element.
+// Details creates a `<details>` element.
 func Details(content ...HTMLElement) *Element {
 	return &Element{tag: "details", children: content}
 }
 
-// Summary creates a <summary> element.
+// Summary creates a `<summary>` element.
 func Summary(content ...HTMLElement) *Element {
 	return &Element{tag: "summary", children: content}
 }
 
-// Blockquote creates a <blockquote> element.
+// Blockquote creates a `<blockquote>` element.
 func Blockquote(content ...HTMLElement) *Element {
 	return &Element{tag: "blockquote", children: content}
 }
 
-// Q creates a <q> inline quotation element.
+// Q creates a `<q>` inline quotation element.
 func Q(content ...HTMLElement) *Element {
 	return &Element{tag: "q", children: content}
 }
 
-// Cite creates a <cite> element.
+// Cite creates a `<cite>` element.
 func Cite(content ...HTMLElement) *Element {
 	return &Element{tag: "cite", children: content}
 }
 
-// Dfn creates a <dfn> definition element.
+// Dfn creates a `<dfn>` definition element.
 func Dfn(content ...HTMLElement) *Element {
 	return &Element{tag: "dfn", children: content}
 }
 
-// Abbr creates an <abbr> abbreviation element.
+// Abbr creates an `<abbr>` abbreviation element.
 func Abbr(content ...HTMLElement) *Element {
 	return &Element{tag: "abbr", children: content}
 }
 
-// Mark creates a <mark> element.
+// Mark creates a `<mark>` element.
 func Mark(content ...HTMLElement) *Element {
 	return &Element{tag: "mark", children: content}
 }
 
-// Small creates a <small> element.
+// Small creates a `<small>` element.
 func Small(content ...HTMLElement) *Element {
 	return &Element{tag: "small", children: content}
 }
 
-// TimeEl creates a <time> element. Renamed to avoid potential conflicts.
+// TimeEl creates a `<time>` element. Renamed to avoid potential conflicts.
 func TimeEl(content ...HTMLElement) *Element {
 	return &Element{tag: "time", children: content}
 }
 
-// Pre creates a <pre> element.
+// Pre creates a `<pre>` element.
 func Pre(content ...HTMLElement) *Element {
 	return &Element{tag: "pre", children: content}
 }
 
-// Code creates a <code> element.
+// Code creates a `<code>` element.
 func Code(content ...HTMLElement) *Element {
 	return &Element{tag: "code", children: content}
 }
 
-// Em creates an <em> emphasis element.
+// Em creates an `<em>` emphasis element.
 func Em(content ...HTMLElement) *Element {
 	return &Element{tag: "em", children: content}
 }
 
-// Strong creates a <strong> element.
+// Strong creates a `<strong>` element.
 func Strong(content ...HTMLElement) *Element {
 	return &Element{tag: "strong", children: content}
 }
 
-// Sub creates a <sub> subscript element.
+// Sub creates a `<sub>` subscript element.
 func Sub(content ...HTMLElement) *Element {
 	return &Element{tag: "sub", children: content}
 }
 
-// Sup creates a <sup> superscript element.
+// Sup creates a `<sup>` superscript element.
 func Sup(content ...HTMLElement) *Element {
 	return &Element{tag: "sup", children: content}
 }
 
-// I creates an <i> idiomatic text element.
+// I creates an `<i>` idiomatic text element.
 func I(content ...HTMLElement) *Element {
 	return &Element{tag: "i", children: content}
 }
 
-// B creates a <b> element for stylistically offset text.
+// B creates a `<b>` element for stylistically offset text.
 func B(content ...HTMLElement) *Element {
 	return &Element{tag: "b", children: content}
 }
 
-// U creates a <u> unarticulated annotation element.
+// U creates a `<u>` unarticulated annotation element.
 func U(content ...HTMLElement) *Element {
 	return &Element{tag: "u", children: content}
 }
 
-// VarEl creates a <var> variable element. Renamed to avoid keyword conflict.
+// VarEl creates a `<var>` variable element. Renamed to avoid keyword conflict.
 func VarEl(content ...HTMLElement) *Element {
 	return &Element{tag: "var", children: content}
 }
 
-// Samp creates a <samp> sample output element.
+// Samp creates a `<samp>` sample output element.
 func Samp(content ...HTMLElement) *Element {
 	return &Element{tag: "samp", children: content}
 }
 
-// Kbd creates a <kbd> keyboard input element.
+// Kbd creates a `<kbd>` keyboard input element.
 func Kbd(content ...HTMLElement) *Element {
 	return &Element{tag: "kbd", children: content}
 }
 
-// Wbr creates a <wbr> word break opportunity element. It's self-closing.
+// Wbr creates a `<wbr>` word break opportunity element. It's self-closing.
 func Wbr() *Element {
 	return &Element{tag: "wbr", selfClose: true}
 }
 
-// A creates an <a> anchor element.
+// A creates an `<a>` anchor element.
 func A(href string, content ...HTMLElement) *Element {
 	return &Element{tag: "a", attributes: map[string]string{"href": href}, children: content}
 }
 
-// Link creates an <a> anchor element with href and text content.
+// Link creates an `<a>` anchor element with href and text content.
 func Link(href, textContent string) *Element {
 	return A(href, Text(textContent))
 }
 
-// Img creates a self-closing <img> element.
+// Img creates a self-closing `<img>` element.
 func Img(src, alt string) *Element {
 	return &Element{tag: "img", selfClose: true, attributes: map[string]string{"src": src, "alt": alt}}
 }
 
-// Image creates an <img> element (alias for Img).
+// Image creates an `<img>` element (alias for Img).
 func Image(src, alt string) *Element {
 	return Img(src, alt)
 }
 
-// Ul creates a <ul> unordered list element.
+// Ul creates a `<ul>` unordered list element.
 func Ul(content ...HTMLElement) *Element {
 	return &Element{tag: "ul", children: content}
 }
 
-// Ol creates an <ol> ordered list element.
+// Ol creates an `<ol>` ordered list element.
 func Ol(content ...HTMLElement) *Element {
 	return &Element{tag: "ol", children: content}
 }
 
-// Li creates a <li> list item element.
+// Li creates a `<li>` list item element.
 func Li(content ...HTMLElement) *Element {
 	return &Element{tag: "li", children: content}
 }
 
-// Table creates a <table> element.
+// Table creates a `<table>` element.
 func Table(content ...HTMLElement) *Element {
 	return &Element{tag: "table", children: content}
 }
 
-// Thead creates a <thead> table header group element.
+// Thead creates a `<thead>` table header group element.
 func Thead(content ...HTMLElement) *Element {
 	return &Element{tag: "thead", children: content}
 }
 
-// Tbody creates a <tbody> table body group element.
+// Tbody creates a `<tbody>` table body group element.
 func Tbody(content ...HTMLElement) *Element {
 	return &Element{tag: "tbody", children: content}
 }
 
-// Tr creates a <tr> table row element.
+// Tr creates a `<tr>` table row element.
 func Tr(content ...HTMLElement) *Element {
 	return &Element{tag: "tr", children: content}
 }
 
-// Td creates a <td> table data cell element.
+// Td creates a `<td>` table data cell element.
 func Td(content ...HTMLElement) *Element {
 	return &Element{tag: "td", children: content}
 }
 
-// Th creates a <th> table header cell element.
+// Th creates a `<th>` table header cell element.
 func Th(content ...HTMLElement) *Element {
 	return &Element{tag: "th", children: content}
 }
 
-// Caption creates a <caption> element for a table.
+// Caption creates a `<caption>` element for a table.
 func Caption(content ...HTMLElement) *Element {
 	return &Element{tag: "caption", children: content}
 }
 
-// Colgroup creates a <colgroup> element.
+// Colgroup creates a `<colgroup>` element.
 func Colgroup(content ...HTMLElement) *Element {
 	return &Element{tag: "colgroup", children: content}
 }
 
-// Col creates a <col> element. It's self-closing.
+// Col creates a `<col>` element. It's self-closing.
 func Col() *Element {
 	return &Element{tag: "col", selfClose: true}
 }
 
-// Form creates a <form> element.
+// Form creates a `<form>` element.
 func Form(content ...HTMLElement) *Element {
 	return &Element{tag: "form", children: content}
 }
 
-// Input creates a self-closing <input> element.
+// Input creates a self-closing `<input>` element.
 func Input(inputType string) *Element {
 	return &Element{tag: "input", selfClose: true, attributes: map[string]string{"type": inputType}}
 }
 
-// Button creates a <button> element.
+// Button creates a `<button>` element.
 func Button(content ...HTMLElement) *Element {
 	return &Element{tag: "button", children: content}
 }
 
-// Label creates a <label> element.
+// Label creates a `<label>` element.
 func Label(content ...HTMLElement) *Element {
 	return &Element{tag: "label", children: content}
 }
 
-// Select creates a <select> dropdown element.
+// Select creates a `<select>` dropdown element.
 func Select(content ...HTMLElement) *Element {
 	return &Element{tag: "select", children: content}
 }
 
-// Option creates an <option> element.
+// Option creates an `<option>` element.
 func Option(value string, content ...HTMLElement) *Element {
 	e := &Element{tag: "option", children: content}
 	if value != "" {
@@ -655,27 +655,27 @@ func Option(value string, content ...HTMLElement) *Element {
 	return e
 }
 
-// Textarea creates a <textarea> element.
+// Textarea creates a `<textarea>` element.
 func Textarea(content ...HTMLElement) *Element {
 	return &Element{tag: "textarea", children: content}
 }
 
-// Fieldset creates a <fieldset> element.
+// Fieldset creates a `<fieldset>` element.
 func Fieldset(content ...HTMLElement) *Element {
 	return &Element{tag: "fieldset", children: content}
 }
 
-// Legend creates a <legend> element.
+// Legend creates a `<legend>` element.
 func Legend(content ...HTMLElement) *Element {
 	return &Element{tag: "legend", children: content}
 }
 
-// Optgroup creates an <optgroup> element.
+// Optgroup creates an `<optgroup>` element.
 func Optgroup(label string, content ...HTMLElement) *Element {
 	return &Element{tag: "optgroup", attributes: map[string]string{"label": label}, children: content}
 }
 
-// Datalist creates a <datalist> element.
+// Datalist creates a `<datalist>` element.
 func Datalist(id string, content ...HTMLElement) *Element {
 	element := &Element{
 		tag:      "datalist",
@@ -685,167 +685,167 @@ func Datalist(id string, content ...HTMLElement) *Element {
 	return element.ID(id)
 }
 
-// OutputEl creates an <output> element. Renamed to avoid potential conflicts.
+// OutputEl creates an `<output>` element. Renamed to avoid potential conflicts.
 func OutputEl(content ...HTMLElement) *Element {
 	return &Element{tag: "output", children: content}
 }
 
-// ProgressEl creates a <progress> element. Renamed to avoid potential conflicts.
+// ProgressEl creates a `<progress>` element. Renamed to avoid potential conflicts.
 func ProgressEl(content ...HTMLElement) *Element {
 	return &Element{tag: "progress", children: content}
 }
 
-// MeterEl creates a <meter> element. Renamed to avoid potential conflicts.
+// MeterEl creates a `<meter>` element. Renamed to avoid potential conflicts.
 func MeterEl(content ...HTMLElement) *Element {
 	return &Element{tag: "meter", children: content}
 }
 
-// TextInput creates an <input type="text"> field.
+// TextInput creates an `<input type="text">` field.
 func TextInput(name string) *Element {
 	return Input("text").Attr("name", name)
 }
 
-// EmailInput creates an <input type="email"> field.
+// EmailInput creates an `<input type="email">` field.
 func EmailInput(name string) *Element {
 	return Input("email").Attr("name", name)
 }
 
-// PasswordInput creates an <input type="password"> field.
+// PasswordInput creates an `<input type="password">` field.
 func PasswordInput(name string) *Element {
 	return Input("password").Attr("name", name)
 }
 
-// CheckboxInput creates an <input type="checkbox">.
+// CheckboxInput creates an `<input type="checkbox">`.
 func CheckboxInput(name string) *Element {
 	return Input("checkbox").Attr("name", name)
 }
 
-// RadioInput creates an <input type="radio">.
+// RadioInput creates an `<input type="radio">`.
 func RadioInput(name, value string) *Element {
 	return Input("radio").Attr("name", name).Attr("value", value)
 }
 
-// NumberInput creates an <input type="number"> field.
+// NumberInput creates an `<input type="number">` field.
 func NumberInput(name string) *Element {
 	return Input("number").Attr("name", name)
 }
 
-// DateInput creates an <input type="date"> field.
+// DateInput creates an `<input type="date">` field.
 func DateInput(name string) *Element {
 	return Input("date").Attr("name", name)
 }
 
-// FileInput creates an <input type="file"> field.
+// FileInput creates an `<input type="file">` field.
 func FileInput(name string) *Element {
 	return Input("file").Attr("name", name)
 }
 
-// HiddenInput creates an <input type="hidden"> field.
+// HiddenInput creates an `<input type="hidden">` field.
 func HiddenInput(name string, value string) *Element {
 	return Input("hidden").Attr("name", name).Attr("value", value)
 }
 
-// RangeInput creates an <input type="range"> field.
+// RangeInput creates an `<input type="range">` field.
 func RangeInput(name string) *Element {
 	return Input("range").Attr("name", name)
 }
 
-// SearchInput creates an <input type="search"> field.
+// SearchInput creates an `<input type="search">` field.
 func SearchInput(name string) *Element {
 	return Input("search").Attr("name", name)
 }
 
-// TelInput creates an <input type="tel"> field.
+// TelInput creates an `<input type="tel">` field.
 func TelInput(name string) *Element {
 	return Input("tel").Attr("name", name)
 }
 
-// UrlInput creates an <input type="url"> field.
+// UrlInput creates an `<input type="url">` field.
 func UrlInput(name string) *Element {
 	return Input("url").Attr("name", name)
 }
 
-// ColorInput creates an <input type="color"> field.
+// ColorInput creates an `<input type="color">` field.
 func ColorInput(name string) *Element {
 	return Input("color").Attr("name", name)
 }
 
-// DateTimeLocalInput creates an <input type="datetime-local"> field.
+// DateTimeLocalInput creates an `<input type="datetime-local">` field.
 func DateTimeLocalInput(name string) *Element {
 	return Input("datetime-local").Attr("name", name)
 }
 
-// MonthInput creates an <input type="month"> field.
+// MonthInput creates an `<input type="month">` field.
 func MonthInput(name string) *Element {
 	return Input("month").Attr("name", name)
 }
 
-// WeekInput creates an <input type="week"> field.
+// WeekInput creates an `<input type="week">` field.
 func WeekInput(name string) *Element {
 	return Input("week").Attr("name", name)
 }
 
-// TimeInput creates an <input type="time"> field.
+// TimeInput creates an `<input type="time">` field.
 func TimeInput(name string) *Element {
 	return Input("time").Attr("name", name)
 }
 
-// SubmitButton creates a <button type="submit">.
+// SubmitButton creates a `<button type="submit">`.
 func SubmitButton(text string) *Element {
 	return Button(Text(text)).Attr("type", "submit")
 }
 
-// ResetButton creates a <button type="reset">.
+// ResetButton creates a `<button type="reset">`.
 func ResetButton(text string) *Element {
 	return Button(Text(text)).Attr("type", "reset")
 }
 
-// ButtonInput creates an <input type="button">.
+// ButtonInput creates an `<input type="button">`.
 func ButtonInput(valueText string) *Element {
 	return Input("button").Attr("value", valueText)
 }
 
-// Audio creates an <audio> element.
+// Audio creates an `<audio>` element.
 func Audio(content ...HTMLElement) *Element {
 	return &Element{tag: "audio", children: content}
 }
 
-// Video creates a <video> element.
+// Video creates a `<video>` element.
 func Video(content ...HTMLElement) *Element {
 	return &Element{tag: "video", children: content}
 }
 
-// Source creates a <source> element. It's self-closing.
+// Source creates a `<source>` element. It's self-closing.
 func Source(src string, mediaType string) *Element {
 	return &Element{tag: "source", selfClose: true, attributes: map[string]string{"src": src, "type": mediaType}}
 }
 
-// Track creates a <track> element. It's self-closing.
+// Track creates a `<track>` element. It's self-closing.
 func Track(kind, src, srclang string) *Element {
 	return &Element{tag: "track", selfClose: true, attributes: map[string]string{"kind": kind, "src": src, "srclang": srclang}}
 }
 
-// Iframe creates an <iframe> element.
+// Iframe creates an `<iframe>` element.
 func Iframe(src string) *Element {
 	return &Element{tag: "iframe", attributes: map[string]string{"src": src}}
 }
 
-// EmbedEl creates an <embed> element. It's self-closing. Renamed to avoid keyword conflict.
+// EmbedEl creates an `<embed>` element. It's self-closing. Renamed to avoid keyword conflict.
 func EmbedEl(src string, embedType string) *Element {
 	return &Element{tag: "embed", selfClose: true, attributes: map[string]string{"src": src, "type": embedType}}
 }
 
-// ObjectEl creates an <object> element. Renamed to avoid keyword conflict.
+// ObjectEl creates an `<object>` element. Renamed to avoid keyword conflict.
 func ObjectEl(content ...HTMLElement) *Element {
 	return &Element{tag: "object", children: content}
 }
 
-// Param creates a <param> element. It's self-closing.
+// Param creates a `<param>` element. It's self-closing.
 func Param(name, value string) *Element {
 	return &Element{tag: "param", selfClose: true, attributes: map[string]string{"name": name, "value": value}}
 }
 
-// DialogEl creates a <dialog> element. Renamed to avoid potential conflicts.
+// DialogEl creates a `<dialog>` element. Renamed to avoid potential conflicts.
 func DialogEl(content ...HTMLElement) *Element {
 	return &Element{tag: "dialog", children: content}
 }

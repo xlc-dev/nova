@@ -50,17 +50,8 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 		return fmt.Errorf("no non-test Go package found in directory: %s", inputDir)
 	}
 
-	// Convert file map to slice for doc.NewFromFiles
-	astFiles := make([]*ast.File, 0, len(pkg.Files))
-	for _, file := range pkg.Files {
-		astFiles = append(astFiles, file)
-	}
-
 	// Extract documentation (exported symbols only by default)
-	docPkg, err := doc.NewFromFiles(fset, astFiles, pkg.Name)
-	if err != nil {
-		return fmt.Errorf("failed to create doc package for '%s': %w", pkg.Name, err)
-	}
+	docPkg := doc.New(pkg, pkg.Name, doc.AllDecls)
 
 	out, err := os.Create(outputFile)
 	if err != nil {
@@ -75,122 +66,15 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 		return fmt.Errorf("failed to write header to output file: %w", err)
 	}
 
-	var tocBuf bytes.Buffer
 	var contentBuf bytes.Buffer
 
 	title := "# Reference\n\n"
-	tocBuf.WriteString("## Table of Contents\n\n")
 
 	// Package Documentation (if any)
 	if docPkg.Doc != "" {
-		sectionTitle := "Overview"
-		anchor := generateAnchor(sectionTitle)
-		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", sectionTitle, anchor))
-		contentBuf.WriteString(fmt.Sprintf("## %s\n\n", sectionTitle))
+		contentBuf.WriteString(fmt.Sprintf("## %s\n\n", "Overview"))
 		contentBuf.WriteString(formatDocText(docPkg.Doc))
 		contentBuf.WriteString("\n\n")
-	}
-
-	// Constants
-	if len(docPkg.Consts) > 0 {
-		sectionTitle := "Constants"
-		anchor := generateAnchor(sectionTitle)
-		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", sectionTitle, anchor))
-		contentBuf.WriteString(fmt.Sprintf("## %s\n\n", sectionTitle))
-		for _, c := range docPkg.Consts {
-			displayNames := strings.Join(c.Names, ", ")
-			itemTitle := fmt.Sprintf("`%s`", displayNames)
-			itemAnchor := generateAnchor(itemTitle)
-			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", itemTitle, itemAnchor))
-			writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl, 3)
-		}
-	}
-
-	// Variables
-	if len(docPkg.Vars) > 0 {
-		sectionTitle := "Variables"
-		anchor := generateAnchor(sectionTitle)
-		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", sectionTitle, anchor))
-		contentBuf.WriteString(fmt.Sprintf("## %s\n\n", sectionTitle))
-		for _, v := range docPkg.Vars {
-			displayNames := strings.Join(v.Names, ", ")
-			itemTitle := fmt.Sprintf("`%s`", displayNames)
-			itemAnchor := generateAnchor(itemTitle)
-			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", itemTitle, itemAnchor))
-			writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl, 3)
-		}
-	}
-
-	// Functions
-	if len(docPkg.Funcs) > 0 {
-		sectionTitle := "Functions"
-		anchor := generateAnchor(sectionTitle)
-		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", sectionTitle, anchor))
-		contentBuf.WriteString(fmt.Sprintf("## %s\n\n", sectionTitle))
-		for _, f := range docPkg.Funcs {
-			itemTitle := fmt.Sprintf("`%s`", f.Name)
-			itemAnchor := generateAnchor(itemTitle)
-			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", itemTitle, itemAnchor))
-			writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl, 3)
-		}
-	}
-
-	// Types
-	if len(docPkg.Types) > 0 {
-		sectionTitle := "Types"
-		anchor := generateAnchor(sectionTitle)
-		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", sectionTitle, anchor))
-		contentBuf.WriteString(fmt.Sprintf("## %s\n\n", sectionTitle))
-		for _, t := range docPkg.Types {
-			typeTitle := fmt.Sprintf("`%s`", t.Name)
-			typeAnchor := generateAnchor(typeTitle)
-			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", typeTitle, typeAnchor))
-			// Document the type itself
-			writeDocItem(&contentBuf, fset, t.Doc, []string{t.Name}, t.Decl, 3)
-
-			if len(t.Consts) > 0 {
-				subSectionTitle := "Associated Constants"
-				contentBuf.WriteString(fmt.Sprintf("#### %s\n\n", subSectionTitle))
-				for _, c := range t.Consts {
-					displayNames := strings.Join(c.Names, ", ")
-					itemTitle := fmt.Sprintf("`%s`", displayNames)
-					itemAnchor := generateAnchor(itemTitle)
-					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl, 4)
-				}
-			}
-			if len(t.Vars) > 0 {
-				subSectionTitle := "Associated Variables"
-				contentBuf.WriteString(fmt.Sprintf("#### %s\n\n", subSectionTitle))
-				for _, v := range t.Vars {
-					displayNames := strings.Join(v.Names, ", ")
-					itemTitle := fmt.Sprintf("`%s`", displayNames)
-					itemAnchor := generateAnchor(itemTitle)
-					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl, 4)
-				}
-			}
-			if len(t.Funcs) > 0 {
-				subSectionTitle := "Associated Functions"
-				contentBuf.WriteString(fmt.Sprintf("#### %s\n\n", subSectionTitle))
-				for _, f := range t.Funcs {
-					itemTitle := fmt.Sprintf("`%s`", f.Name)
-					itemAnchor := generateAnchor(itemTitle)
-					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl, 4)
-				}
-			}
-			if len(t.Methods) > 0 {
-				subSectionTitle := "Methods"
-				contentBuf.WriteString(fmt.Sprintf("#### %s\n\n", subSectionTitle))
-				for _, m := range t.Methods {
-					itemTitle := fmt.Sprintf("`%s.%s`", t.Name, m.Name)
-					itemAnchor := generateAnchor(itemTitle)
-					tocBuf.WriteString(fmt.Sprintf("    - [%s](#%s)\n", itemTitle, itemAnchor))
-					writeDocItem(&contentBuf, fset, m.Doc, []string{m.Name}, m.Decl, 4)
-				}
-			}
-		}
 	}
 
 	// Write Title
@@ -199,15 +83,73 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 		return fmt.Errorf("failed to write title to output file: %w", err)
 	}
 
-	// Write Table of Contents
-	if tocBuf.Len() > len("## Table of Contents\n\n") { // Only write TOC if it has entries
-		_, err = tocBuf.WriteTo(out)
+	// Generate and Write Table of Contents
+	toc := generateTOC(docPkg)
+	if toc != "" {
+		_, err = out.WriteString(toc)
 		if err != nil {
-			return fmt.Errorf("failed to write TOC buffer to output file: %w", err)
+			return fmt.Errorf("failed to write TOC to output file: %w", err)
 		}
 		_, err = out.WriteString("\n\n") // Add separation after TOC
 		if err != nil {
 			return fmt.Errorf("failed to write separator after TOC: %w", err)
+		}
+	}
+
+	// Constants
+	if len(docPkg.Consts) > 0 {
+		contentBuf.WriteString("## Constants\n\n")
+		for _, c := range docPkg.Consts {
+			writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl, 3)
+		}
+	}
+
+	// Variables
+	if len(docPkg.Vars) > 0 {
+		contentBuf.WriteString("## Variables\n\n")
+		for _, v := range docPkg.Vars {
+			writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl, 3)
+		}
+	}
+
+	// Functions
+	if len(docPkg.Funcs) > 0 {
+		contentBuf.WriteString("## Functions\n\n")
+		for _, f := range docPkg.Funcs {
+			writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl, 3)
+		}
+	}
+
+	// Types
+	if len(docPkg.Types) > 0 {
+		contentBuf.WriteString("## Types\n\n")
+		for _, t := range docPkg.Types {
+			writeDocItem(&contentBuf, fset, t.Doc, []string{t.Name}, t.Decl, 3)
+
+			if len(t.Consts) > 0 {
+				contentBuf.WriteString("#### Associated Constants\n\n")
+				for _, c := range t.Consts {
+					writeDocItem(&contentBuf, fset, c.Doc, c.Names, c.Decl, 4)
+				}
+			}
+			if len(t.Vars) > 0 {
+				contentBuf.WriteString("#### Associated Variables\n\n")
+				for _, v := range t.Vars {
+					writeDocItem(&contentBuf, fset, v.Doc, v.Names, v.Decl, 4)
+				}
+			}
+			if len(t.Funcs) > 0 {
+				contentBuf.WriteString("#### Associated Functions\n\n")
+				for _, f := range t.Funcs {
+					writeDocItem(&contentBuf, fset, f.Doc, []string{f.Name}, f.Decl, 4)
+				}
+			}
+			if len(t.Methods) > 0 {
+				contentBuf.WriteString("#### Methods\n\n")
+				for _, m := range t.Methods {
+					writeDocItem(&contentBuf, fset, m.Doc, []string{m.Name}, m.Decl, 4)
+				}
+			}
 		}
 	}
 
@@ -228,25 +170,74 @@ func generateReferenceMarkdown(inputDir, outputFile string) error {
 	return nil
 }
 
+func generateTOC(docPkg *doc.Package) string {
+	var tocBuf bytes.Buffer
+	tocBuf.WriteString("## Table of Contents\n\n")
+
+	hasContent := false
+
+	if docPkg.Doc != "" {
+		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", "Overview", "overview"))
+		hasContent = true
+	}
+
+	if len(docPkg.Consts) > 0 {
+		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", "Constants", "constants"))
+		hasContent = true
+	}
+
+	if len(docPkg.Vars) > 0 {
+		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", "Variables", "variables"))
+		hasContent = true
+	}
+
+	if len(docPkg.Funcs) > 0 {
+		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", "Functions", "functions"))
+		hasContent = true
+	}
+
+	if len(docPkg.Types) > 0 {
+		tocBuf.WriteString(fmt.Sprintf("- [%s](#%s)\n", "Types", "types"))
+		hasContent = true
+		for _, t := range docPkg.Types {
+			typeTitle := fmt.Sprintf("`%s`", t.Name)
+			typeAnchor := generateAnchor(t.Name)
+			tocBuf.WriteString(fmt.Sprintf("  - [%s](#%s)\n", typeTitle, typeAnchor))
+
+			if len(t.Consts) > 0 || len(t.Vars) > 0 || len(t.Funcs) > 0 || len(t.Methods) > 0 {
+				if len(t.Consts) > 0 {
+					tocBuf.WriteString(fmt.Sprintf("    - [Associated Constants](#%s-constants)\n", typeAnchor))
+				}
+				if len(t.Vars) > 0 {
+					tocBuf.WriteString(fmt.Sprintf("    - [Associated Variables](#%s-variables)\n", typeAnchor))
+				}
+				if len(t.Funcs) > 0 {
+					tocBuf.WriteString(fmt.Sprintf("    - [Associated Functions](#%s-functions)\n", typeAnchor))
+				}
+				if len(t.Methods) > 0 {
+					tocBuf.WriteString(fmt.Sprintf("    - [Methods](#%s-methods)\n", typeAnchor))
+				}
+			}
+		}
+	}
+
+	if !hasContent {
+		return ""
+	}
+
+	return tocBuf.String()
+}
+
 // writeDocItem formats a single documentation item (const, var, func, type, method)
 // and writes it to the content buffer.
 func writeDocItem(contentBuf *bytes.Buffer, fset *token.FileSet, docComment string, names []string, decl ast.Node, level int) {
-	// Use the first name for the header, join for display if multiple (const/var blocks)
-	// For methods, names only contains the method name, not the receiver type.
-	// The anchor generation in the main function handles creating unique anchors like Type.Method.
 	displayNames := strings.Join(names, ", ")
-	itemTitle := fmt.Sprintf("`%s`", displayNames) // Title used for the H3 header
-
-	// Generate an anchor based *only* on the display name(s).
-	// For methods, this will be `#methodname`. For associated funcs, `#funcname`.
-	// For types, `#typename`. For top-level funcs/consts/vars, `#name`.
-	// The TOC links generated earlier might be more specific (e.g., `#type.methodname`)
-	// but the header ID generated by Markdown processors will likely match this simpler anchor.
-	itemAnchor := generateAnchor(itemTitle)
+	itemTitle := fmt.Sprintf("`%s`", displayNames)
+	itemAnchor := generateAnchor(displayNames)
 
 	// Create a clean anchor tag that is compatible with most Markdown renderers
-	contentBuf.WriteString(fmt.Sprintf("<a id=\"%s\"></a>\n", itemAnchor))
-	contentBuf.WriteString(fmt.Sprintf("%s %s\n\n", strings.Repeat("#", level), itemTitle)) // Header for the item
+	fmt.Fprintf(contentBuf, "<a id=\"%s\"></a>\n", itemAnchor)
+	fmt.Fprintf(contentBuf, "%s %s\n\n", strings.Repeat("#", level), itemTitle)
 
 	// Print the declaration (signature) using go/printer
 	var declBuf bytes.Buffer
@@ -257,7 +248,7 @@ func writeDocItem(contentBuf *bytes.Buffer, fset *token.FileSet, docComment stri
 		contentBuf.WriteString("```go\n// Error printing declaration\n```\n\n")
 	} else {
 		contentBuf.WriteString("```go\n")
-		contentBuf.Write(declBuf.Bytes()) // Write the formatted declaration
+		contentBuf.Write(declBuf.Bytes())
 		contentBuf.WriteString("\n```\n\n")
 	}
 
@@ -268,39 +259,34 @@ func writeDocItem(contentBuf *bytes.Buffer, fset *token.FileSet, docComment stri
 	}
 }
 
-// formatDocText performs basic formatting on Go doc strings for Markdown.
-// (No changes needed in this function)
 func formatDocText(text string) string {
+	// Trim leading/trailing whitespace
 	trimmed := strings.TrimSpace(text)
-	// Split into paragraphs based on double newline
-	paragraphs := strings.Split(trimmed, "\n\n")
-	for i, p := range paragraphs {
-		if strings.HasPrefix(p, "    ") || strings.HasPrefix(p, "\t") {
-			lines := strings.Split(p, "\n")
-			cleanedLines := make([]string, len(lines))
-			for j, line := range lines {
-				cleanedLines[j] = strings.TrimPrefix(strings.TrimPrefix(line, "    "), "\t")
-			}
-			paragraphs[i] = "```text\n" + strings.Join(cleanedLines, "\n") + "\n```"
-		} else {
-			// Replace single newlines within a paragraph with spaces for better flow
-			// Keep code examples formatted correctly by not replacing newlines inside ``` blocks
-			if !strings.HasPrefix(paragraphs[i], "```") {
-				paragraphs[i] = strings.ReplaceAll(p, "\n", " ")
-			}
-			// Basic fix for lists potentially getting joined: re-insert newline before list items
-			paragraphs[i] = strings.ReplaceAll(paragraphs[i], " - ", "\n - ")
-			paragraphs[i] = strings.ReplaceAll(paragraphs[i], " * ", "\n * ")
-			paragraphs[i] = regexp.MustCompile(` (\d+)\. `).ReplaceAllString(paragraphs[i], "\n$1. ")
 
-		}
-	}
-	// Join paragraphs with double newline for Markdown paragraph separation
-	return strings.Join(paragraphs, "\n\n")
+	// Use doc.ToHTML to handle formatting, then convert to Markdown
+	var buf bytes.Buffer
+	doc.ToHTML(&buf, trimmed, nil)
+	html := buf.String()
+
+	// Basic conversion from HTML to Markdown
+	md := strings.ReplaceAll(html, "<p>", "")
+	md = strings.ReplaceAll(md, "</p>", "\n\n")
+	md = strings.ReplaceAll(md, "<pre>", "```go\n")
+	md = strings.ReplaceAll(md, "</pre>", "\n```\n\n")
+	md = strings.ReplaceAll(md, "<code>", "`")
+	md = strings.ReplaceAll(md, "</code>", "`")
+	md = strings.ReplaceAll(md, "<ul>", "")
+	md = strings.ReplaceAll(md, "</ul>", "")
+	md = strings.ReplaceAll(md, "<li>", "- ")
+	md = strings.ReplaceAll(md, "</li>", "\n")
+
+	// Clean up extra newlines
+	md = strings.TrimSpace(md)
+	md = regexp.MustCompile(`\n{3,}`).ReplaceAllString(md, "\n\n")
+
+	return md
 }
 
-// generateAnchor creates a Markdown-friendly anchor link from a string.
-// It converts to lowercase, replaces spaces with hyphens, and removes non-alphanumeric characters except hyphens.
 func generateAnchor(text string) string {
 	// Remove backticks first
 	text = strings.ReplaceAll(text, "`", "")
@@ -310,6 +296,10 @@ func generateAnchor(text string) string {
 	// Remove any characters that are not letters, numbers, or hyphens
 	reg := regexp.MustCompile("[^a-z0-9-]+")
 	text = reg.ReplaceAllString(text, "")
+
+	// Replace multiple hyphens with a single hyphen
+	text = regexp.MustCompile("-+").ReplaceAllString(text, "-")
+
 	// Ensure it doesn't start or end with a hyphen
 	text = strings.Trim(text, "-")
 	return text
