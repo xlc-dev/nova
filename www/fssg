@@ -4,88 +4,57 @@
 # fssg - Fast, Simple Static Site Generator
 # -----------------------------------------------------------------------------
 #
-# What fssg does
-#  - Recursively scans src/ for Markdown (.md) and HTML (.html) files and
-#    produces a deployable, minified output site in dist/.
-#  - Applies a site-wide template (src/template.html) by replacing
-#    {{content}} with the processed page body.
-#  - Processes includes (src/includes/*) and include-blocks which allow
-#    embedding external templates and passing named parameters.
-#  - Supports simple conditionals inside templates and pages:
-#      {{IF_PAGE:some/page.html}} ... {{ELSE_PAGE}} ... {{ENDIF_PAGE}}
-#      {{IF_EXT:md}} ... {{ELSE_EXT}} ... {{ENDIF_EXT}}
-#  - Converts Markdown into HTML with a small, self-contained AWK-based
-#    Markdown parser supporting headings, lists, code fences, tables,
-#    links/images/inline formatting, blockquotes and more.
-#  - Hoists and deduplicates <style> blocks to the end of <head> and
-#    <script> blocks to the end of <body>.
-#  - Copies src/static/ into dist/static/ for assets.
-#  - Optionally starts a local web server and can watch src/ for changes.
+# Overview:
+#   fssg is a portable, dependency-free static site generator written entirely
+#   in POSIX shell and AWK. It recursively processes Markdown (.md) and HTML
+#   files in `src/` and outputs a minified, deployable website in `dist/`.
 #
-# Usage
+# Key Features:
+#   - Converts Markdown into clean HTML using a built‑in AWK parser.
+#   - Supports includes (`src/includes/`) and include-blocks with parameters.
+#   - Handles template logic and conditionals:
+#   -   {{IF_PAGE:page.html}} ... {{ELSE_PAGE}} ... {{ENDIF_PAGE}}
+#   -   {{IF_EXT:md}} ... {{ELSE_EXT}} ... {{ENDIF_EXT}}
+#   - Applies a site‑wide layout (src/template.html) via {{content}} injection.
+#   - Hoists and consolidates <style> and <script> blocks automatically.
+#   - Copies static assets from `src/static` -> `dist/static/`.
+#   - Optional live‑reload and local dev server with `--serve`/`--watch`.
+#   - Parallel build support with `--jobs <num>`.
+#
+# Usage:
 #   ./fssg [options]
 #
-# Command line options
-#   -h, --help
-#       Display the help message (this text).
+# Common Options:
+#   -h, --help        Show help text and exit.
+#   -V, --version     Show version information.
+#   -q, --quiet       Suppress informational output (errors still shown).
+#   -v, --verbose     Enable extensive debug logging.
+#   -n, --nocolor     Disable colored terminal output.
 #
-#   -q, --quiet
-#       Suppress informational and debug output. Errors are still shown.
+# Development & Build:
+#   -w, --watch       Rebuild automatically when `src/` changes.
+#   -s, --serve       Start a local web server (default port: 8000).
+#   -o, --open        Open default web browser when serving (requires --serve).
+#   -j, --jobs <num>  Number of parallel build jobs (default: 100).
+#   -m, --minify      Disable HTML minification (useful for debugging).
 #
-#   -v, --verbose
-#       Enable verbose debug logging to aid troubleshooting.
+# Environment Variables:
+#   FSSG_SERVER_CMD   Override the server command for --serve.
+#                     Example: FSSG_SERVER_CMD="(cd dist && python3 -m http.server 9000)"
+#   FSSG_SERVER_PORT  Port used by internal server (default: 8000).
 #
-#   -V, --version
-#       Print the fssg version and exit.
-#
-#   -n, --nocolor
-#       Disable ANSI color sequences in messages. Enabled by default when
-#       stdout is a terminal.
-#
-#   -w, --watch
-#       Watch the src/ tree and rebuild automatically on changes. When used
-#       with -s/--serve the server stays running and the browser can be
-#       opened automatically with -o/--open.
-#
-#   -s, --serve
-#       Start a local web server that serves dist/. The script will try a
-#       bundled mongoose, then system 'mongoose', then python3/http.server,
-#       then python/SimpleHTTPServer. The server port defaults to 8000 and
-#       can be changed via the FSSG_SERVER_PORT environment variable.
-#
-#   -o, --open
-#       Open the default web browser after starting the server. This flag
-#       requires -s/--serve to be meaningful.
-#
-#   -j, --jobs <num>
-#       Number of parallel build jobs (default: 4). Controls how many page
-#       conversions run in background concurrently. Accepts a positive
-#       integer.
-#
-#    -m, --minify
-#       Disables HTML minification. This flag is useful for debugging.
-#
-# Environment variables
-#   FSSG_SERVER_CMD
-#       Override the server command used by --serve. Example:
-#         FSSG_SERVER_CMD="(cd dist && python3 -m http.server 9000)"
-#
-#   FSSG_SERVER_PORT
-#       Port used by the internal server (default: 8000).
-#
-# Template/include directives (brief)
-#   {{ title: My Page Title }}
-#       Override the page title (used when injecting into template).
-#
-#   {{ include: filename.html }}
-#       Include a file from src/includes/
-#       (shown only when the include condition passes).
-#
-#   {{ include-block: filename.html param="value" markdown="true" }} ... {{ endinclude }}
-#       Include a template and pass a block of content. If markdown="true"
-#       the inner block is processed through the Markdown parser first.
+# Template Directives:
+#   {{ title: My Page }}
+#        Sets per‑page title.
+#   {{ include: header.html }}
+#        Includes a partial from src/includes/.
+#   {{ include-block: card.html param="value" markdown="true" }} ... {{ endinclude }}
+#        Passes content blocks into partial templates; can render inner markdown if markdown="true".
 #
 # License: MIT License (see below)
+#
+# Author:  xlc-dev
+# URL:     https://github.com/xlc-dev/fssg
 #
 # Copyright (c) xlc-dev 2025
 #
@@ -109,7 +78,7 @@
 # -----------------------------------------------------------------------------
 
 # Global Configuration
-VERSION="1.3"
+VERSION="1.2"
 QUIET=0
 VERBOSE=0
 MAX_JOBS=100
@@ -782,7 +751,7 @@ watch_mode() {
 # Show help message
 display_help() {
   cat <<EOF
-fssg - Fast, Simple Static Site Generator (v$VERSION)
+fssg - Fast, Simple Static Site Generator (v$VERSION).
 -----------------------------------------------------
 
 A POSIX-compliant static site generator using standard shell tools.
@@ -791,17 +760,25 @@ Usage:
   $(basename "$0") [options]
 
 Options:
-  -h, --help         Display this help message and exit.
-  -V, --version      Print the fssg version and exit.
-  -q, --quiet        Suppress all informational output.
-  -v, --verbose      Enable verbose debug logging.
-  -n, --nocolor      Disable ANSI color in output.
+  -h, --help            Display the help message (this text).
+  -V, --version         Print the fssg version and exit.
+  -q, --quiet           Suppress informational and debug output. Errors are still shown.
+  -v, --verbose         Enable verbose debug logging to aid troubleshooting.
+  -n, --nocolor         Disable ANSI color sequences in messages.
+  -m, --minify          Disables HTML minification. This flag is useful for debugging.
 
 Build & Development:
-  -w, --watch        Watch src/ for changes and rebuild automatically.
-  -s, --serve        Start a local server for the dist/ directory.
-  -o, --open         Open a browser after starting the server (use with -s).
-  -j, --jobs <num>   Number of parallel build jobs (default: $MAX_JOBS).
+  -w, --watch           Watch the src/ tree and rebuild automatically on changes.
+  -s, --serve           Start a local web server that serves dist/ to localhost:8000 (default).
+  -o, --open            Open the default web browser after starting the server. This flag
+                        requires -s/--serve to be meaningful.
+  -j, --jobs <num>      Number of parallel build jobs (default: 100). Controls how many page
+                        conversions run in background concurrently. Accepts a positive number.
+
+Environment Variables:
+  FSSG_SERVER_CMD       Override the server command used by --serve. Example:
+                        FSSG_SERVER_CMD="(cd dist && python3 -m http.server 9000)"
+  FSSG_SERVER_PORT      Port used by the internal server (default: 8000).
 EOF
 }
 
