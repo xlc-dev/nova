@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/xlc-dev/nova">
-    <img src="./docs/nova.png" alt="Nova Logo" width="350" style="border-radius: 50%;">
+    <img src="./www/src/static/img/nova.png" alt="Nova Logo" width="350" style="border-radius: 50%;">
   </a>
 </p>
 
