@@ -70,6 +70,7 @@ jobs:
         run: |
           cd ./www
           ./fssg -n -j 50
+          touch ./dist/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
