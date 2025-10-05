@@ -69,7 +69,7 @@ jobs:
       - name: Run fssg
         run: |
           cd ./www
-          ./fssg -q -n -j 20
+          ./fssg -q -n -j 1
           touch ./dist/.nojekyll
 
       - name: Setup Pages
