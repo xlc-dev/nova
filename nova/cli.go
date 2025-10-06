@@ -181,7 +181,7 @@ type stringSliceValue struct {
 
 // newStringSliceValue creates a new value for string slice flags.
 func newStringSliceValue(dest *[]string, defaults []string) *stringSliceValue {
-	if dest != nil && (*dest == nil || len(*dest) == 0) {
+	if dest != nil && len(*dest) == 0 {
 		// Create a copy of defaults to avoid modifying the original Default slice
 		*dest = make([]string, len(defaults))
 		copy(*dest, defaults)
@@ -492,7 +492,7 @@ func validateFlags(flags []Flag, set *flag.FlagSet) error {
 		}
 	}
 	if len(errs) > 0 {
-		return fmt.Errorf(strings.Join(errs, "; "))
+		return fmt.Errorf("%s", strings.Join(errs, "; "))
 	}
 	return nil
 }

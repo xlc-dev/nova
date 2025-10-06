@@ -229,8 +229,8 @@ func detectLanguage(acceptLanguage string) string {
 	}
 
 	// Parse Accept-Language header (simplified)
-	languages := strings.Split(acceptLanguage, ",")
-	for _, lang := range languages {
+	languages := strings.SplitSeq(acceptLanguage, ",")
+	for lang := range languages {
 		// Remove quality value if present (e.g., "en;q=0.9")
 		langCode := strings.TrimSpace(strings.Split(lang, ";")[0])
 		// Extract just the language part (e.g., "en" from "en-US")
@@ -369,7 +369,7 @@ func matchSegments(path string, segments []segment) (bool, map[string]string) {
 // Supports automatic type conversion for string, bool, int, and float types.
 func bindFormToStruct(form url.Values, v any) error {
 	rv := reflect.ValueOf(v)
-	if rv.Kind() != reflect.Ptr || rv.Elem().Kind() != reflect.Struct {
+	if rv.Kind() != reflect.Pointer || rv.Elem().Kind() != reflect.Struct {
 		return fmt.Errorf("v must be a pointer to struct")
 	}
 
@@ -458,7 +458,7 @@ func setFieldValue(field reflect.Value, value string) error {
 // error messages.
 func validateStruct(val any, lang string) error {
 	v := reflect.ValueOf(val)
-	for v.Kind() == reflect.Ptr {
+	for v.Kind() == reflect.Pointer {
 		if v.IsNil() {
 			return fmt.Errorf("nil value")
 		}
@@ -485,10 +485,10 @@ func validateStruct(val any, lang string) error {
 
 		if required && fv.IsZero() {
 			if custom != "" {
-				allErrs = append(allErrs, fmt.Errorf(custom))
+				allErrs = append(allErrs, fmt.Errorf("%s", custom))
 			} else {
 				allErrs = append(allErrs,
-					fmt.Errorf(getMessage(lang, "required", name)))
+					fmt.Errorf("%s", getMessage(lang, "required", name)))
 			}
 			continue
 		}
@@ -526,7 +526,7 @@ func validateField(
 		if err := validateStruct(fv.Addr().Interface(), lang); err != nil {
 			return ValidationErrors{err}
 		}
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if !fv.IsNil() {
 			if err := validateStruct(fv.Interface(), lang); err != nil {
 				return ValidationErrors{err}
@@ -552,7 +552,7 @@ func validateStringField(
 			if msg == "" {
 				msg = getMessage(lang, "minlength", fieldName, min)
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 	if maxTag := f.Tag.Get("maxlength"); maxTag != "" {
@@ -561,7 +561,7 @@ func validateStringField(
 			if msg == "" {
 				msg = getMessage(lang, "maxlength", fieldName, max)
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 
@@ -572,7 +572,7 @@ func validateStringField(
 			if msg == "" {
 				msg = getMessage(lang, "pattern", fieldName)
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 
@@ -585,7 +585,7 @@ func validateStringField(
 				msg = getMessage(lang, "enum",
 					fieldName, strings.Join(allowed, ", "))
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 
@@ -598,7 +598,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "email", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "url":
 			if u, err := url.ParseRequestURI(s); err != nil ||
@@ -607,7 +607,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "url", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "uuid":
 			// RFC-4122 v4 UUID
@@ -619,7 +619,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "uuid", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "date-time":
 			if _, err := time.Parse(time.RFC3339, s); err != nil {
@@ -627,7 +627,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "date-time", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "date":
 			if _, err := time.Parse("2006-01-02", s); err != nil {
@@ -635,7 +635,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "date", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "time":
 			if _, err := time.Parse("15:04:05", s); err != nil {
@@ -643,7 +643,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "time", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "password":
 			if len(s) < 8 {
@@ -651,7 +651,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "password", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "phone":
 			if matched, _ := regexp.MatchString(
@@ -662,7 +662,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "phone", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "alphanumeric":
 			if matched, _ := regexp.MatchString(`^[A-Za-z0-9]+$`, s); !matched {
@@ -670,7 +670,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "alphanumeric", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "alpha":
 			if matched, _ := regexp.MatchString(`^[A-Za-z]+$`, s); !matched {
@@ -678,7 +678,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "alpha", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		case "numeric":
 			if matched, _ := regexp.MatchString(`^[0-9]+$`, s); !matched {
@@ -686,7 +686,7 @@ func validateStringField(
 				if msg == "" {
 					msg = getMessage(lang, "numeric", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		}
 	}
@@ -709,7 +709,7 @@ func validateNumericField(
 			if msg == "" {
 				msg = getMessage(lang, "min", fieldName, min)
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 	if maxTag := f.Tag.Get("max"); maxTag != "" {
@@ -718,7 +718,7 @@ func validateNumericField(
 			if msg == "" {
 				msg = getMessage(lang, "max", fieldName, max)
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 	if multTag := f.Tag.Get("multipleOf"); multTag != "" {
@@ -729,7 +729,7 @@ func validateNumericField(
 					msg = getMessage(lang, "multipleOf",
 						fieldName, mult)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 		}
 	}
@@ -752,7 +752,7 @@ func validateSliceField(
 			if msg == "" {
 				msg = getMessage(lang, "minItems", fieldName, min)
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 	if maxTag := f.Tag.Get("maxItems"); maxTag != "" {
@@ -761,7 +761,7 @@ func validateSliceField(
 			if msg == "" {
 				msg = getMessage(lang, "maxItems", fieldName, max)
 			}
-			errs = append(errs, fmt.Errorf(msg))
+			errs = append(errs, fmt.Errorf("%s", msg))
 		}
 	}
 	if f.Tag.Get("uniqueItems") == "true" {
@@ -773,7 +773,7 @@ func validateSliceField(
 				if msg == "" {
 					msg = getMessage(lang, "uniqueItems", fieldName)
 				}
-				errs = append(errs, fmt.Errorf(msg))
+				errs = append(errs, fmt.Errorf("%s", msg))
 			}
 			seen[v] = true
 		}
@@ -781,7 +781,7 @@ func validateSliceField(
 	for i := range length {
 		item := fv.Index(i)
 		if item.Kind() == reflect.Struct ||
-			(item.Kind() == reflect.Ptr && !item.IsNil()) {
+			(item.Kind() == reflect.Pointer && !item.IsNil()) {
 			if sub := validateStruct(item.Interface(), lang); sub != nil {
 				errs = append(errs,
 					fmt.Errorf("%s[%d]: %w", fieldName, i, sub))
