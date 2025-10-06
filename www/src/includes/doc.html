@@ -1,6 +1,6 @@
 <header class="main-header" id="mainheader">
   <div class="container">
-    <a href="/docs" class="logo">nova<span>docs</span></a>
+    <a href="{{BASE_URL}}/docs" class="logo">nova<span>docs</span></a>
     <nav class="main-nav">
       <ul>
         <li><a href="/">homepage</a></li>
@@ -16,24 +16,26 @@
       <nav class="sidebar-nav">
         <h5>Getting Started</h5>
         <ul>
-          <li><a href="/docs">Introduction</a></li>
-          <li><a href="/docs/quickstart.html">Quickstart</a></li>
-          <li><a href="/docs/scaffolding.html">Scaffolding</a></li>
+          <li><a href="{{BASE_URL}}/docs">Introduction</a></li>
+          <li><a href="{{BASE_URL}}/docs/quickstart.html">Quickstart</a></li>
+          <li><a href="{{BASE_URL}}/docs/scaffolding.html">Scaffolding</a></li>
         </ul>
         <h5>Core Concepts</h5>
         <ul>
-          <li><a href="/docs/cli.html">CLI</a></li>
-          <li><a href="/docs/router.html">Router</a></li>
+          <li><a href="{{BASE_URL}}/docs/cli.html">CLI</a></li>
+          <li><a href="{{BASE_URL}}/docs/router.html">Router</a></li>
           <li>
-            <a href="/docs/database_migrations.html">Database Migrations</a>
+            <a href="{{BASE_URL}}/docs/database_migrations.html"
+              >Database Migrations</a
+            >
           </li>
-          <li><a href="/docs/middleware.html">Middleware</a></li>
-          <li><a href="/docs/openapi.html">OpenAPI</a></li>
+          <li><a href="{{BASE_URL}}/docs/middleware.html">Middleware</a></li>
+          <li><a href="{{BASE_URL}}/docs/openapi.html">OpenAPI</a></li>
         </ul>
         <h5>Extras</h5>
         <ul>
-          <li><a href="/docs/faq.html">FAQ</a></li>
-          <li><a href="/docs/reference.html">Reference</a></li>
+          <li><a href="{{BASE_URL}}/docs/faq.html">FAQ</a></li>
+          <li><a href="{{BASE_URL}}/docs/reference.html">Reference</a></li>
         </ul>
       </nav>
     </aside>
@@ -72,7 +74,10 @@
         return;
       }
 
-      if (currentPath === "/docs" && linkPath === "/docs") {
+      if (
+        currentPath === "{{BASE_URL}}/docs" &&
+        linkPath === "{{BASE_URL}}/docs"
+      ) {
         link.classList.add("active");
       }
     });
