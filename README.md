@@ -43,7 +43,7 @@ Nova consists of two main components:
 
 ### Prerequisites
 
-- Go 1.23 or later
+- Go 1.24 or later
 
 ### Installation
 
@@ -120,7 +120,6 @@ Here are some common Go commands you might use for development:
 
 Documentation is available to guide you through Nova's features and usage. The docs are created and built using [ffsg](https://xlc-dev.github.io/fssg/).
 A fast static site generator written by yours truely.
-All documentation can be found in the `docs/src` folder written in Markdown.
 
 **[Read the full documentation here](https://xlc-dev.github.io/nova/docs)**
 
