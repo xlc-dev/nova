@@ -20,10 +20,10 @@ Nova's OpenAPI support automatically generates and serves an OpenAPI 3.0 specifi
 1. [Getting Started](#getting-started)
 2. [Core Concepts](#core-concepts)
    - [OpenAPIConfig](#openapiconfig)
-   - [RouteOptions & ResponseOption](#routeoptions--responseoption)
+   - [RouteOptions and ResponseOption](#routeoptions--responseoption)
    - [Schema Generation](#schema-generation)
 
-3. [Registering & Serving the Spec](#registering--serving-the-spec)
+3. [Registering and Serving the Spec](#registering--serving-the-spec)
 4. [Serving Swagger UI](#serving-swagger-ui)
 5. [Full Example](#full-example)
 
@@ -67,7 +67,7 @@ type OpenAPIConfig struct {
 }
 ```
 
-### RouteOptions & ResponseOption
+### RouteOptions and ResponseOption
 
 Attach OpenAPI metadata when registering routes:
 
@@ -106,7 +106,7 @@ Nova inspects Go types via reflection to build JSON Schemas:
 - **Maps:** `type: object` + `additionalProperties`.
 - **References:** reuses named schemas when the same struct type appears multiple times.
 
-## Registering & Serving the Spec
+## Registering and Serving the Spec
 
 ```go
 // After defining routes on your `router`:
