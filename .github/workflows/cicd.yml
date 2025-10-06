@@ -65,12 +65,10 @@ jobs:
         run: |
           go install github.com/xlc-dev/nova@latest
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          nova gendoc --output ./www/src/docs/quickstart.md
 
-      - name: Run fssg
-        run: |
-          cd ./www
-          ./fssg -q -n -j 1
-          touch ./dist/.nojekyll
+      - name: Build static site
+        run: FSSG_BASE_URL="/nova" ./www/fssg
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       rel="shortcut icon"
-      href="/static/img/favicon.png"
+      href="{{BASE_URL}}/static/img/favicon.png"
       type="image/x-icon"
     />
-    <link rel="stylesheet" href="/static/css/main.css" />
+    <link rel="stylesheet" href="{{BASE_URL}}/static/css/main.css" />
     {{IF_PAGE: index.html}}
-    <link rel="stylesheet" href="/static/css/homepage.css" />
+    <link rel="stylesheet" href="{{BASE_URL}}/static/css/homepage.css" />
     {{ELSE_PAGE}}
-    <link rel="stylesheet" href="/static/css/docs.css" />
+    <link rel="stylesheet" href="{{BASE_URL}}/static/css/docs.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-coldark-dark.min.css"
