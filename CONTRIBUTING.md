@@ -2,7 +2,7 @@
 
 First off, thank you for considering contributing to Nova! We appreciate you taking the time to help improve the project. All contributions, from bug reports to new features, are welcome.
 
-## ❓ How Can I Contribute?
+## How Can I Contribute?
 
 ### Reporting Bugs or Suggesting Enhancements
 
@@ -23,7 +23,7 @@ Massive thanks if you're willing to contribute to Nova by making a pull request!
 
 All I can say is that for big PRs, please make sure to open an issue first to discuss the changes and ensure they align with the project's goals. Otherwise that would be wasted effort if it is not a feature fitting for Nova.
 
-## 📝 Coding Style
+## Coding Style
 
 - Follow standard Go idioms and best practices.
 - Try to write and structure your code the same way as the existing codebase so we can keep the codebase consistent.
