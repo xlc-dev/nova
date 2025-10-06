@@ -65,7 +65,7 @@ jobs:
         run: |
           go install github.com/xlc-dev/nova@latest
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          nova gendoc --output ./www/src/docs/quickstart.md
+          nova gendoc --output ./www/src/docs/reference.md
 
       - name: Build static site
         run: FSSG_BASE_URL="/nova" ./www/fssg
