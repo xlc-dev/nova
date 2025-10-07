@@ -184,7 +184,7 @@ parse_markdown() {
     !in_code&&/^[[:space:]]*<[Ss][Tt][Yy][Ll][Ee]/{if(!in_style){close_para();close_blocks();close_lists_to(0)}in_style=1}
     in_script||in_style{print;if(in_script&&/<\/[Ss][Cc][Rr][Ii][Pp][Tt]>/)in_script=0;if(in_style&&/<\/[Ss][Tt][Yy][Ll][Ee]>/)in_style=0;next}
     /^[[:space:]]*```/{if(in_code){print "</code></pre>";in_code=0}else{close_para();close_blocks();close_lists_to(0);line=$0;sub(/^[[:space:]]*```[[:space:]]*/,"",line);lang=line;sub(/[[:space:]]*$/,"",lang);if(lang!="")printf "<pre><code class=\"language-"lang"\">";else printf "<pre><code>";in_code=1}next}
-    in_code{gsub(/&/,"\\&amp;",$0);gsub(/</,"\\&lt;",$0);gsub(/>/,"\\&gt;",$0);print;next}
+    in_code{gsub(/&/,"\\&amp;",$0);gsub(/</,"\\&lt;",$0);gsub(/>,"\\&gt;",$0);print;next}
     in_html_block{print;if(is_closing_html($0))in_html_block=0;next}
     is_block_html($0){close_para();close_blocks();close_lists_to(0);print;if($0!~/<\/(div|header|footer|nav|section|article|aside|main|form|table|ul|ol|dl|pre|blockquote|h[1-6]|p|hr|address|fieldset|figure)>/)in_html_block=1;next}
     /^[[:space:]]*$/{close_para();close_blocks();if(in_bq){print"</blockquote>";in_bq=0};next}
@@ -297,7 +297,7 @@ run_template_processor() {
       }
       FILENAME=="-"{ content[++content_c]=$0; next }
       {
-        line=$0; gsub(/\{\{[[:space:]]*title[[:space:]]*\}\}/, template_title_value, line)
+        line=$0; gsub(/\{\{title\}\}/, template_title_value, line)
         gsub(/\{\{[[:space:]]*BASE_URL[[:space:]]*\}\}/, BASE_URL, line)
         if(state=="INCLUDE_BLOCK"){
           if(line~/\{\{[[:space:]]*endinclude/){
@@ -493,23 +493,25 @@ process_file() {
 	rel_path="${src_file#src/}"
 	extension="${src_file##*.}"
 	out_file="dist/${rel_path%.*}.html"
+
 	mkdir -p "$(dirname "$out_file")" ||
 		{
 			log_error "Failed to create directory for $out_file"
 			return 1
 		}
+
 	base_name=$(basename "$src_file" ."$extension")
 	pretty_title=$(
 		echo "$base_name" | tr '-' ' ' |
 			$AWK_CMD '{for(i=1;i<=NF;i++)$i=toupper(substr($i,1,1))tolower(substr($i,2));}1'
 	)
-
 	raw_content=$(cat "$src_file")
 	override_title=$(
 		echo "$raw_content" 2>/dev/null |
-			$AWK_CMD '/\{\{ *[Tt]itle:/ {sub(/.*\{\{.*:/,"");sub(/\}\}.*/,"");print;exit}'
+			$AWK_CMD '/\{\{title:/ {sub(/.*\{\{.*:/,"");sub(/\}\}.*/,"");print;exit}'
 	)
 	final_title="${override_title:-$pretty_title}"
+
 	page_id="${rel_path%.*}.html"
 	template_file="src/template.html"
 	if ! [ -f "$template_file" ]; then
@@ -554,14 +556,14 @@ process_file() {
 	if [ "$extension" = "md" ] && [ "$is_pre_rendered_html" -eq 0 ]; then
 		body_html=$(
 			echo "$content_directives_processed" |
-				sed 's/{{ *[Tt]itle:[^}]*}}//g' |
+				sed 's/{{title:[^}]*}}//g' |
 				parse_markdown
 		)
 	else
 		# Otherwise, just remove the title tag and pass through.
 		body_html=$(
 			echo "$content_directives_processed" |
-				sed 's/{{ *[Tt]itle:[^}]*}}//g'
+				sed 's/{{title:[^}]*}}//g'
 		)
 	fi
 
@@ -615,7 +617,7 @@ if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
 	fi
 
 	echo "$processed_content" | minify_and_write "$out_file"
-	log_verbose "Finished:   $src_file -> $out_file"
+	log_verbose "Finished: $src_file -> $out_file"
 	return 0
 }
 
