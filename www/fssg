@@ -104,8 +104,8 @@ fatal() { log_error "$1" && exit 1; }
 case "$SCRIPT_PATH" in
 /*) SCRIPT_DIR=$(dirname "$SCRIPT_PATH") ;;
 */*) SCRIPT_DIR=$(
-  cd "$(dirname "$SCRIPT_PATH")" || exit 1
-  pwd
+	cd "$(dirname "$SCRIPT_PATH")" || exit 1
+	pwd
 ) ;;
 *) SCRIPT_DIR=$(pwd) ;;
 esac
@@ -117,43 +117,43 @@ SCRIPT_PATH="$SCRIPT_DIR/$(basename "$SCRIPT_PATH")"
 # Check for AWK program
 AWK_PROG=${FSSG_AWK%% *}
 if ! command -v "$AWK_PROG" >/dev/null 2>&1; then
-  fatal "'$AWK_PROG' not found. Please install it and try again."
+	fatal "'$AWK_PROG' not found. Please install it and try again."
 fi
 
 # Cleanup function for trap on exit
 cleanup() {
-  # Stop the server if it's running
-  if [ -n "$SERVER_PID" ]; then
-    log_verbose "Stopping server (PID: $SERVER_PID)..."
-    kill "$SERVER_PID" 2>/dev/null || true
-  fi
+	# Stop the server if it's running
+	if [ -n "$SERVER_PID" ]; then
+		log_verbose "Stopping server (PID: $SERVER_PID)..."
+		kill "$SERVER_PID" 2>/dev/null || true
+	fi
 }
 
 # Wait for background jobs to finish and capture non-zero exits
 wait_for_pids() {
-  err=0
-  if [ -z "$pids" ]; then return 0; fi
-  for pid in $pids; do
-    # wait returns 127 when the pid is not a child (already reaped / not ours).
-    # Treat 127 as non-fatal; treat other non-zero exit codes as failures.
-    wait "$pid"
-    rc=$?
-    if [ "$rc" -eq 127 ]; then
-      log_verbose "PID $pid not a child (already reaped); ignoring."
-      continue
-    fi
-    if [ "$rc" -ne 0 ]; then
-      log_verbose "PID $pid failed (exit $rc)."
-      err=1
-    fi
-  done
-  return $err
+	err=0
+	if [ -z "$pids" ]; then return 0; fi
+	for pid in $pids; do
+		# wait returns 127 when the pid is not a child (already reaped / not ours).
+		# Treat 127 as non-fatal; treat other non-zero exit codes as failures.
+		wait "$pid"
+		rc=$?
+		if [ "$rc" -eq 127 ]; then
+			log_verbose "PID $pid not a child (already reaped); ignoring."
+			continue
+		fi
+		if [ "$rc" -ne 0 ]; then
+			log_verbose "PID $pid failed (exit $rc)."
+			err=1
+		fi
+	done
+	return $err
 }
 
 # Parses Markdown to HTML using an embedded AWK script
 parse_markdown() {
-  script=$(
-    cat <<'EOF'
+	script=$(
+		cat <<'EOF'
     BEGIN{list_depth=0;in_code=0;in_table=0;in_thead=0;in_tbody=0;in_bq=0;in_para=0;in_script=0;in_style=0;in_html_block=0}
     function close_para(){if(in_para){print"</p>";in_para=0}}
     function open_list(t,i){list_depth++;list_type[list_depth]=t;list_indent[list_depth]=i;print"<"t">"}
@@ -197,20 +197,20 @@ parse_markdown() {
     {if(in_bq&&$0!~/^[[:space:]]*>/){print"</blockquote>";in_bq=0};close_lists_to(0);close_blocks();if($0~/^[[:space:]]*</){close_para();print}else if($0~/[^[:space:]]/){if(!in_para){printf"<p>%s",process_inline($0);in_para=1}else{printf" %s",process_inline($0)}}}
     END{close_blocks();close_lists_to(0);close_para();if(in_bq)print"</blockquote>";if(in_code)print"</code></pre>";printf"\n"}
 EOF
-  )
-  $AWK_CMD "$script"
+	)
+	$AWK_CMD "$script"
 }
 
 # Processes templates, conditionals, and includes
 run_template_processor() {
-  _title="$1"
-  _page="$2"
-  _ext="$3"
+	_title="$1"
+	_page="$2"
+	_ext="$3"
 
-  shift 3
+	shift 3
 
-  script=$(
-    cat <<'EOF'
+	script=$(
+		cat <<'EOF'
       BEGIN{content_c=0;cond_depth=0;print_ok[0]=1;branch_taken[0]=0;block="";inc_filename="";markdown_flag=0;state="NORMAL"}
       function ac(line,i,out,pos,rest){
         out=""; rest=line
@@ -323,17 +323,17 @@ run_template_processor() {
         pl(line)
       }
 EOF
-  )
-  $AWK_CMD -v template_title_value="$_title" \
-    -v current_page="$_page" -v current_ext="$_ext" \
-    -v INC_DIR="src/includes" -v pid="$$" -v BASE_URL="${FSSG_BASE_URL}" \
-    -v SCRIPT_PATH="$SCRIPT_PATH" "$script" "$@"
+	)
+	$AWK_CMD -v template_title_value="$_title" \
+		-v current_page="$_page" -v current_ext="$_ext" \
+		-v INC_DIR="src/includes" -v pid="$$" -v BASE_URL="${FSSG_BASE_URL}" \
+		-v SCRIPT_PATH="$SCRIPT_PATH" "$script" "$@"
 }
 
 # Hoists styles and scripts to the end of <head> and <body> respectively
 process_styles_and_scripts() {
-  script=$(
-    cat <<'EOF'
+	script=$(
+		cat <<'EOF'
     BEGIN { s=0; b=""; sc=0; tc=0 }
     /<style\b[^>]*>/ { s=1; b=$0; next }
     /<\/style>/ && s==1 { S[++sc] = b RS $0; s=0; b=""; next }
@@ -355,20 +355,20 @@ process_styles_and_scripts() {
     }
     { print }
 EOF
-  )
-  $AWK_CMD "$script"
+	)
+	$AWK_CMD "$script"
 }
 
 # Minifies and writes final HTML, preserving <pre> blocks verbatim.
 minify_and_write() {
-  out_file="$1"
-  if [ "$MINIFY" -eq 0 ]; then
-    process_styles_and_scripts >"$out_file"
-    return 0
-  fi
+	out_file="$1"
+	if [ "$MINIFY" -eq 0 ]; then
+		process_styles_and_scripts >"$out_file"
+		return 0
+	fi
 
-  script=$(
-    cat <<'EOF'
+	script=$(
+		cat <<'EOF'
     { buf = buf $0 "\n" }
     function is_ws(c){ return c~/[[:space:]]/ }
     function strip_html_comments(s, out, cs, ce){
@@ -483,108 +483,108 @@ minify_and_write() {
       printf "%s", out
     }
 EOF
-  )
-  process_styles_and_scripts | $AWK_CMD "$script" >"$out_file"
+	)
+	process_styles_and_scripts | $AWK_CMD "$script" >"$out_file"
 }
 
 # Process a single file from src/ into dist/
 process_file() {
-  src_file="$1"
-  rel_path="${src_file#src/}"
-  extension="${src_file##*.}"
-  out_file="dist/${rel_path%.*}.html"
+	src_file="$1"
+	rel_path="${src_file#src/}"
+	extension="${src_file##*.}"
+	out_file="dist/${rel_path%.*}.html"
 
-  mkdir -p "$(dirname "$out_file")" ||
-    {
-      log_error "Failed to create directory for $out_file"
-      return 1
-    }
+	mkdir -p "$(dirname "$out_file")" ||
+		{
+			log_error "Failed to create directory for $out_file"
+			return 1
+		}
 
-  base_name=$(basename "$src_file" ."$extension")
-  pretty_title=$(
-    echo "$base_name" | tr '-' ' ' |
-      $AWK_CMD '{for(i=1;i<=NF;i++)$i=toupper(substr($i,1,1))tolower(substr($i,2));}1'
-  )
-  raw_content=$(cat "$src_file")
-  override_title=$(
-    echo "$raw_content" 2>/dev/null |
-      $AWK_CMD '/\{\{title:/ {sub(/.*\{\{.*:/,"");sub(/\}\}.*/,"");print;exit}'
-  )
-  final_title="${override_title:-$pretty_title}"
+	base_name=$(basename "$src_file" ."$extension")
+	pretty_title=$(
+		echo "$base_name" | tr '-' ' ' |
+			$AWK_CMD '{for(i=1;i<=NF;i++)$i=toupper(substr($i,1,1))tolower(substr($i,2));}1'
+	)
+	raw_content=$(cat "$src_file")
+	override_title=$(
+		echo "$raw_content" 2>/dev/null |
+			$AWK_CMD '/\{\{title:/ {sub(/.*\{\{.*:/,"");sub(/\}\}.*/,"");print;exit}'
+	)
+	final_title="${override_title:-$pretty_title}"
 
-  page_id="${rel_path%.*}.html"
-  template_file="src/template.html"
-  if ! [ -f "$template_file" ]; then
-    log_verbose "No src/template.html found, processing without a layout."
-    template_file="/dev/null"
-  fi
+	page_id="${rel_path%.*}.html"
+	template_file="src/template.html"
+	if ! [ -f "$template_file" ]; then
+		log_verbose "No src/template.html found, processing without a layout."
+		template_file="/dev/null"
+	fi
 
-  # PASS 1: Process file for includes & conditionals.
-  content_with_includes=$(
-    echo "" | run_template_processor "$final_title" "$page_id" "$extension" \
-      - "$src_file"
-  )
+	# PASS 1: Process file for includes & conditionals.
+	content_with_includes=$(
+		echo "" | run_template_processor "$final_title" "$page_id" "$extension" \
+			- "$src_file"
+	)
 
-  # PASS 1b: Process any template directives that came from includes
-  # This ensures {{IF_PAGE:}} etc. from include templates are processed
-  # before markdown parsing
-  if echo "$content_with_includes" 2>/dev/null | grep -q '{{[[:space:]]*[A-Za-z_]'; then
-    log_verbose "Processing template directives from includes..."
-    tmpfile_directives=$(mktemp)
-    echo "$content_with_includes" >"$tmpfile_directives"
-    content_directives_processed=$(
-      echo "" | run_template_processor "$final_title" "$page_id" "$extension" \
-        - "$tmpfile_directives"
-    )
-    rm -f "$tmpfile_directives"
-  else
-    content_directives_processed="$content_with_includes"
-  fi
+	# PASS 1b: Process any template directives that came from includes
+	# This ensures {{IF_PAGE:}} etc. from include templates are processed
+	# before markdown parsing
+	if echo "$content_with_includes" 2>/dev/null | grep -q '{{[[:space:]]*[A-Za-z_]'; then
+		log_verbose "Processing template directives from includes..."
+		tmpfile_directives=$(mktemp)
+		echo "$content_with_includes" >"$tmpfile_directives"
+		content_directives_processed=$(
+			echo "" | run_template_processor "$final_title" "$page_id" "$extension" \
+				- "$tmpfile_directives"
+		)
+		rm -f "$tmpfile_directives"
+	else
+		content_directives_processed="$content_with_includes"
+	fi
 
-  # Check if include-block with markdown=true was used. If so, the content is
-  # already HTML and we should skip the main markdown parsing pass.
-  # We detect this by checking if the original file had the directive and the
-  # output now looks like an HTML document.
-  is_pre_rendered_html=0
-  if echo "$raw_content" 2>/dev/null | grep 'include-block:[^}]*markdown="true"' >/dev/null &&
-    echo "$content_directives_processed" 2>/dev/null | grep -i '<!DOCTYPE.*html\|<!doctype.*html\|<html>' >/dev/null; then
-    log_verbose "Detected pre-rendered HTML from include-block; skipping main markdown pass."
-    is_pre_rendered_html=1
-  fi
+	# Check if include-block with markdown=true was used. If so, the content is
+	# already HTML and we should skip the main markdown parsing pass.
+	# We detect this by checking if the original file had the directive and the
+	# output now looks like an HTML document.
+	is_pre_rendered_html=0
+	if echo "$raw_content" 2>/dev/null | grep 'include-block:[^}]*markdown="true"' >/dev/null &&
+		echo "$content_directives_processed" 2>/dev/null | grep -i '<!DOCTYPE.*html\|<!doctype.*html\|<html>' >/dev/null; then
+		log_verbose "Detected pre-rendered HTML from include-block; skipping main markdown pass."
+		is_pre_rendered_html=1
+	fi
 
-  # PASS 2: If the original file was Markdown and it wasn't pre-rendered...
-  if [ "$extension" = "md" ] && [ "$is_pre_rendered_html" -eq 0 ]; then
-    body_html=$(
-      echo "$content_directives_processed" |
-        sed 's/{{title:[^}]*}}//g' |
-        parse_markdown
-    )
-  else
-    # Otherwise, just remove the title tag and pass through.
-    body_html=$(
-      echo "$content_directives_processed" |
-        sed 's/{{title:[^}]*}}//g'
-    )
-  fi
+	# PASS 2: If the original file was Markdown and it wasn't pre-rendered...
+	if [ "$extension" = "md" ] && [ "$is_pre_rendered_html" -eq 0 ]; then
+		body_html=$(
+			echo "$content_directives_processed" |
+				sed 's/{{title:[^}]*}}//g' |
+				parse_markdown
+		)
+	else
+		# Otherwise, just remove the title tag and pass through.
+		body_html=$(
+			echo "$content_directives_processed" |
+				sed 's/{{title:[^}]*}}//g'
+		)
+	fi
 
-  # PASS 3: Inject body into main template only if it wasn't pre-rendered.
-  # Pre-rendered content already has its full layout from the include-block.
-  if [ "$is_pre_rendered_html" -eq 1 ]; then
-    processed_content="$body_html"
-  else
-    tmp_body_file="$(mktemp)"
-    printf '%s\n' "$body_html" >"$tmp_body_file"
+	# PASS 3: Inject body into main template only if it wasn't pre-rendered.
+	# Pre-rendered content already has its full layout from the include-block.
+	if [ "$is_pre_rendered_html" -eq 1 ]; then
+		processed_content="$body_html"
+	else
+		tmp_body_file="$(mktemp)"
+		printf '%s\n' "$body_html" >"$tmp_body_file"
 
-    processed_content=$(
-      cat "$tmp_body_file" | run_template_processor "$final_title" "$page_id" "$extension" \
-        - "$template_file"
-    )
+		processed_content=$(
+			cat "$tmp_body_file" | run_template_processor "$final_title" "$page_id" "$extension" \
+				- "$template_file"
+		)
 
-    rm -f "$tmp_body_file"
-  fi
+		rm -f "$tmp_body_file"
+	fi
 
-  # FINAL STEP: Minify, hoist styles/scripts, and write to disk.
-  AUTO_RELOAD_SCRIPT='<script>
+	# FINAL STEP: Minify, hoist styles/scripts, and write to disk.
+	AUTO_RELOAD_SCRIPT='<script>
 if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
  (function checkAutoReload(){
    let last;
@@ -607,204 +607,204 @@ if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
 }
 </script>'
 
-  if [ "$WATCH" -eq 1 ] || [ "$SERVE" -eq 1 ]; then
-    # inject autoreload script before </body>
-    processed_content=$(printf '%s\n' "$processed_content" |
-      $AWK_CMD -v script="$AUTO_RELOAD_SCRIPT" '
+	if [ "$WATCH" -eq 1 ] || [ "$SERVE" -eq 1 ]; then
+		# inject autoreload script before </body>
+		processed_content=$(printf '%s\n' "$processed_content" |
+			$AWK_CMD -v script="$AUTO_RELOAD_SCRIPT" '
        /<\/body>/ { print script; print; next }
        { print }
      ')
-  fi
+	fi
 
-  echo "$processed_content" | minify_and_write "$out_file"
-  log_verbose "Finished: $src_file -> $out_file"
-  return 0
+	echo "$processed_content" | minify_and_write "$out_file"
+	log_verbose "Finished: $src_file -> $out_file"
+	return 0
 }
 
 # Build the full site
 build_site() {
-  log_info "Starting build..."
+	log_info "Starting build..."
 
-  rm -rf dist
-  mkdir -p dist/static || fatal "Could not create dist/static directory."
+	rm -rf dist
+	mkdir -p dist/static || fatal "Could not create dist/static directory."
 
-  if [ -d src/static ]; then
-    log_verbose "Copying static assets..."
-    if ! cp -R src/static/. dist/static/ 2>/dev/null; then
-      log_warn "Copying static assets failed. Some files might be missing."
-    fi
-  fi
+	if [ -d src/static ]; then
+		log_verbose "Copying static assets..."
+		if ! cp -R src/static/. dist/static/ 2>/dev/null; then
+			log_warn "Copying static assets failed. Some files might be missing."
+		fi
+	fi
 
-  file_list=$(mktemp)
-  find src -type f \( -name '*.md' -o -name '*.html' \) \
-    ! -path 'src/includes/*' ! -path 'src/static/*' \
-    ! -name 'template.html' >"$file_list"
+	file_list=$(mktemp)
+	find src -type f \( -name '*.md' -o -name '*.html' \) \
+		! -path 'src/includes/*' ! -path 'src/static/*' \
+		! -name 'template.html' >"$file_list"
 
-  file_count=$(wc -l <"$file_list" | awk '{print $1}')
-  log_info "Found $file_count files to process..."
+	file_count=$(wc -l <"$file_list" | awk '{print $1}')
+	log_info "Found $file_count files to process..."
 
-  BUILD_FAILED=0
-  running=0
-  processed_count=0
-  pids=""
+	BUILD_FAILED=0
+	running=0
+	processed_count=0
+	pids=""
 
-  while IFS= read -r f; do
-    (
-      log_verbose "Processing: $f"
-      if ! process_file "$f"; then
-        log_error "Failed to process: $f"
-        exit 1
-      fi
-    ) </dev/null &
+	while IFS= read -r f; do
+		(
+			log_verbose "Processing: $f"
+			if ! process_file "$f"; then
+				log_error "Failed to process: $f"
+				exit 1
+			fi
+		) </dev/null &
 
-    pids="$pids $!"
-    running=$((running + 1))
-    processed_count=$((processed_count + 1))
+		pids="$pids $!"
+		running=$((running + 1))
+		processed_count=$((processed_count + 1))
 
-    if [ "$running" -ge "$MAX_JOBS" ]; then
-      # Wait for the first PID in the list to free up a slot
-      wait "$(echo "$pids" | cut -d' ' -f2)"
-      # Check its exit code
-      rc=$?
-      if [ "$rc" -ne 0 ]; then BUILD_FAILED=1; fi
-      # Remove it from the list
-      pids=$(echo "$pids" | cut -d' ' -f3-)
-      running=$((running - 1))
-    fi
-  done <"$file_list"
-  rm -f "$file_list"
+		if [ "$running" -ge "$MAX_JOBS" ]; then
+			# Wait for the first PID in the list to free up a slot
+			wait "$(echo "$pids" | cut -d' ' -f2)"
+			# Check its exit code
+			rc=$?
+			if [ "$rc" -ne 0 ]; then BUILD_FAILED=1; fi
+			# Remove it from the list
+			pids=$(echo "$pids" | cut -d' ' -f3-)
+			running=$((running - 1))
+		fi
+	done <"$file_list"
+	rm -f "$file_list"
 
-  # Wait for all remaining background jobs to finish
-  if ! wait_for_pids; then
-    BUILD_FAILED=1
-  fi
+	# Wait for all remaining background jobs to finish
+	if ! wait_for_pids; then
+		BUILD_FAILED=1
+	fi
 
-  if [ "$BUILD_FAILED" -eq 0 ]; then
-    # Only create the .reload file if watching or serving
-    if [ "$WATCH" -eq 1 ] || [ "$SERVE" -eq 1 ]; then
-      date +%s >dist/.reload
-    fi
-    log_info "Build successful! ($processed_count files"
-    return 0
-  else
-    log_error "Build finished with errors. Please check logs above."
-    return 1
-  fi
+	if [ "$BUILD_FAILED" -eq 0 ]; then
+		# Only create the .reload file if watching or serving
+		if [ "$WATCH" -eq 1 ] || [ "$SERVE" -eq 1 ]; then
+			date +%s >dist/.reload
+		fi
+		log_info "Build successful! ($processed_count file(s))"
+		return 0
+	else
+		log_error "Build finished with errors. Please check logs above."
+		return 1
+	fi
 }
 
 # Starts a web server
 start_server() {
-  SERVER_CMD=""
+	SERVER_CMD=""
 
-  # Allow overriding the exact server command via env var
-  if [ -n "${FSSG_SERVER_CMD:-}" ]; then
-    SERVER_CMD="$FSSG_SERVER_CMD"
-    log_verbose "Using custom server command: $SERVER_CMD"
-  fi
+	# Allow overriding the exact server command via env var
+	if [ -n "${FSSG_SERVER_CMD:-}" ]; then
+		SERVER_CMD="$FSSG_SERVER_CMD"
+		log_verbose "Using custom server command: $SERVER_CMD"
+	fi
 
-  # If no custom command, prefer a local ./mongoose binary
-  if [ -z "$SERVER_CMD" ] && [ -d "./mongoose" ]; then
-    log_verbose "Found './mongoose' directory, checking for executables..."
-    uname_s=$(uname -s 2>/dev/null || echo "")
-    case "$uname_s" in
-    Darwin*) CAND="./mongoose/mongoose_macos" ;;
-    Linux*) CAND="./mongoose/mongoose_linux" ;;
-    CYGWIN* | MINGW* | MSYS*) CAND="./mongoose/mongoose_windows.exe" ;;
-    *) CAND="./mongoose/mongoose_linux" ;;
-    esac
+	# If no custom command, prefer a local ./mongoose binary
+	if [ -z "$SERVER_CMD" ] && [ -d "./mongoose" ]; then
+		log_verbose "Found './mongoose' directory, checking for executables..."
+		uname_s=$(uname -s 2>/dev/null || echo "")
+		case "$uname_s" in
+		Darwin*) CAND="./mongoose/mongoose_macos" ;;
+		Linux*) CAND="./mongoose/mongoose_linux" ;;
+		CYGWIN* | MINGW* | MSYS*) CAND="./mongoose/mongoose_windows.exe" ;;
+		*) CAND="./mongoose/mongoose_linux" ;;
+		esac
 
-    if [ -x "$CAND" ]; then
-      log_verbose "Using platform-specific local mongoose: $CAND"
-      SERVER_CMD="$CAND -d dist/ -v 0"
-    else
-      # Fallback: find any executable file in the directory
-      for f in ./mongoose/*; do
-        if [ -x "$f" ]; then
-          log_verbose "Using fallback local mongoose: $f"
-          SERVER_CMD="$f -d dist/ -v 0"
-          break
-        fi
-      done
-    fi
-  fi
+		if [ -x "$CAND" ]; then
+			log_verbose "Using platform-specific local mongoose: $CAND"
+			SERVER_CMD="$CAND -d dist/ -v 0"
+		else
+			# Fallback: find any executable file in the directory
+			for f in ./mongoose/*; do
+				if [ -x "$f" ]; then
+					log_verbose "Using fallback local mongoose: $f"
+					SERVER_CMD="$f -d dist/ -v 0"
+					break
+				fi
+			done
+		fi
+	fi
 
-  # If still no server found, check for system-wide commands
-  if [ -z "$SERVER_CMD" ]; then
-    if command -v mongoose >/dev/null 2>&1; then
-      log_verbose "Found 'mongoose' in PATH, using it to serve."
-      SERVER_CMD="mongoose -d dist/ -v 0"
-    elif command -v python3 >/dev/null 2>&1; then
-      log_verbose "Found 'python3', using its http.server module."
-      SERVER_CMD="cd dist && python3 -m http.server $FSSG_SERVER_PORT"
-    elif command -v python >/dev/null 2>&1; then
-      log_verbose "Found 'python', using its SimpleHTTPServer module."
-      SERVER_CMD="cd dist && python -m SimpleHTTPServer $FSSG_SERVER_PORT"
-    else
-      fatal "No server found. Place mongoose in ./mongoose/, or install mongoose or python3/python system-wide."
-    fi
-  fi
+	# If still no server found, check for system-wide commands
+	if [ -z "$SERVER_CMD" ]; then
+		if command -v mongoose >/dev/null 2>&1; then
+			log_verbose "Found 'mongoose' in PATH, using it to serve."
+			SERVER_CMD="mongoose -d dist/ -v 0"
+		elif command -v python3 >/dev/null 2>&1; then
+			log_verbose "Found 'python3', using its http.server module."
+			SERVER_CMD="cd dist && python3 -m http.server $FSSG_SERVER_PORT"
+		elif command -v python >/dev/null 2>&1; then
+			log_verbose "Found 'python', using its SimpleHTTPServer module."
+			SERVER_CMD="cd dist && python -m SimpleHTTPServer $FSSG_SERVER_PORT"
+		else
+			fatal "No server found. Place mongoose in ./mongoose/, or install mongoose or python3/python system-wide."
+		fi
+	fi
 
-  log_info "Starting server..."
-  # Use sh -c to handle complex commands like 'cd ... && ...' properly
-  sh -c "$SERVER_CMD" >/dev/null 2>&1 &
-  SERVER_PID=$!
+	log_info "Starting server..."
+	# Use sh -c to handle complex commands like 'cd ... && ...' properly
+	sh -c "$SERVER_CMD" >/dev/null 2>&1 &
+	SERVER_PID=$!
 
-  # Wait briefly for the server to bind to the port and check if it's running
-  sleep 0.1
-  if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-    log_error "Server command failed to start."
-    log_error "Command was: $SERVER_CMD"
-    fatal "Failed to start development server."
-  fi
+	# Wait briefly for the server to bind to the port and check if it's running
+	sleep 0.1
+	if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+		log_error "Server command failed to start."
+		log_error "Command was: $SERVER_CMD"
+		fatal "Failed to start development server."
+	fi
 
-  log_info "Server started at http://localhost:$FSSG_SERVER_PORT (PID: $SERVER_PID)"
-  log_info "Press Ctrl+C to stop."
+	log_info "Server started at http://localhost:$FSSG_SERVER_PORT (PID: $SERVER_PID)"
+	log_info "Press Ctrl+C to stop."
 }
 
 # Opens the default web browser
 open_browser() {
-  url="http://localhost:${FSSG_SERVER_PORT}"
-  log_info "Opening browser at $url"
-  case "$(uname -s)" in
-  Darwin*) open "$url" >/dev/null 2>&1 & ;;
-  Linux*) xdg-open "$url" >/dev/null 2>&1 & ;;
-  CYGWIN* | MINGW* | MSYS*) start "$url" >/dev/null 2>&1 & ;;
-  *) log_info "Please open the URL above in your browser manually." ;;
-  esac
+	url="http://localhost:${FSSG_SERVER_PORT}"
+	log_info "Opening browser at $url"
+	case "$(uname -s)" in
+	Darwin*) open "$url" >/dev/null 2>&1 & ;;
+	Linux*) xdg-open "$url" >/dev/null 2>&1 & ;;
+	CYGWIN* | MINGW* | MSYS*) start "$url" >/dev/null 2>&1 & ;;
+	*) log_info "Please open the URL above in your browser manually." ;;
+	esac
 }
 
 # Rebuild files on change
 watch_mode() {
-  log_info "Initial build for watch mode..."
-  if ! build_site; then
-    log_warn "Initial build failed. Please fix errors before watching."
-  fi
+	log_info "Initial build for watch mode..."
+	if ! build_site; then
+		log_warn "Initial build failed. Please fix errors before watching."
+	fi
 
-  if [ "${SERVE:-0}" -eq 1 ]; then
-    start_server
-    [ "${OPEN_BROWSER:-0}" = "1" ] && open_browser
-  fi
+	if [ "${SERVE:-0}" -eq 1 ]; then
+		start_server
+		[ "${OPEN_BROWSER:-0}" = "1" ] && open_browser
+	fi
 
-  log_info "Watching src/ for changes (Press Ctrl+C to stop)..."
-  snapshot_checksum() { find src -type f -exec cksum {} \; 2>/dev/null | sort | cksum; }
-  prev_sum=$(snapshot_checksum)
+	log_info "Watching src/ for changes (Press Ctrl+C to stop)..."
+	snapshot_checksum() { find src -type f -exec cksum {} \; 2>/dev/null | sort | cksum; }
+	prev_sum=$(snapshot_checksum)
 
-  while :; do
-    sleep 0.5
-    cur_sum=$(snapshot_checksum)
-    if [ "$prev_sum" != "$cur_sum" ]; then
-      log_info "Change detected, rebuilding..."
-      if ! build_site; then
-        log_error "Build failed after change. Watch will continue."
-      fi
-      prev_sum=$cur_sum
-    fi
-  done
+	while :; do
+		sleep 0.5
+		cur_sum=$(snapshot_checksum)
+		if [ "$prev_sum" != "$cur_sum" ]; then
+			log_info "Change detected, rebuilding..."
+			if ! build_site; then
+				log_error "Build failed after change. Watch will continue."
+			fi
+			prev_sum=$cur_sum
+		fi
+	done
 }
 
 # Show help message
 display_help() {
-  cat <<EOF
+	cat <<EOF
 fssg - Fast, Simple Static Site Generator (v$VERSION).
 -----------------------------------------------------
 
@@ -841,109 +841,109 @@ EOF
 
 # Main script entrypoint
 main() {
-  # Set up traps for cleanup on exit
-  trap 'cleanup' EXIT
-  trap 'exit 130' INT TERM HUP
+	# Set up traps for cleanup on exit
+	trap 'cleanup' EXIT
+	trap 'exit 130' INT TERM HUP
 
-  # Handle internal markdown parsing call
-  if [ "${1:-}" = "--_md" ]; then
-    if [ -n "$2" ] && [ -f "$2" ]; then
-      parse_markdown <"$2"
-    else
-      parse_markdown
-    fi
-    exit 0
-  fi
+	# Handle internal markdown parsing call
+	if [ "${1:-}" = "--_md" ]; then
+		if [ -n "$2" ] && [ -f "$2" ]; then
+			parse_markdown <"$2"
+		else
+			parse_markdown
+		fi
+		exit 0
+	fi
 
-  # Parse command line arguments
-  while [ $# -gt 0 ]; do
-    case "$1" in
-    -h | --help)
-      display_help
-      exit 0
-      ;;
-    -V | --version)
-      echo "fssg version $VERSION"
-      exit 0
-      ;;
-    -q | --quiet)
-      QUIET=1
-      VERBOSE=0
-      shift
-      ;;
-    -v | --verbose)
-      VERBOSE=1
-      QUIET=0
-      shift
-      ;;
-    -n | --nocolor)
-      NO_COLOR=1
-      shift
-      ;;
-    -w | --watch)
-      WATCH=1
-      shift
-      ;;
-    -s | --serve)
-      SERVE=1
-      shift
-      ;;
-    -o | --open)
-      OPEN_BROWSER=1
-      shift
-      ;;
-    -m | --minify)
-      MINIFY=0
-      shift
-      ;;
-    -j | --jobs)
-      shift
-      case $1 in
-      *[!0-9]* | '') fatal "-j/--jobs requires a numeric argument." ;;
-      *) MAX_JOBS=$1 ;;
-      esac
-      shift
-      ;;
-    --)
-      shift
-      break
-      ;;
-    -*) fatal "Unknown option: $1. Use --help for usage info." ;;
-    *) break ;;
-    esac
-  done
+	# Parse command line arguments
+	while [ $# -gt 0 ]; do
+		case "$1" in
+		-h | --help)
+			display_help
+			exit 0
+			;;
+		-V | --version)
+			echo "fssg version $VERSION"
+			exit 0
+			;;
+		-q | --quiet)
+			QUIET=1
+			VERBOSE=0
+			shift
+			;;
+		-v | --verbose)
+			VERBOSE=1
+			QUIET=0
+			shift
+			;;
+		-n | --nocolor)
+			NO_COLOR=1
+			shift
+			;;
+		-w | --watch)
+			WATCH=1
+			shift
+			;;
+		-s | --serve)
+			SERVE=1
+			shift
+			;;
+		-o | --open)
+			OPEN_BROWSER=1
+			shift
+			;;
+		-m | --minify)
+			MINIFY=0
+			shift
+			;;
+		-j | --jobs)
+			shift
+			case $1 in
+			*[!0-9]* | '') fatal "-j/--jobs requires a numeric argument." ;;
+			*) MAX_JOBS=$1 ;;
+			esac
+			shift
+			;;
+		--)
+			shift
+			break
+			;;
+		-*) fatal "Unknown option: $1. Use --help for usage info." ;;
+		*) break ;;
+		esac
+	done
 
-  # Set color variables
-  if [ "$NO_COLOR" -eq 1 ] || ! [ -t 1 ]; then
-    GREEN="" RED="" YELLOW="" BLUE="" NC=""
-  else
-    GREEN=$(printf '\033[0;32m')
-    RED=$(printf '\033[0;31m')
-    YELLOW=$(printf '\033[0;33m')
-    BLUE=$(printf '\033[0;34m')
-    NC=$(printf '\033[0m')
-  fi
+	# Set color variables
+	if [ "$NO_COLOR" -eq 1 ] || ! [ -t 1 ]; then
+		GREEN="" RED="" YELLOW="" BLUE="" NC=""
+	else
+		GREEN=$(printf '\033[0;32m')
+		RED=$(printf '\033[0;31m')
+		YELLOW=$(printf '\033[0;33m')
+		BLUE=$(printf '\033[0;34m')
+		NC=$(printf '\033[0m')
+	fi
 
-  if ! [ -d "src" ]; then
-    fatal "Source directory 'src' not found. Please create it and add content."
-  fi
+	if ! [ -d "src" ]; then
+		fatal "Source directory 'src' not found. Please create it and add content."
+	fi
 
-  if [ "$WATCH" -eq 1 ]; then
-    watch_mode
-  else
-    build_site
-    build_status=$?
-    if [ "$SERVE" -eq 1 ]; then
-      if [ $build_status -ne 0 ]; then
-        log_warn "Build failed. Server will not be started."
-      else
-        start_server
-        [ "$OPEN_BROWSER" -eq 1 ] && open_browser
-        wait "$SERVER_PID"
-      fi
-    fi
-    exit $build_status
-  fi
+	if [ "$WATCH" -eq 1 ]; then
+		watch_mode
+	else
+		build_site
+		build_status=$?
+		if [ "$SERVE" -eq 1 ]; then
+			if [ $build_status -ne 0 ]; then
+				log_warn "Build failed. Server will not be started."
+			else
+				start_server
+				[ "$OPEN_BROWSER" -eq 1 ] && open_browser
+				wait "$SERVER_PID"
+			fi
+		fi
+		exit $build_status
+	fi
 }
 
 main "$@"
