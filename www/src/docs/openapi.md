@@ -20,10 +20,10 @@ Nova's OpenAPI support automatically generates and serves an OpenAPI 3.0 specifi
 1. [Getting Started](#getting-started)
 2. [Core Concepts](#core-concepts)
    - [OpenAPIConfig](#openapiconfig)
-   - [RouteOptions and ResponseOption](#routeoptions--responseoption)
+   - [RouteOptions and ResponseOption](#routeoptions-and-responseoption)
    - [Schema Generation](#schema-generation)
 
-3. [Registering and Serving the Spec](#registering--serving-the-spec)
+3. [Registering and Serving the Spec](#registering-and-serving-the-spec)
 4. [Serving Swagger UI](#serving-swagger-ui)
 5. [Full Example](#full-example)
 
