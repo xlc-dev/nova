@@ -74,7 +74,7 @@
 # -----------------------------------------------------------------------------
 
 # Global Configuration
-VERSION="1.3.1"
+VERSION="1.3.2"
 QUIET=0
 VERBOSE=0
 MAX_JOBS=100
@@ -184,7 +184,7 @@ parse_markdown() {
     !in_code&&/^[[:space:]]*<[Ss][Tt][Yy][Ll][Ee]/{if(!in_style){close_para();close_blocks();close_lists_to(0)}in_style=1}
     in_script||in_style{print;if(in_script&&/<\/[Ss][Cc][Rr][Ii][Pp][Tt]>/)in_script=0;if(in_style&&/<\/[Ss][Tt][Yy][Ll][Ee]>/)in_style=0;next}
     /^[[:space:]]*```/{if(in_code){print "</code></pre>";in_code=0}else{close_para();close_blocks();close_lists_to(0);line=$0;sub(/^[[:space:]]*```[[:space:]]*/,"",line);lang=line;sub(/[[:space:]]*$/,"",lang);if(lang!="")printf "<pre><code class=\"language-"lang"\">";else printf "<pre><code>";in_code=1}next}
-    in_code{gsub(/&/,"\\&amp;",$0);gsub(/</,"\\&lt;",$0);gsub(/>,"\\&gt;",$0);print;next}
+    in_code{gsub(/&/,"\\&amp;",$0);gsub(/</,"\\&lt;",$0);gsub(/>/,"\\&gt;",$0);print;next}
     in_html_block{print;if(is_closing_html($0))in_html_block=0;next}
     is_block_html($0){close_para();close_blocks();close_lists_to(0);print;if($0!~/<\/(div|header|footer|nav|section|article|aside|main|form|table|ul|ol|dl|pre|blockquote|h[1-6]|p|hr|address|fieldset|figure)>/)in_html_block=1;next}
     /^[[:space:]]*$/{close_para();close_blocks();if(in_bq){print"</blockquote>";in_bq=0};next}
@@ -198,7 +198,10 @@ parse_markdown() {
     END{close_blocks();close_lists_to(0);close_para();if(in_bq)print"</blockquote>";if(in_code)print"</code></pre>";printf"\n"}
 EOF
   )
-  $AWK_CMD "$script"
+  tmpawk=$(mktemp)
+  printf '%s\n' "$script" >"$tmpawk"
+  $AWK_CMD -f "$tmpawk"
+  rm -f "$tmpawk"
 }
 
 # Processes templates, conditionals, and includes
@@ -211,7 +214,12 @@ run_template_processor() {
 
   script=$(
     cat <<'EOF'
-      BEGIN{content_c=0;cond_depth=0;print_ok[0]=1;branch_taken[0]=0;block="";inc_filename="";markdown_flag=0;state="NORMAL"}
+      BEGIN{
+        content_c=0;cond_depth=0;print_ok[0]=1;branch_taken[0]=0;
+        block="";inc_filename="";markdown_flag=0;state="NORMAL";
+        found_title_override=0;
+      }
+
       function ac(line,i,out,pos,rest){
         out=""; rest=line
         while((pos=index(rest,"{{content}}"))>0){
@@ -227,8 +235,10 @@ run_template_processor() {
         }
         print out rest
       }
+
       function trim(s){gsub(/^[[:space:]]+|[[:space:]]+$/,"",s); return s}
       function cn(t){gsub(/\n|[[:space:]]+/," ",t); return trim(t)}
+
       function pc(tag,tn,type,target,current_val,is_met,can_take){
         tn=cn(tag)
         if(tn~/^\{\{[[:space:]]*IF_(EXT|PAGE):/){
@@ -250,6 +260,7 @@ run_template_processor() {
         } else if(tn~/^\{\{[[:space:]]*ENDIF_(EXT|PAGE)/){ cond_depth--; return 1 }
         return 0
       }
+
       function it(s){gsub(/^[[:space:]]+|[[:space:]]+$/,"",s); return s}
       function lt(fp,arr,n,line){n=0; while((getline line<fp)>0) arr[++n]=line; close(fp); return n}
       function rd(arr,n,params,block,i,key,line,rest,p,out){
@@ -260,6 +271,7 @@ run_template_processor() {
           print out rest
         }
       }
+
       function pt(full,s,ps,key,val,eq,vs,qc,off){
         s=it(full); gsub(/\n/," ",s); sub(/^.*include-block[[:space:]]*:/,"",s); sub(/\}\}.*/,"",s); s=it(s)
         if(match(s,/^[^[:space:]]+/)){ inc_filename=substr(s,RSTART,RLENGTH); ps=it(substr(s,RSTART+RLENGTH)) } else { inc_filename=""; ps="" }
@@ -275,12 +287,13 @@ run_template_processor() {
           params[key]=val; if(key=="markdown" && (val=="true" || val=="1")) markdown_flag=1
         }
       }
+
       function pl(line,rest,match_pos,before,directive,norm,f,fname,p,il){
         rest=line
         while(rest!=""){
           match_pos=match(rest,/\{\{[[:space:]]*(IF_|ELIF_|ELSE_|ENDIF_|include-block:|include:)/)
           if(match_pos==0){ if(print_ok[cond_depth]) ac(rest); return }
-          before=substr(rest,1,match_pos-1); if(before!"" && print_ok[cond_depth]) ac(before)
+          before=substr(rest,1,match_pos-1); if(before!="" && print_ok[cond_depth]) ac(before)
           directive=substr(rest,match_pos); if(!match(directive,/\}\}/)){ if(print_ok[cond_depth]) ac(directive); return }
           directive=substr(directive,1,RSTART+RLENGTH-1); norm=directive; gsub(/\n|[[:space:]]+/," ",norm)
           if(pc(norm)){}
@@ -295,10 +308,26 @@ run_template_processor() {
           rest=substr(rest,match_pos+length(directive))
         }
       }
+
       FILENAME=="-"{ content[++content_c]=$0; next }
+
       {
-        line=$0; gsub(/\{\{title\}\}/, template_title_value, line)
+        line=$0
+
+        if (match(line,/^\{\{[[:space:]]*title[[:space:]]*:/)) {
+          sub(/^\{\{[[:space:]]*title[[:space:]]*:[[:space:]]*/,"",line)
+          sub(/\}\}[[:space:]]*$/,"",line)
+          template_title_value=trim(line)
+          found_title_override=1
+          next
+        }
+
+        if (match(line,/\{\{[[:space:]]*title[[:space:]]*\}\}/)) {
+          sub(/\{\{[[:space:]]*title[[:space:]]*\}\}/,template_title_value,line)
+        }
+
         gsub(/\{\{[[:space:]]*BASE_URL[[:space:]]*\}\}/, BASE_URL, line)
+
         if(state=="INCLUDE_BLOCK"){
           if(line~/\{\{[[:space:]]*endinclude/){
             p=INC_DIR"/"inc_filename
@@ -319,11 +348,13 @@ run_template_processor() {
           } else { block = block (block ? "\n" : "") line }
           next
         }
+
         if(line~/^[[:space:]]*$/){ if(print_ok[cond_depth]) print line; next }
         pl(line)
       }
 EOF
   )
+
   $AWK_CMD -v template_title_value="$_title" \
     -v current_page="$_page" -v current_ext="$_ext" \
     -v INC_DIR="src/includes" -v pid="$$" -v BASE_URL="${FSSG_BASE_URL}" \
@@ -495,95 +526,78 @@ process_file() {
   out_file="dist/${rel_path%.*}.html"
 
   mkdir -p "$(dirname "$out_file")" ||
-    {
-      log_error "Failed to create directory for $out_file"
-      return 1
-    }
+    { log_error "Failed to create directory for $out_file"; return 1; }
 
   base_name=$(basename "$src_file" ."$extension")
   pretty_title=$(
     echo "$base_name" | tr '-' ' ' |
       $AWK_CMD '{for(i=1;i<=NF;i++)$i=toupper(substr($i,1,1))tolower(substr($i,2));}1'
   )
+
   raw_content=$(cat "$src_file")
+
   override_title=$(
-    echo "$raw_content" 2>/dev/null |
-      $AWK_CMD '/\{\{title:/ {sub(/.*\{\{.*:/,"");sub(/\}\}.*/,"");print;exit}'
+    echo "$raw_content" | $AWK_CMD '
+      /^[[:space:]]*\{\{[[:space:]]*title[[:space:]]*:/ {
+        gsub(/^[[:space:]]*\{\{[[:space:]]*title[[:space:]]*:[[:space:]]*/,"")
+        gsub(/\}\}[[:space:]]*$/,"")
+        print; exit
+      }'
   )
+
+  filtered_content=$(
+    echo "$raw_content" | $AWK_CMD '!/^[[:space:]]*\{\{[[:space:]]*title[[:space:]]*:/'
+  )
+
   final_title="${override_title:-$pretty_title}"
 
   page_id="${rel_path%.*}.html"
   template_file="src/template.html"
-  if ! [ -f "$template_file" ]; then
-    log_verbose "No src/template.html found, processing without a layout."
-    template_file="/dev/null"
-  fi
+  [ -f "$template_file" ] || template_file="/dev/null"
 
-  # PASS 1: Process file for includes & conditionals.
+  tmp_filtered=$(mktemp)
+  printf '%s\n' "$filtered_content" >"$tmp_filtered"
+
   content_with_includes=$(
-    echo "" | run_template_processor "$final_title" "$page_id" "$extension" \
-      - "$src_file"
+    run_template_processor "$final_title" "$page_id" "$extension" - "$tmp_filtered"
   )
+  rm -f "$tmp_filtered"
 
-  # PASS 1b: Process any template directives that came from includes
-  # This ensures {{IF_PAGE:}} etc. from include templates are processed
-  # before markdown parsing
-  if echo "$content_with_includes" 2>/dev/null | grep -q '{{[[:space:]]*[A-Za-z_]'; then
-    log_verbose "Processing template directives from includes..."
+  if echo "$content_with_includes" | grep -q '{{[[:space:]]*[A-Za-z_]'; then
     tmpfile_directives=$(mktemp)
-    echo "$content_with_includes" >"$tmpfile_directives"
+    printf '%s\n' "$content_with_includes" >"$tmpfile_directives"
     content_directives_processed=$(
-      echo "" | run_template_processor "$final_title" "$page_id" "$extension" \
-        - "$tmpfile_directives"
+      run_template_processor "$final_title" "$page_id" "$extension" - "$tmpfile_directives"
     )
     rm -f "$tmpfile_directives"
   else
     content_directives_processed="$content_with_includes"
   fi
 
-  # Check if include-block with markdown=true was used. If so, the content is
-  # already HTML and we should skip the main markdown parsing pass.
-  # We detect this by checking if the original file had the directive and the
-  # output now looks like an HTML document.
   is_pre_rendered_html=0
-  if echo "$raw_content" 2>/dev/null | grep 'include-block:[^}]*markdown="true"' >/dev/null &&
-    echo "$content_directives_processed" 2>/dev/null | grep -i '<!DOCTYPE.*html\|<!doctype.*html\|<html>' >/dev/null; then
-    log_verbose "Detected pre-rendered HTML from include-block; skipping main markdown pass."
+  if echo "$raw_content" | grep 'include-block:[^}]*markdown="true"' >/dev/null &&
+     echo "$content_directives_processed" | grep -i '<!DOCTYPE.*html\|<html>' >/dev/null
+  then
     is_pre_rendered_html=1
   fi
 
-  # PASS 2: If the original file was Markdown and it wasn't pre-rendered...
   if [ "$extension" = "md" ] && [ "$is_pre_rendered_html" -eq 0 ]; then
-    body_html=$(
-      echo "$content_directives_processed" |
-        sed 's/{{title:[^}]*}}//g' |
-        parse_markdown
-    )
+    body_html=$(echo "$content_directives_processed" | parse_markdown)
   else
-    # Otherwise, just remove the title tag and pass through.
-    body_html=$(
-      echo "$content_directives_processed" |
-        sed 's/{{title:[^}]*}}//g'
-    )
+    body_html="$content_directives_processed"
   fi
 
-  # PASS 3: Inject body into main template only if it wasn't pre-rendered.
-  # Pre-rendered content already has its full layout from the include-block.
   if [ "$is_pre_rendered_html" -eq 1 ]; then
     processed_content="$body_html"
   else
-    tmp_body_file="$(mktemp)"
+    tmp_body_file=$(mktemp)
     printf '%s\n' "$body_html" >"$tmp_body_file"
-
     processed_content=$(
-      cat "$tmp_body_file" | run_template_processor "$final_title" "$page_id" "$extension" \
-        - "$template_file"
+      run_template_processor "$final_title" "$page_id" "$extension" - "$template_file" <"$tmp_body_file"
     )
-
     rm -f "$tmp_body_file"
   fi
 
-  # FINAL STEP: Minify, hoist styles/scripts, and write to disk.
   AUTO_RELOAD_SCRIPT='<script>
 if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
  (function checkAutoReload(){
@@ -592,14 +606,9 @@ if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
      try{
        const res=await fetch("/.reload",{cache:"no-store"});
        const text=await res.text();
-       if(last && last!==text.trim()){
-         console.log("[autoreload] change detected => reload");
-         location.reload();
-       }
+       if(last&&last!==text.trim()){location.reload();}
        last=text.trim();
-     }catch(e){
-       console.warn("[autoreload] error",e);
-     }
+     }catch(e){}
      setTimeout(poll,2000);
    }
    poll();
@@ -608,7 +617,6 @@ if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
 </script>'
 
   if [ "$WATCH" -eq 1 ] || [ "$SERVE" -eq 1 ]; then
-    # inject autoreload script before </body>
     processed_content=$(printf '%s\n' "$processed_content" |
       $AWK_CMD -v script="$AUTO_RELOAD_SCRIPT" '
        /<\/body>/ { print script; print; next }
