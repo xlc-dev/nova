@@ -624,10 +624,7 @@ if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
      ')
   fi
 
-  tmp_content=$(mktemp)
-  printf '%s\n' "$processed_content" >"$tmp_content"
-  minify_and_write "$out_file" <"$tmp_content"
-  rm -f "$tmp_content"
+  echo "$processed_content" | minify_and_write "$out_file"
   log_verbose "Finished: $src_file -> $out_file"
   return 0
 }
@@ -666,7 +663,7 @@ build_site() {
         log_error "Failed to process: $f"
         exit 1
       fi
-    ) </dev/null &
+    ) </dev/null 2>/dev/null &
 
     pids="$pids $!"
     running=$((running + 1))
