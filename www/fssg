@@ -624,7 +624,10 @@ if (location.hostname==="localhost"||location.hostname==="127.0.0.1"){
      ')
   fi
 
-  echo "$processed_content" | minify_and_write "$out_file"
+  tmp_content=$(mktemp)
+  printf '%s\n' "$processed_content" >"$tmp_content"
+  minify_and_write "$out_file" <"$tmp_content"
+  rm -f "$tmp_content"
   log_verbose "Finished: $src_file -> $out_file"
   return 0
 }
