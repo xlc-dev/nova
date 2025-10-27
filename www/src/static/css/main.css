@@ -32,7 +32,7 @@ html {
   font-family: "Inter";
   src:
     url("/static/fonts/Inter-Regular.woff2") format("woff2"),
-    url("/nova/static/fonts/Inter-Regular.woff") format("woff2");
+    url("/nova/static/fonts/Inter-Regular.woff2") format("woff2");
 }
 
 body {
