@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/lib/pq v1.12.1
+	github.com/lib/pq v1.12.2
 	modernc.org/sqlite v1.48.0
 )
 
