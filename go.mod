@@ -6,7 +6,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/lib/pq v1.12.3
-	modernc.org/sqlite v1.48.1
+	modernc.org/sqlite v1.48.2
 )
 
 require (
