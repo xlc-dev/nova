@@ -3,7 +3,7 @@ module github.com/xlc-dev/nova
 go 1.25.0
 
 require (
-	github.com/fsnotify/fsnotify v1.10.0
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/lib/pq v1.12.3
 	modernc.org/sqlite v1.50.0
