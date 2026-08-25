@@ -22,6 +22,9 @@
 
 ---
 
+> [!WARNING]
+> Nova is not ready for serious use. This project is currently on the back burner, and development may not resume.
+
 Nova is a Go framework designed to help you build robust and scalable web applications with ease. It leverages the power of Go's standard library while providing convenient tools and abstractions to accelerate your development workflow.
 
 Nova consists of two main components:
